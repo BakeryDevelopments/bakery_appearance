@@ -1,0 +1,3 @@
+---@class NuiMessage
+---@field action string
+---@field data? any
