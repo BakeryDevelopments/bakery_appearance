@@ -114,29 +114,29 @@ export const AppearanceNav: FC = () => {
       if (tabs.length < 8) {
         target = limitRef[tabs.length - 1];
       }
-      
+
       // Animate from 0 to target
       let current = 0;
       const duration = 1000;
       const startTime = Date.now();
-      
+
       const animate = () => {
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        
+
         // Cubic in-out easing
         const eased = progress < 0.5
           ? 4 * progress * progress * progress
           : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-        
+
         current = eased * target;
         setLimit(current);
-        
+
         if (progress < 1) {
           requestAnimationFrame(animate);
         }
       };
-      
+
       requestAnimationFrame(animate);
     }, 250);
 
@@ -147,7 +147,7 @@ export const AppearanceNav: FC = () => {
   useEffect(() => {
     const loadIcons = async () => {
       const components: { [key: string]: FC<any> } = {};
-      
+
       for (const tab of tabs) {
         try {
           const iconModule = await import(`./icons/${tab.icon}.tsx`);
@@ -156,7 +156,7 @@ export const AppearanceNav: FC = () => {
           console.warn(`Failed to load icon: ${tab.icon}`, error);
         }
       }
-      
+
       setIconComponents(components);
     };
 
@@ -179,16 +179,16 @@ export const AppearanceNav: FC = () => {
 
   const handleToggleClick = (item: ToggleItem) => {
     if (!appearance) return;
-    
+
     const data = appearance[item.type][item.id as keyof (TDrawables | TProps)];
     let hookData: any[] = [];
-    
+
     if (item.hook?.drawables) {
       for (const d of item.hook.drawables) {
         hookData.push(appearance.drawables[d.id as keyof TDrawables]);
       }
     }
-    
+
     if (data) {
       const currentToggle = toggles[item.id as keyof typeof toggles];
       toggleItem(item.id, !currentToggle, data, item.hook, hookData);
@@ -269,11 +269,6 @@ export const AppearanceNav: FC = () => {
                   placeItems: 'center',
                   transition: 'transform 0.15s ease-in-out',
                 }}
-                sx={{
-                  '&:hover': {
-                    transform: 'scale(1.05)',
-                  },
-                }}
               >
                 <Hexagon active={selected} />
                 <Box
@@ -321,7 +316,7 @@ export const AppearanceNav: FC = () => {
               placeItems: 'center',
               overflow: 'visible',
               position: 'absolute',
-              transform: 'translate(110%, -90%)',
+              transform: 'translate(120%, -95%)',
               animation: 'scaleIn 0.75s ease-out 1.25s backwards',
               background: 'transparent',
               border: 'none',
@@ -335,21 +330,23 @@ export const AppearanceNav: FC = () => {
                 placeItems: 'center',
                 transition: 'transform 0.15s ease-in-out',
               }}
-              sx={{
-                '&:hover': {
-                  transform: 'scale(1.05)',
-                },
-              }}
             >
-              <Hexagon active={false} variant="error" strokeWidth="1vh" />
+              <Hexagon active={true} variant="error" strokeWidth="1vh" />
               <Box
                 style={{
-                  width: '2vh',
+                  width: '3vh',
                   height: '100%',
                   position: 'absolute',
                   display: 'grid',
                   placeItems: 'center',
                   color: 'white',
+                  transition: 'transform 0.15s ease-in-out'
+                }}
+                sx={{
+                  '&:hover': {
+                    transform: 'scale(1.25)',
+                    transition: 'transform 0.15s ease-in-out'
+                  },
                 }}
               >
                 <IconCancel />
@@ -381,13 +378,8 @@ export const AppearanceNav: FC = () => {
               placeItems: 'center',
               transition: 'transform 0.15s ease-in-out',
             }}
-            sx={{
-              '&:hover': {
-                transform: 'scale(1.05)',
-              },
-            }}
           >
-            <Hexagon active={false} variant="success" />
+            <Hexagon active={true} variant="success" />
             <Box
               style={{
                 width: '8vh',
@@ -396,6 +388,13 @@ export const AppearanceNav: FC = () => {
                 display: 'grid',
                 placeItems: 'center',
                 color: 'white',
+                transition: 'transform 0.15s ease-in-out'
+              }}
+              sx={{
+                '&:hover': {
+                  transform: 'scale(1.5) ',
+                  transition: 'transform 0.15s ease-in-out'
+                },
               }}
             >
               {allValid ? <IconSave /> : <IconLock />}
@@ -408,7 +407,7 @@ export const AppearanceNav: FC = () => {
           unstyled
           onClick={() => setShowToggles(!showToggles)}
           style={{
-            height: '5vh',
+            height: '5.5vh',
             width: '5vh',
             position: 'absolute',
             display: 'grid',
@@ -430,11 +429,6 @@ export const AppearanceNav: FC = () => {
               transformOrigin: 'center',
               transition: 'transform 0.15s ease-in-out',
             }}
-            sx={{
-              '&:hover': {
-                transform: 'scale(1.05)',
-              },
-            }}
           >
             <Hexagon active={showToggles} strokeWidth="1vh" />
             <Box
@@ -446,6 +440,13 @@ export const AppearanceNav: FC = () => {
                 placeItems: 'center',
                 fill: 'white',
                 color: 'white',
+                transition: 'transform 0.15s ease-in-out'
+              }}
+              sx={{
+                '&:hover': {
+                  transform: 'scale(1.25)',
+                  transition: 'transform 0.15s ease-in-out'
+                },
               }}
             >
               <IconToggle />
@@ -575,9 +576,8 @@ export const AppearanceNav: FC = () => {
               }}
             >
               {allValid || modal === 'close'
-                ? `${locale.CLOSE_SUBTITLE} ${
-                    modal === 'close' ? locale.CLOSELOSE_SUBTITLE : locale.SAVEAPPLY_SUBTITLE
-                  } ${locale.CLOSE2_SUBTITLE}`
+                ? `${locale.CLOSE_SUBTITLE} ${modal === 'close' ? locale.CLOSELOSE_SUBTITLE : locale.SAVEAPPLY_SUBTITLE
+                } ${locale.CLOSE2_SUBTITLE}`
                 : locale.CANT_SAVE}
             </Text>
           </Box>

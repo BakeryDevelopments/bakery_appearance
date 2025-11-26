@@ -4,7 +4,7 @@ interface IconProps {
   size?: number;
 }
 
-export const IconSave: FC<IconProps> = ({ size = 24 }) => {
+export const IconSave: FC<IconProps> = ({ size = 42 }) => {
   return (
     <svg
       width={size}

@@ -1,8 +1,8 @@
-// import { FC, useState, useEffect } from 'react';
-// import { Box, TextInput, Button, Stack, Text, Grid, NumberInput } from '@mantine/core';
-// import { Divider } from '../micro/Divider';
-// import { useAppearanceStore } from '../../Providers/AppearanceStoreProvider';
-// import type { THeadBlend } from '../../types/appearance';
+import { FC, useState, useEffect } from 'react';
+import { Box, TextInput, Button, Stack, Text, Grid, NumberInput } from '@mantine/core';
+import { Divider } from '../micro/Divider';
+import { useAppearanceStore } from '../../Providers/AppearanceStoreProvider';
+import type { TValue, THeadOverlay } from '../../types/appearance';
 
 
 // export const FaceMenu: FC = () => {

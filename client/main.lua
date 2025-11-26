@@ -69,7 +69,8 @@ function GetPlayerAppearance()
   -- Dummy function to simulate getting player appearance
   return {
     model = GetEntityModel(cache.ped),
-    components = {},
+    headBlend = GetPedHeritageData(cache.ped),
+    components = GetPedComponents(cache.ped),
     props = {},
     tattoos = {}
   }

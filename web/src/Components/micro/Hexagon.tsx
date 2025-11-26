@@ -49,7 +49,7 @@ export const Hexagon: FC<HexagonProps> = ({
       }}
     >
       <polygon
-        points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5"
+        points="25,5 75,5 95,50 75,95 25,95 5,50"
         fill={getFillColor()}
         stroke={getStrokeColor()}
         strokeWidth={strokeWidth}
@@ -58,5 +58,6 @@ export const Hexagon: FC<HexagonProps> = ({
         }}
       />
     </svg>
+    
   );
 };
