@@ -165,9 +165,6 @@ export const AppearanceNav: FC = () => {
     }
   }, [tabs]);
 
-  const innerSize = 7.5; // 120vh converted to rem (120/16)
-  const innerRadius = innerSize / 2;
-
   const pieAngle = useMemo(() => {
     const tabCount = tabs.length < 8 ? 8 : tabs.length > 8 ? 8 : tabs.length;
     return limit / tabCount;
@@ -214,7 +211,7 @@ export const AppearanceNav: FC = () => {
       <Box
         component="nav"
         style={{
-          position: 'relative',
+          position: 'absolute',
           zIndex: 9999,
           width: 'fit-content',
           height: 'fit-content',
@@ -223,14 +220,16 @@ export const AppearanceNav: FC = () => {
       >
         {tabs.map((tab, index) => {
           const selected = selectedTab?.id === tab.id;
-          const [x, y] = pointIcon(
-            centerX,
-            centerX,
-            innerRadius,
-            pieAngle * (index + 1) - pieAngle / 2,
-            limit
-          );
+            const [x, y] = pointIcon(
+              (window.innerWidth / 2) * (100 / window.innerHeight),  // convert center to vh units
+              35,  // vertical center (adjusted)
+              60,  // radius for the circle
+              pieAngle * (tabs.length - index) - pieAngle / 2,
+              limit
+            );
           const IconComponent = iconComponents[tab.icon];
+
+          console.log(tab.icon)
 
           return (
             <Button

@@ -20,14 +20,11 @@ export const useDebugDataReceiver = () => {
   } = useAppearanceStore();
 
   HandleNuiMessage<TMenuData>('data', (data) => {
-    console.log('[Debug] Received data via HandleNuiMessage:', data);
 
     // Parse locale if it's a string
     const locale = typeof data.locale === 'string' 
       ? JSON.parse(data.locale) 
       : data.locale;
-
-    console.log('[Debug] Parsed locale:', locale);
 
     // Set all the data
     setLocale(locale);
@@ -46,12 +43,10 @@ export const useDebugDataReceiver = () => {
       src: tabId,
     }));
 
-    console.log('[Debug] Created tabs:', tabs);
     setTabs(tabs);
     
     // Set first tab as selected
     if (tabs.length > 0) {
-      console.log('[Debug] Setting selected tab:', tabs[0]);
       setSelectedTab(tabs[0]);
     }
   });

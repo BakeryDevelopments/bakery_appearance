@@ -13,9 +13,6 @@ export const AppearanceMenu: FC = () => {
   const [IconComponent, setIconComponent] = useState<ComponentType | null>(null);
   const [MenuComponent, setMenuComponent] = useState<ComponentType | null>(null);
 
-  console.log('[AppearanceMenu] selectedTab:', selectedTab);
-  console.log('[AppearanceMenu] locale:', locale);
-
   // Show content after initial delay
   useEffect(() => {
     const timer = setTimeout(() => {

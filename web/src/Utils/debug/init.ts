@@ -26,13 +26,13 @@ const InitDebug: DebugAction[] = [
         action: () => {
             let tabs = [
                 'heritage',
+                'face',
                 'hair',
                 'clothes',
                 'accessories',
-                'face',
                 'makeup',
-                'outfits',
                 'tattoos',
+                'outfits',
             ];
 
             DebugEventSend<TMenuData>(Receive.data, {
@@ -63,5 +63,4 @@ export function InitialiseDebugSenders(): void {
 // Initialize debug receivers (event listeners, etc.)
 export const InitialiseDebugReceivers = () => {
   // TODO: Implement debug receiver initialization
-  console.log('Debug receivers initialized');
 };
