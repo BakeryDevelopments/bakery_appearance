@@ -175,7 +175,7 @@ export const Heritage: FC = () => {
     const [isModelBoxHovered, setIsModelBoxHovered] = useState(false);
 
     return (
-        <Stack spacing="lg" style={{ padding: '0.25rem 0.75rem' }}>
+        <Stack spacing="lg" style={{ padding: '0.25rem 0.75rem', width:'18rem', maxWidth:'400px' }}>
             {/* Model Selection */}
             <Box>
                 <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale.MODEL_TITLE || 'Model'}</Text>

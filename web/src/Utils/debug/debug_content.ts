@@ -259,7 +259,7 @@ export const debugAppearance: TAppearance = {
             colourType: 0,
             secondColor: 0,
             id: 'Ageing',
-            overlayValue: 255,
+            overlayValue: 0,
         },
         BodyBlemishes: {
             index: 11,
@@ -268,7 +268,7 @@ export const debugAppearance: TAppearance = {
             colourType: 0,
             secondColor: 0,
             id: 'BodyBlemishes',
-            overlayValue: 255,
+            overlayValue: 0,
         },
         Blush: {
             index: 5,
@@ -277,7 +277,7 @@ export const debugAppearance: TAppearance = {
             colourType: 2,
             secondColor: 0,
             id: 'Blush',
-            overlayValue: 255,
+            overlayValue: 0,
         },
         Eyebrows: {
             index: 2,
@@ -286,7 +286,7 @@ export const debugAppearance: TAppearance = {
             colourType: 1,
             secondColor: 0,
             id: 'Eyebrows',
-            overlayValue: 255,
+            overlayValue: 0,
         },
         EyeColor: {
             index: 13,
@@ -300,7 +300,7 @@ export const debugAppearance: TAppearance = {
             colourType: 1,
             secondColor: 0,
             id: 'ChestHair',
-            overlayValue: 255,
+            overlayValue: 0,
         },
         AddBodyBlemishes: {
             index: 12,
@@ -309,7 +309,7 @@ export const debugAppearance: TAppearance = {
             colourType: 0,
             secondColor: 0,
             id: 'AddBodyBlemishes',
-            overlayValue: 255,
+            overlayValue: 0,
         },
         MolesFreckles: {
             index: 9,
@@ -318,7 +318,7 @@ export const debugAppearance: TAppearance = {
             colourType: 0,
             secondColor: 0,
             id: 'MolesFreckles',
-            overlayValue: 255,
+            overlayValue: 0,
         },
         Lipstick: {
             index: 8,
@@ -327,7 +327,7 @@ export const debugAppearance: TAppearance = {
             colourType: 2,
             secondColor: 0,
             id: 'Lipstick',
-            overlayValue: 255,
+            overlayValue: 0,
         },
         FacialHair: {
             index: 1,
@@ -336,7 +336,7 @@ export const debugAppearance: TAppearance = {
             colourType: 1,
             secondColor: 0,
             id: 'FacialHair',
-            overlayValue: 255,
+            overlayValue: 0,
         },
         SunDamage: {
             index: 7,
@@ -345,7 +345,7 @@ export const debugAppearance: TAppearance = {
             colourType: 0,
             secondColor: 0,
             id: 'SunDamage',
-            overlayValue: 255,
+            overlayValue: 0,
         },
         Complexion: {
             index: 6,
@@ -354,7 +354,7 @@ export const debugAppearance: TAppearance = {
             colourType: 0,
             secondColor: 0,
             id: 'Complexion',
-            overlayValue: 255,
+            overlayValue: 0,
         },
         Makeup: {
             index: 4,
@@ -363,7 +363,7 @@ export const debugAppearance: TAppearance = {
             colourType: 2,
             secondColor: 0,
             id: 'Makeup',
-            overlayValue: 255,
+            overlayValue: 0,
         },
         Blemishes: {
             index: 0,
@@ -372,7 +372,7 @@ export const debugAppearance: TAppearance = {
             colourType: 0,
             secondColor: 0,
             id: 'Blemishes',
-            overlayValue: 255,
+            overlayValue: 0,
         },
     },
     hairColor: {
@@ -599,7 +599,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 0,
                     secondColor: 0,
                     id: 'Ageing',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 BodyBlemishes: {
                     index: 11,
@@ -608,7 +608,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 0,
                     secondColor: 0,
                     id: 'BodyBlemishes',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 Blush: {
                     index: 5,
@@ -617,7 +617,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 2,
                     secondColor: 0,
                     id: 'Blush',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 Eyebrows: {
                     index: 2,
@@ -626,7 +626,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 1,
                     secondColor: 0,
                     id: 'Eyebrows',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 EyeColor: {
                     index: 13,
@@ -640,7 +640,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 1,
                     secondColor: 0,
                     id: 'ChestHair',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 AddBodyBlemishes: {
                     index: 12,
@@ -649,7 +649,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 0,
                     secondColor: 0,
                     id: 'AddBodyBlemishes',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 MolesFreckles: {
                     index: 9,
@@ -658,7 +658,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 0,
                     secondColor: 0,
                     id: 'MolesFreckles',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 Lipstick: {
                     index: 8,
@@ -667,7 +667,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 2,
                     secondColor: 0,
                     id: 'Lipstick',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 FacialHair: {
                     index: 1,
@@ -676,7 +676,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 1,
                     secondColor: 0,
                     id: 'FacialHair',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 SunDamage: {
                     index: 7,
@@ -685,7 +685,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 0,
                     secondColor: 0,
                     id: 'SunDamage',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 Complexion: {
                     index: 6,
@@ -694,7 +694,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 0,
                     secondColor: 0,
                     id: 'Complexion',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 Makeup: {
                     index: 4,
@@ -703,7 +703,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 2,
                     secondColor: 0,
                     id: 'Makeup',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 Blemishes: {
                     index: 0,
@@ -712,7 +712,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 0,
                     secondColor: 0,
                     id: 'Blemishes',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
             },
             props: {
@@ -853,7 +853,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 0,
                     secondColor: 0,
                     id: 'Ageing',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 BodyBlemishes: {
                     index: 11,
@@ -862,7 +862,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 0,
                     secondColor: 0,
                     id: 'BodyBlemishes',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 Blush: {
                     index: 5,
@@ -871,7 +871,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 2,
                     secondColor: 0,
                     id: 'Blush',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 Eyebrows: {
                     index: 2,
@@ -880,7 +880,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 1,
                     secondColor: 0,
                     id: 'Eyebrows',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 EyeColor: {
                     index: 13,
@@ -894,7 +894,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 1,
                     secondColor: 0,
                     id: 'ChestHair',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 AddBodyBlemishes: {
                     index: 12,
@@ -903,7 +903,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 0,
                     secondColor: 0,
                     id: 'AddBodyBlemishes',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 MolesFreckles: {
                     index: 9,
@@ -912,7 +912,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 0,
                     secondColor: 0,
                     id: 'MolesFreckles',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 Lipstick: {
                     index: 8,
@@ -921,7 +921,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 2,
                     secondColor: 0,
                     id: 'Lipstick',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 FacialHair: {
                     index: 1,
@@ -930,7 +930,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 1,
                     secondColor: 0,
                     id: 'FacialHair',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 SunDamage: {
                     index: 7,
@@ -939,7 +939,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 0,
                     secondColor: 0,
                     id: 'SunDamage',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 Complexion: {
                     index: 6,
@@ -948,7 +948,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 0,
                     secondColor: 0,
                     id: 'Complexion',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 Makeup: {
                     index: 4,
@@ -957,7 +957,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 2,
                     secondColor: 0,
                     id: 'Makeup',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 Blemishes: {
                     index: 0,
@@ -966,7 +966,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 0,
                     secondColor: 0,
                     id: 'Blemishes',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
             },
             props: {
@@ -1107,7 +1107,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 0,
                     secondColor: 0,
                     id: 'Ageing',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 BodyBlemishes: {
                     index: 11,
@@ -1116,7 +1116,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 0,
                     secondColor: 0,
                     id: 'BodyBlemishes',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 Blush: {
                     index: 5,
@@ -1125,7 +1125,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 2,
                     secondColor: 0,
                     id: 'Blush',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 Eyebrows: {
                     index: 2,
@@ -1134,7 +1134,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 1,
                     secondColor: 0,
                     id: 'Eyebrows',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 EyeColor: {
                     index: 13,
@@ -1148,7 +1148,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 1,
                     secondColor: 0,
                     id: 'ChestHair',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 AddBodyBlemishes: {
                     index: 12,
@@ -1157,7 +1157,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 0,
                     secondColor: 0,
                     id: 'AddBodyBlemishes',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 MolesFreckles: {
                     index: 9,
@@ -1166,7 +1166,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 0,
                     secondColor: 0,
                     id: 'MolesFreckles',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 Lipstick: {
                     index: 8,
@@ -1175,7 +1175,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 2,
                     secondColor: 0,
                     id: 'Lipstick',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 FacialHair: {
                     index: 1,
@@ -1184,7 +1184,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 1,
                     secondColor: 0,
                     id: 'FacialHair',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 SunDamage: {
                     index: 7,
@@ -1193,7 +1193,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 0,
                     secondColor: 0,
                     id: 'SunDamage',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 Complexion: {
                     index: 6,
@@ -1202,7 +1202,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 0,
                     secondColor: 0,
                     id: 'Complexion',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 Makeup: {
                     index: 4,
@@ -1211,7 +1211,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 2,
                     secondColor: 0,
                     id: 'Makeup',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
                 Blemishes: {
                     index: 0,
@@ -1220,7 +1220,7 @@ export const debugOutfits: TOutfit[] = [
                     colourType: 0,
                     secondColor: 0,
                     id: 'Blemishes',
-                    overlayValue: 255,
+                    overlayValue: 0,
                 },
             },
             props: {
