@@ -16,7 +16,7 @@ server_scripts {'server/*.lua'}
 ui_page 'web/build/index.html'
 
 files {
-  'modules/nui.lua',
+  'modules/*.lua',
   'web/build/index.html',
   'web/build/**/*',
   'shared/locale/*.json'

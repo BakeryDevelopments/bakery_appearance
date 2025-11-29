@@ -229,8 +229,6 @@ export const AppearanceNav: FC = () => {
             );
           const IconComponent = iconComponents[tab.icon];
 
-          console.log(tab.icon)
-
           return (
             <Button
               key={tab.id}

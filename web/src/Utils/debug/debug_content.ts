@@ -422,9 +422,9 @@ export const debugAppearance: TAppearance = {
             id: 'Chin_Bone_Lowering',
             value: 0,
         },
-        Jaw_Bone_Back_Lenght: {
+        Jaw_Bone_Back_Length: {
             index: 14,
-            id: 'Jaw_Bone_Back_Lenght',
+            id: 'Jaw_Bone_Back_Length',
             value: 0,
         },
         EyeBrow_Height: {
