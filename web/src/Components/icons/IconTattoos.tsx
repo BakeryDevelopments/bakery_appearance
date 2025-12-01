@@ -13,9 +13,9 @@ export const IconTattoos: FC<IconProps> = ({ size = 48 }) => {
       fill="white"
       xmlns="http://www.w3.org/2000/svg"
     >
-<g id="SVGRepo_bgCarrier" stroke-width="0">
+<g id="SVGRepo_bgCarrier" strokeWidth="0">
     </g>
-    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+    <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
     <g id="SVGRepo_iconCarrier"> 
         <rect x="171.445" y="154.984" fill="#ffffff" width="33.211" height="55.351"></rect> 
         <path fill='#e6e6e6' d="M204.656,199.265c22.008,0,39.853,17.845,39.853,39.853l-56.458,22.141l-56.458-22.141 c0-22.008,17.845-39.853,39.853-39.853H204.656z"></path> 
