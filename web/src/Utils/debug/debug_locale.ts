@@ -61,7 +61,7 @@ export default {
     "THIRDPARENT_SUBTITLE": "Third Parent",
     "MOTHER_SUBTITLE": "Mother",
     "FATHER_SUBTITLE": "Father",
-    "COLOR_SUBTITLE": "Colour",
+    "COLOUR_SUBTITLE": "Colour",
     "OPACITY_SUBTITLE": "Opacity",
     "HIGHLIGHT_SUBTITLE": "Hightlight",
     "WIDTH_SUBTITLE": "Width",

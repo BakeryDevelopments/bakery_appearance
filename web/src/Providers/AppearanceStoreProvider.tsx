@@ -1,11 +1,12 @@
 import { createContext, useContext, ReactNode, FC, useState, useRef } from 'react';
 import { Send } from '../enums/events';
-import { SendEvent } from '../Utils/eventsHandlers';
+import { TriggerNuiCallback } from '../Utils/TriggerNuiCallback';
+
 import type {
   TAppearance,
   TBlacklist,
   TDrawables,
-  THairColor,
+  THairColour,
   THeadBlend,
   THeadOverlay,
   THeadStructure,
@@ -21,6 +22,7 @@ import type {
   TTattoo,
   TJOBDATA,
 } from '../types/appearance';
+import { debugAppearance } from '../Utils/debug/debug_content';
 
 interface AppearanceStoreContextType {
   // State
@@ -71,8 +73,8 @@ interface AppearanceStoreContextType {
   setHeadBlend: (headBlend: THeadBlend) => void;
   setHeadStructure: (headStructure: THeadStructure[keyof THeadStructure]) => void;
   setHeadOverlay: (overlay: THeadOverlay[keyof THeadOverlay]) => void;
-  setEyeColor: (eyeColor: TValue) => void;
-  setHairColor: (hairColor: THairColor) => void;
+  setEyeColour: (eyeColour: TValue) => void;
+  setHairColour: (hairColour: THairColour) => void;
   setProp: (prop: TProps[keyof TProps], value: number, isTexture?: boolean) => void;
   setDrawable: (drawable: TDrawables[keyof TDrawables], value: number, isTexture?: boolean) => void;
 
@@ -130,44 +132,38 @@ export const AppearanceStoreProvider: FC<{ children: ReactNode }> = ({ children 
       headOverlay: appearance.headOverlay,
     };
 
-    SendEvent<boolean>(Send.saveOutfit, { label, outfit, job }).then((success) => {
-      if (!success || !outfits) return;
-      const newOutfits = [...outfits];
-      newOutfits.push({
-        id: newOutfits.length + 1,
-        label: label,
-        outfit: JSON.parse(JSON.stringify(outfit)),
-        jobname: job?.name || null,
-      });
-      setOutfits(newOutfits);
+    const data = { label, outfit, job };
+    TriggerNuiCallback<any>(Send.saveOutfit, data, data).then((updatedData) => {
+      if (!updatedData) return;
+      setOutfits(updatedData.outfits ?? outfits);
+      setAppearance(updatedData.appearance ?? appearance);
     });
   };
 
   const editOutfit = (outfit: TOutfit) => {
     const { label, id } = outfit;
-    SendEvent<boolean>(Send.renameOutfit, { label, id }).then((success) => {
-      if (!success || !outfits) return;
-      setOutfits(
-        outfits.map((o) => (o.id === id ? { ...o, label } : o))
-      );
+    const data = { label, id };
+    TriggerNuiCallback<any>(Send.renameOutfit, data, data).then((updatedData) => {
+      if (!updatedData) return;
+      setOutfits(updatedData.outfits ?? outfits);
+      setAppearance(updatedData.appearance ?? appearance);
     });
   };
 
   const deleteOutfit = (id: number) => {
-    SendEvent<boolean>(Send.deleteOutfit, { id }).then((success) => {
-      if (!success || !outfits) return;
-      setOutfits(outfits.filter((outfit) => outfit.id !== id));
+    const data = { id };
+    TriggerNuiCallback<any>(Send.deleteOutfit, data, data).then((updatedData) => {
+      if (!updatedData) return;
+      setOutfits(updatedData.outfits ?? outfits);
+      setAppearance(updatedData.appearance ?? appearance);
     });
   };
 
   const useOutfit = (outfit: TOutfitData) => {
-    SendEvent<boolean>(Send.useOutfit, outfit).then((success) => {
-      if (!success || !appearance) return;
-      setAppearance({
-        ...appearance,
-        drawables: outfit.drawables,
-        props: outfit.props,
-      });
+    TriggerNuiCallback<any>(Send.useOutfit, outfit, outfit).then((updatedData) => {
+      if (!updatedData) return;
+      setAppearance(updatedData.appearance ?? appearance);
+      setOutfits(updatedData.outfits ?? outfits);
     });
   };
 
@@ -177,14 +173,12 @@ export const AppearanceStoreProvider: FC<{ children: ReactNode }> = ({ children 
     if (outfit) return;
 
     const outfitName = `Imported Outfit ${outfits.length + 1}`;
+    const data = { id, outfitName };
 
-    SendEvent<{ success: boolean; id: number; outfit: TOutfitData; label: string }>(
-      Send.importOutfit,
-      { id, outfitName }
-    ).then(({ success, id, outfit, label }) => {
-      if (!success) return;
-      const newOutfit = { id, label, outfit };
-      setOutfits([...(outfits || []), newOutfit]);
+    TriggerNuiCallback<any>(Send.importOutfit, data, data).then((updatedData) => {
+      if (!updatedData) return;
+      setOutfits(updatedData.outfits ?? outfits);
+      setAppearance(updatedData.appearance ?? appearance);
     });
   };
 
@@ -198,12 +192,12 @@ export const AppearanceStoreProvider: FC<{ children: ReactNode }> = ({ children 
   };
 
   const itemOutfit = (outfit: TOutfitData, label: string) => {
-    SendEvent(Send.itemOutfit, { outfit, label });
+    TriggerNuiCallback(Send.itemOutfit, { outfit, label });
   };
 
   // Tattoos methods
   const setPlayerTattoos = (playerTattoos: TTattoo[]) => {
-    SendEvent<boolean>(Send.setTattoos, playerTattoos).then((success) => {
+    TriggerNuiCallback<boolean>(Send.setTattoos, playerTattoos,).then((success) => {
       if (!success || !appearance) return;
       setAppearance({ ...appearance, tattoos: playerTattoos });
     });
@@ -212,50 +206,50 @@ export const AppearanceStoreProvider: FC<{ children: ReactNode }> = ({ children 
   // Appearance methods
   const cancelAppearance = () => {
     if (originalAppearance) {
-      SendEvent(Send.cancel, originalAppearance);
+      TriggerNuiCallback(Send.cancel, originalAppearance);
     }
   };
 
   const saveAppearance = () => {
     if (appearance) {
-      SendEvent(Send.save, appearance);
+      TriggerNuiCallback(Send.save, appearance);
     }
   };
 
   const setModel = (model: TModel) => {
-    SendEvent<TAppearance>(Send.setModel, model).then((data) => {
+    TriggerNuiCallback<TAppearance>(Send.setModel, model).then((data) => {
       setAppearance(data);
     });
 
     if (tattoos) {
-      SendEvent<TZoneTattoo[]>(Send.getModelTattoos, []).then((newTattoos) => {
+      TriggerNuiCallback<TZoneTattoo[]>(Send.getModelTattoos, []).then((newTattoos) => {
         setTattoos(newTattoos);
       });
     }
   };
 
   const setHeadBlend = (headBlend: THeadBlend) => {
-    SendEvent(Send.setHeadBlend, headBlend);
+    TriggerNuiCallback(Send.setHeadBlend, headBlend, 1);
   };
 
   const setHeadStructure = (headStructure: THeadStructure[keyof THeadStructure]) => {
-    SendEvent(Send.setHeadStructure, headStructure);
+    TriggerNuiCallback(Send.setHeadStructure, headStructure, 1);
   };
 
   const setHeadOverlay = (overlay: THeadOverlay[keyof THeadOverlay]) => {
-    SendEvent(Send.setHeadOverlay, overlay);
+    TriggerNuiCallback(Send.setHeadOverlay, overlay, 1);
   };
 
-  const setEyeColor = (eyeColor: TValue) => {
-    SendEvent(Send.setHeadOverlay, eyeColor);
+  const setEyeColour = (eyeColour: TValue) => {
+    TriggerNuiCallback(Send.setHeadOverlay, eyeColour);
   };
 
-  const setHairColor = (hairColor: THairColor) => {
-    SendEvent(Send.setHeadOverlay, {
-      hairColor: hairColor.color,
-      hairHighlight: hairColor.highlight,
-      id: 'hairColor',
-    });
+  const setHairColour = (hairColour: THairColour) => {
+    TriggerNuiCallback(Send.setHeadOverlay, {
+      hairColour: hairColour.Colour,
+      hairHighlight: hairColour.highlight,
+      id: 'hairColour',
+    }, 1);
   };
 
   const setProp = (prop: TProps[keyof TProps], value: number, isTexture?: boolean) => {
@@ -265,7 +259,7 @@ export const AppearanceStoreProvider: FC<{ children: ReactNode }> = ({ children 
     if (isTexture) prop.texture = value;
     else prop.value = value;
 
-    SendEvent<number>(Send.setProp, {
+    TriggerNuiCallback<number>(Send.setProp, {
       value: prop.value,
       index: prop.index,
       texture: prop.texture,
@@ -292,12 +286,12 @@ export const AppearanceStoreProvider: FC<{ children: ReactNode }> = ({ children 
     if (isTexture) drawable.texture = value;
     else drawable.value = value;
 
-    SendEvent<number>(Send.setDrawable, {
+    TriggerNuiCallback<number>(Send.setDrawable, {
       value: drawable.value,
       index: drawable.index,
       texture: drawable.texture,
       isTexture: isTexture,
-    }).then((drawableTotal) => {
+    }, 7 ).then((drawableTotal) => {
       setAppearance((prev) => {
         if (!prev) return prev;
         const updated = { ...prev };
@@ -323,7 +317,7 @@ export const AppearanceStoreProvider: FC<{ children: ReactNode }> = ({ children 
     if (isToggling.current) return;
     isToggling.current = true;
 
-    SendEvent<boolean>(Send.toggleItem, {
+    TriggerNuiCallback<boolean>(Send.toggleItem, {
       item,
       toggle,
       data,
@@ -375,8 +369,8 @@ export const AppearanceStoreProvider: FC<{ children: ReactNode }> = ({ children 
     setHeadBlend,
     setHeadStructure,
     setHeadOverlay,
-    setEyeColor,
-    setHairColor,
+    setEyeColour,
+    setHairColour,
     setProp,
     setDrawable,
     toggleItem,

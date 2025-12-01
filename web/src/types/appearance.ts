@@ -61,16 +61,16 @@ export type THeadOverlay = {
 	[key: string]: {
 		index: number
 		overlayOpacity: number
-		firstColor: number
+		firstColour: number
 		colourType: number
-		secondColor: number
+		secondColour: number
 		id: string
 		overlayValue: number
 		value?: number
 	}
 }
 
-export type TEyeColor = {
+export type TEyeColour = {
     [key: string]: {
 		index: number
 		id: string
@@ -78,9 +78,9 @@ export type TEyeColor = {
 	}
 }
 
-export type THairColor = {
+export type THairColour = {
 	highlight: number
-	color: number
+	Colour: number
 }
 
 export type THeadBlend = {
@@ -149,8 +149,8 @@ export type TAppearance = {
 	drawTotal: TDrawTotal
 	drawables: TDrawables
 	propTotal: TPropTotal
-	headOverlay: THeadOverlay | TEyeColor
-	hairColor: THairColor
+	headOverlay: THeadOverlay | TEyeColour
+	hairColour: THairColour
 	headBlend: THeadBlend
 	headStructure: THeadStructure
 	headOverlayTotal: THeadOverlayTotal
@@ -158,7 +158,7 @@ export type TAppearance = {
 }
 
 export type TOutfitData  = {
-	headOverlay: THeadOverlay | TEyeColor
+	headOverlay: THeadOverlay | TEyeColour
     drawables: TDrawables
     props: TProps
 }
@@ -212,7 +212,7 @@ export type TTab = {
 }
 
 
-export type TColors = {
+export type TColours = {
 	label: string;
 	hex: string;
 }

@@ -13,12 +13,10 @@ export const DebugProvider: FC = () => {
   useEffect(() => {
     InitialiseDebugSenders();
     InitialiseDebugReceivers();
-  }, []);
 
-  // Initialize action values
-  useEffect(() => {
     const initialValues: Record<string, any> = {};
     SendDebuggers.forEach((section, sectionIndex) => {
+      console.log('Section:', section.label);
       section.actions.forEach((action, actionIndex) => {
         const key = `${sectionIndex}-${actionIndex}`;
         initialValues[key] = action.value ?? '';
@@ -26,6 +24,11 @@ export const DebugProvider: FC = () => {
     });
     setActionValues(initialValues);
   }, []);
+
+  // // Initialize action values
+  // useEffect(() => {
+
+  // }, []);
 
   const handleActionValue = (key: string, value: any) => {
     setActionValues(prev => ({ ...prev, [key]: value }));
@@ -129,6 +132,7 @@ export const DebugProvider: FC = () => {
                 style={{
                   borderLeft: '2px solid var(--mantine-color-blue-6)',
                   paddingLeft: 'var(--mantine-spacing-sm)',
+                  zIndex: 9999999
                 }}
               >
                 <Text fw={500} mb="xs">
