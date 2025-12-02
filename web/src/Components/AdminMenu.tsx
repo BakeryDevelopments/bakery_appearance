@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react';
-import { Tabs, ColorPicker, Button, Stack, Group, Text, TextInput, Select, ActionIcon, Modal, Checkbox } from '@mantine/core';
-import { IconPalette, IconLock, IconPlus, IconTrash } from '@tabler/icons-react';
+import { Tabs, ColorPicker, Button, Stack, Group, Text, TextInput, Select, ActionIcon, Modal, Checkbox, Accordion, Badge, Box } from '@mantine/core';
+import { IconPalette, IconLock, IconPlus, IconTrash, IconChevronDown, IconUser } from '@tabler/icons-react';
 import { TriggerNuiCallback } from '../Utils/TriggerNuiCallback';
 import { HandleNuiMessage } from '../Hooks/HandleNuiMessage';
 import { CameraShape } from './micro/CameraShape';
@@ -18,6 +18,7 @@ interface ClothingRestriction {
   id: string;
   job?: string;
   gang?: string;
+  identifier?: string;
   gender: 'male' | 'female';
   type?: 'model' | 'clothing';
   part?: 'model' | 'drawable' | 'prop';
@@ -46,6 +47,9 @@ export const AdminMenu: FC = () => {
 
   const [texturesAll, setTexturesAll] = useState<boolean>(true);
   const [texturesInput, setTexturesInput] = useState<string>('');
+  const [models, setModels] = useState<string[]>([]);
+  const [addModelModalOpen, setAddModelModalOpen] = useState(false);
+  const [newModelName, setNewModelName] = useState<string>('');
 
   const categoryOptionsByPart: Record<PartType, { value: string; label: string }[]> = {
     model: [{ value: 'model', label: 'Model' }],
@@ -82,6 +86,10 @@ export const AdminMenu: FC = () => {
     setShape(data);
   });
 
+  HandleNuiMessage<string[]>('setModels', (data) => {
+    setModels(data);
+  });
+
   useEffect(() => {}, [isVisible]);
 
   const handleSaveThemeAndShape = () => {
@@ -97,7 +105,7 @@ export const AdminMenu: FC = () => {
     if (!newRestriction.itemId || (!newRestriction.job && !newRestriction.gang)) return;
 
     const part: PartType = (newRestriction.part as PartType) || 'drawable';
-    const category = newRestriction.category;
+    const category = part === 'model' ? 'model' : newRestriction.category;
     const textures = texturesAll
       ? undefined
       : texturesInput
@@ -109,13 +117,14 @@ export const AdminMenu: FC = () => {
       id: `${Date.now()}-${Math.random()}`,
       job: newRestriction.job,
       gang: newRestriction.gang,
+      identifier: newRestriction.identifier,
       gender: newRestriction.gender || 'male',
       type: (part === 'model' ? 'model' : 'clothing'),
       part,
       category,
       itemId: newRestriction.itemId!,
-      texturesAll,
-      textures,
+      texturesAll: part === 'model' ? false : texturesAll,
+      textures: part === 'model' ? undefined : textures,
     };
 
     TriggerNuiCallback('addRestriction', restriction).then(() => {
@@ -184,6 +193,10 @@ export const AdminMenu: FC = () => {
             <Tabs.Tab value="restrictions">
               <IconLock size={16} style={{ marginRight: 8, verticalAlign: 'middle' }} />
               Restrictions
+            </Tabs.Tab>
+            <Tabs.Tab value="models">
+              <IconUser size={16} style={{ marginRight: 8, verticalAlign: 'middle' }} />
+              Models
             </Tabs.Tab>
           </Tabs.List>
 
@@ -326,53 +339,186 @@ export const AdminMenu: FC = () => {
               </Group>
 
               <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', color: 'white' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                      <th style={{ padding: '0.75rem', textAlign: 'left' }}>Job/Gang</th>
-                      <th style={{ padding: '0.75rem', textAlign: 'left' }}>Gender</th>
-                      <th style={{ padding: '0.75rem', textAlign: 'left' }}>Part</th>
-                      <th style={{ padding: '0.75rem', textAlign: 'left' }}>Category</th>
-                      <th style={{ padding: '0.75rem', textAlign: 'left' }}>Item ID</th>
-                      <th style={{ padding: '0.75rem', textAlign: 'left' }}>Textures</th>
-                      <th style={{ padding: '0.75rem', textAlign: 'left' }}>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {restrictions.length === 0 ? (
-                      <tr>
-                        <td colSpan={7} style={{ padding: '2rem', textAlign: 'center', color: '#888' }}>
-                          No restrictions configured
-                        </td>
-                      </tr>
-                    ) : (
-                      restrictions.map((r, idx) => (
-                        <tr
-                          key={r.id}
-                          style={{
-                            borderBottom: '1px solid rgba(255,255,255,0.05)',
-                            backgroundColor: idx % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent',
-                          }}
-                        >
-                          <td style={{ padding: '0.75rem' }}>{r.job || r.gang}</td>
-                          <td style={{ padding: '0.75rem' }}>{r.gender}</td>
-                          <td style={{ padding: '0.75rem' }}>{r.part || r.type}</td>
-                          <td style={{ padding: '0.75rem' }}>{r.category || '-'}</td>
-                          <td style={{ padding: '0.75rem' }}>{r.itemId}</td>
-                          <td style={{ padding: '0.75rem' }}>{r.texturesAll ? 'All' : (r.textures?.join(', ') || '-')}</td>
-                          <td style={{ padding: '0.75rem' }}>
-                            <ActionIcon color="red" onClick={() => handleDeleteRestriction(r.id)}>
-                              <IconTrash size={16} />
-                            </ActionIcon>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
+                {restrictions.length === 0 ? (
+                  <Box style={{ padding: '2rem', textAlign: 'center', color: '#888', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
+                    No restrictions configured
+                  </Box>
+                ) : (
+                  <Accordion
+                    chevronPosition="right"
+                    variant="separated"
+                    styles={{
+                      item: {
+                        backgroundColor: 'rgba(255,255,255,0.03)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        marginBottom: '0.5rem',
+                      },
+                      control: {
+                        '&:hover': {
+                          backgroundColor: 'rgba(255,255,255,0.05)',
+                        },
+                      },
+                    }}
+                  >
+                    {(() => {
+                      // Group restrictions by job/gang, then by identifier
+                      const grouped = restrictions.reduce((acc, r) => {
+                        const key = r.job || r.gang || 'Unknown';
+                        const identifierKey = r.identifier || 'all';
+                        if (!acc[key]) acc[key] = {};
+                        if (!acc[key][identifierKey]) acc[key][identifierKey] = [];
+                        acc[key][identifierKey].push(r);
+                        return acc;
+                      }, {} as Record<string, Record<string, ClothingRestriction[]>>);
+
+                      return Object.entries(grouped).map(([jobGang, identifierGroups]) => {
+                        const totalCount = Object.values(identifierGroups).flat().length;
+                        const type = restrictions.find(r => (r.job || r.gang) === jobGang)?.job ? 'Job' : 'Gang';
+                        
+                        return (
+                          <Accordion.Item key={jobGang} value={jobGang}>
+                            <Accordion.Control>
+                              <Group position="apart" style={{ width: '100%', paddingRight: '1rem' }}>
+                                <Group spacing="sm">
+                                  <Text fw={600} c="white" tt="capitalize">
+                                    {jobGang}
+                                  </Text>
+                                  <Badge size="sm" color="blue" variant="light">
+                                    {type}
+                                  </Badge>
+                                  <Badge size="sm" color="gray" variant="outline">
+                                    {totalCount} restriction{totalCount !== 1 ? 's' : ''}
+                                  </Badge>
+                                </Group>
+                              </Group>
+                            </Accordion.Control>
+                            <Accordion.Panel>
+                              <Stack spacing="md">
+                                {Object.entries(identifierGroups).map(([identifier, items]) => (
+                                  <Box key={identifier} style={{ backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: 6, padding: '1rem' }}>
+                                    <Group position="apart" mb="sm">
+                                      <Group spacing="xs">
+                                        <Text size="sm" fw={500} c="dimmed">
+                                          {identifier === 'all' ? '🌐 All Players' : `👤 ${identifier}`}
+                                        </Text>
+                                      </Group>
+                                    </Group>
+                                    <Stack spacing="xs">
+                                      {items.map((r) => (
+                                        <Group
+                                          key={r.id}
+                                          position="apart"
+                                          style={{
+                                            padding: '0.5rem',
+                                            backgroundColor: 'rgba(255,255,255,0.02)',
+                                            borderRadius: 4,
+                                            border: '1px solid rgba(255,255,255,0.05)',
+                                          }}
+                                        >
+                                          <Group spacing="sm">
+                                            <Badge size="sm" color={r.gender === 'male' ? 'blue' : 'pink'} variant="filled">
+                                              {r.gender === 'male' ? '♂' : '♀'} {r.gender}
+                                            </Badge>
+                                            <Badge size="sm" color="cyan" variant="light">
+                                              {r.part || r.type}
+                                            </Badge>
+                                            <Text size="sm" c="white">
+                                              {r.category ? `${r.category}:` : ''} <strong>#{r.itemId}</strong>
+                                            </Text>
+                                            <Badge size="xs" color="grape" variant="outline">
+                                              {r.texturesAll ? 'All Textures' : r.textures?.length ? `Textures: ${r.textures.join(', ')}` : 'No Textures'}
+                                            </Badge>
+                                          </Group>
+                                          <ActionIcon color="red" size="sm" onClick={() => handleDeleteRestriction(r.id)}>
+                                            <IconTrash size={14} />
+                                          </ActionIcon>
+                                        </Group>
+                                      ))}
+                                    </Stack>
+                                  </Box>
+                                ))}
+                              </Stack>
+                            </Accordion.Panel>
+                          </Accordion.Item>
+                        );
+                      });
+                    })()}
+                  </Accordion>
+                )}
               </div>
 
               {/* Advanced JSON sets removed per request */}
+            </Stack>
+          </Tabs.Panel>
+
+          <Tabs.Panel value="models" pt="xl">
+            <Stack spacing="lg">
+              <Group position="apart">
+                <Text c="white" fw={500}>
+                  Available Player Models
+                </Text>
+                <Button onClick={() => setAddModelModalOpen(true)}>
+                  <IconPlus size={16} style={{ marginRight: 8, verticalAlign: 'middle' }} />
+                  Add Model
+                </Button>
+              </Group>
+
+              <div style={{ overflowX: 'auto' }}>
+                {models.length === 0 ? (
+                  <Box style={{ padding: '2rem', textAlign: 'center', color: '#888', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
+                    No models configured
+                  </Box>
+                ) : (
+                  <Stack spacing="xs">
+                    {(() => {
+                      // Always show freemode models first
+                      const freemodeModels = ['mp_m_freemode_01', 'mp_f_freemode_01'];
+                      const otherModels = models.filter(m => !freemodeModels.includes(m));
+                      const sortedModels = [...freemodeModels.filter(m => models.includes(m)), ...otherModels];
+                      
+                      return sortedModels.map((model, idx) => {
+                        const isFreemode = freemodeModels.includes(model);
+                        return (
+                          <Group
+                            key={idx}
+                            position="apart"
+                            style={{
+                              padding: '0.75rem 1rem',
+                              backgroundColor: idx % 2 === 0 ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.01)',
+                              borderRadius: 6,
+                              border: isFreemode ? '1px solid rgba(59, 130, 246, 0.3)' : '1px solid rgba(255,255,255,0.05)',
+                            }}
+                          >
+                            <Group spacing="sm">
+                              <IconUser size={18} color={isFreemode ? '#3b82f6' : '#888'} />
+                              <Text c="white" fw={isFreemode ? 600 : 500}>
+                                {model}
+                              </Text>
+                              {isFreemode && (
+                                <Badge size="xs" color="blue" variant="light">
+                                  Protected
+                                </Badge>
+                              )}
+                            </Group>
+                            {!isFreemode && (
+                              <ActionIcon 
+                                color="red" 
+                                onClick={() => {
+                                  TriggerNuiCallback('deleteModel', model).then(() => {
+                                    setModels(models.filter(m => m !== model));
+                                  });
+                                }}
+                              >
+                                <IconTrash size={16} />
+                              </ActionIcon>
+                            )}
+                          </Group>
+                        );
+                      });
+                    })()}
+                  </Stack>
+                )}
+              </div>
             </Stack>
           </Tabs.Panel>
         </Tabs>
@@ -397,6 +543,13 @@ export const AdminMenu: FC = () => {
               value={newRestriction.gang || ''}
               onChange={(e) => setNewRestriction({ ...newRestriction, gang: e.target.value || undefined, job: undefined })}
             />
+            <TextInput
+              label="Identifier (optional - leave empty for all players)"
+              placeholder="license:abc123 or steam:110000123456789"
+              description="Restrict to specific player identifier"
+              value={newRestriction.identifier || ''}
+              onChange={(e) => setNewRestriction({ ...newRestriction, identifier: e.target.value || undefined })}
+            />
             <Select
               label="Gender"
               value={newRestriction.gender}
@@ -419,6 +572,8 @@ export const AdminMenu: FC = () => {
                 setNewRestriction({
                   ...newRestriction,
                   part,
+                  category: part === 'model' ? undefined : newRestriction.category,
+                  itemId: part === 'model' ? undefined : newRestriction.itemId,
                 });
               }}
               data={[
@@ -427,15 +582,32 @@ export const AdminMenu: FC = () => {
                 { value: 'prop', label: 'Prop (hats/glasses)' },
               ]}
             />
-            <Select
-              label="Category"
-              value={newRestriction.category || ''}
-              onChange={(value) =>
-                setNewRestriction({ ...newRestriction, category: value || undefined })
-              }
-              data={categoryOptionsByPart[(newRestriction.part as PartType) || 'drawable']}
-              placeholder="Select category"
-            />
+            {(newRestriction.part || 'drawable') === 'model' ? (
+              <Select
+                label="Model"
+                placeholder="Search for a model..."
+                value={newRestriction.itemId?.toString() || ''}
+                onChange={(value) => {
+                  if (value) {
+                    setNewRestriction({ ...newRestriction, itemId: parseInt(value, 10) });
+                  }
+                }}
+                data={models.map((model, index) => ({ value: index.toString(), label: model }))}
+                searchable
+                maxDropdownHeight={300}
+                nothingFound="No models found"
+              />
+            ) : (
+              <Select
+                label="Category"
+                value={newRestriction.category || ''}
+                onChange={(value) =>
+                  setNewRestriction({ ...newRestriction, category: value || undefined })
+                }
+                data={categoryOptionsByPart[(newRestriction.part as PartType) || 'drawable']}
+                placeholder="Select category"
+              />
+            )}
             {(newRestriction.part || 'drawable') !== 'model' && (
               <>
                 <Checkbox
@@ -451,28 +623,81 @@ export const AdminMenu: FC = () => {
                     onChange={(e) => setTexturesInput(e.currentTarget.value)}
                   />
                 )}
+                <TextInput
+                  label="Item ID"
+                  type="number"
+                  placeholder="123"
+                  value={newRestriction.itemId?.toString() || ''}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value, 10);
+                    if (!isNaN(value)) {
+                      setNewRestriction({ ...newRestriction, itemId: value });
+                    } else {
+                      setNewRestriction({ ...newRestriction, itemId: undefined });
+                    }
+                  }}
+                />
               </>
             )}
-            <TextInput
-              label="Item ID"
-              type="number"
-              placeholder="123"
-              value={newRestriction.itemId?.toString() || ''}
-              onChange={(e) => {
-                const value = parseInt(e.target.value, 10);
-                if (!isNaN(value)) {
-                  setNewRestriction({ ...newRestriction, itemId: value });
-                } else {
-                  setNewRestriction({ ...newRestriction, itemId: undefined });
-                }
-              }}
-            />
             
             <Group position="right" mt="md">
               <Button variant="subtle" onClick={() => setAddModalOpen(false)}>
                 Cancel
               </Button>
               <Button onClick={handleAddRestriction}>Add</Button>
+            </Group>
+          </Stack>
+        </Modal>
+
+        <Modal
+          opened={addModelModalOpen}
+          onClose={() => {
+            setAddModelModalOpen(false);
+            setNewModelName('');
+          }}
+          title="Add Player Model"
+          centered
+          zIndex={10000}
+        >
+          <Stack spacing="md">
+            <TextInput
+              label="Model Name"
+              placeholder="mp_m_freemode_01 or a_m_y_business_01"
+              description="Enter the exact spawn name of the ped model"
+              value={newModelName}
+              onChange={(e) => setNewModelName(e.target.value)}
+            />
+            
+            <Group position="right" mt="md">
+              <Button 
+                variant="subtle" 
+                onClick={() => {
+                  setAddModelModalOpen(false);
+                  setNewModelName('');
+                }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={() => {
+                  if (!newModelName.trim()) return;
+                  
+                  const freemodeModels = ['mp_m_freemode_01', 'mp_f_freemode_01'];
+                  if (freemodeModels.includes(newModelName.trim().toLowerCase())) {
+                    // Show error - can't add protected models
+                    return;
+                  }
+                  
+                  TriggerNuiCallback('addModel', newModelName.trim()).then(() => {
+                    setModels([...models, newModelName.trim()]);
+                    setAddModelModalOpen(false);
+                    setNewModelName('');
+                  });
+                }}
+                disabled={!newModelName.trim()}
+              >
+                Add
+              </Button>
             </Group>
           </Stack>
         </Modal>

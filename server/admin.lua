@@ -4,6 +4,7 @@ local QBCore = exports['qb-core']:GetCoreObject()
 local RestrictionsCache = {}
 local ThemeCache = nil
 local ShapeCache = nil
+local ModelsCache = {}
 
 -- Load all restrictions into cache on startup
 local function LoadRestrictionsCache()
@@ -67,10 +68,21 @@ local function LoadShapeCache()
     print('[tj_appearance] Shape cache loaded')
 end
 
+-- Load models into cache
+local function LoadModelsCache()
+    local result = MySQL.query.await('SELECT model_name FROM appearance_models ORDER BY model_name')
+    ModelsCache = {}
+    for _, row in ipairs(result or {}) do
+        table.insert(ModelsCache, row.model_name)
+    end
+    print('[tj_appearance] Loaded ' .. #ModelsCache .. ' models into cache')
+end
+
 -- Initialize all caches on resource start
 CreateThread(function()
     LoadThemeCache()
     LoadShapeCache()
+    LoadModelsCache()
     LoadRestrictionsCache()
 end)
 
@@ -138,6 +150,86 @@ lib.callback.register('tj_appearance:admin:saveShape', function(source, shape)
     
     -- Broadcast to all clients
     TriggerClientEvent('tj_appearance:client:updateShape', -1, shape)
+    return true
+end)
+
+-- Get all models
+lib.callback.register('tj_appearance:admin:getModels', function(source)
+    if not IsAdmin(source) then return {} end
+    
+    -- Ensure freemode models are always first
+    local freemodeModels = {'mp_m_freemode_01', 'mp_f_freemode_01'}
+    local otherModels = {}
+    
+    for _, model in ipairs(ModelsCache) do
+        if model ~= 'mp_m_freemode_01' and model ~= 'mp_f_freemode_01' then
+            table.insert(otherModels, model)
+        end
+    end
+    
+    local sortedModels = {}
+    -- Add freemode models first if they exist in cache
+    for _, freemodel in ipairs(freemodeModels) do
+        for _, model in ipairs(ModelsCache) do
+            if model == freemodel then
+                table.insert(sortedModels, model)
+                break
+            end
+        end
+    end
+    
+    -- Add other models
+    for _, model in ipairs(otherModels) do
+        table.insert(sortedModels, model)
+    end
+    
+    return sortedModels
+end)
+
+-- Add model
+lib.callback.register('tj_appearance:admin:addModel', function(source, modelName)
+    if not IsAdmin(source) then return false end
+    
+    -- Prevent adding freemode models (they should always exist)
+    if modelName == 'mp_m_freemode_01' or modelName == 'mp_f_freemode_01' then
+        return false
+    end
+    
+    -- Check if model already exists
+    for _, model in ipairs(ModelsCache) do
+        if model == modelName then
+            return false
+        end
+    end
+    
+    MySQL.insert.await('INSERT INTO appearance_models (model_name) VALUES (?)', { modelName })
+    
+    -- Update cache
+    table.insert(ModelsCache, modelName)
+    table.sort(ModelsCache)
+    
+    return true
+end)
+
+-- Delete model
+lib.callback.register('tj_appearance:admin:deleteModel', function(source, modelName)
+    if not IsAdmin(source) then return false end
+    
+    -- Prevent deletion of freemode models
+    if modelName == 'mp_m_freemode_01' or modelName == 'mp_f_freemode_01' then
+        return false
+    end
+    
+    MySQL.query.await('DELETE FROM appearance_models WHERE model_name = ?', { modelName })
+    
+    -- Update cache
+    for i, model in ipairs(ModelsCache) do
+        if model == modelName then
+            table.remove(ModelsCache, i)
+            break
+        end
+    end
+    
     return true
 end)
 
@@ -235,8 +327,15 @@ lib.callback.register('tj_appearance:getPlayerRestrictions', function(source)
                 -- Only blacklist if player is NOT in the restricted group
                 if not isPlayerInGroup then
                     if restriction.type == 'model' then
-                        -- Model blacklist
-                        table.insert(out[gender].models, restriction.itemId)
+                        -- Model blacklist - convert index to model name
+                        local modelIndex = tonumber(restriction.itemId)
+                        if modelIndex and ModelsCache[modelIndex + 1] then -- Lua arrays are 1-indexed
+                            local modelName = ModelsCache[modelIndex + 1]
+                            -- Skip freemode models (always allowed)
+                            if modelName ~= 'mp_m_freemode_01' and modelName ~= 'mp_f_freemode_01' then
+                                table.insert(out[gender].models, modelName)
+                            end
+                        end
                     else
                         -- Clothing/prop blacklist
                         local category = restriction.category

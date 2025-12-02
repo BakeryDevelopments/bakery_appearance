@@ -1,6 +1,7 @@
 import { FC, useState, useEffect, lazy, Suspense, ComponentType, useRef } from 'react';
 import { Box, Text, Divider } from '@mantine/core';
 import { useAppearanceStore } from '../Providers/AppearanceStoreProvider';
+import { useCustomization } from '../Providers/CustomizationProvider';
 import classes from './menu.module.css';
 
 // Icon imports will be dynamic
@@ -13,6 +14,7 @@ interface AppearanceMenuProps {
 
 export const AppearanceMenu: FC<AppearanceMenuProps> = ({ animateIn, isVisible }) => {
   const { selectedTab, locale } = useAppearanceStore();
+  const { theme } = useCustomization();
   const [showContent, setShowContent] = useState(false);
   const hasAnimatedRef = useRef(false);
   const [IconComponent, setIconComponent] = useState<ComponentType | null>(null);
@@ -142,7 +144,7 @@ export const AppearanceMenu: FC<AppearanceMenuProps> = ({ animateIn, isVisible }
           </Text>
         </Box>
 
-        <Text style={{ color: 'var(--mantine-color-blue-6)' }}>
+        <Text style={{ color: theme.primaryColor }}>
           {locale.MENU_TITLE}
         </Text>
 

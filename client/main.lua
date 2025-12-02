@@ -37,16 +37,14 @@ RegisterCommand('appearance', function()
     
     print('[tj_appearance] Loaded blacklist for ' .. gender .. ':', json.encode(blacklist))
 
+    local models = lib.callback.await('tj_appearance:admin:getModels', false)
     handleNuiMessage({
       action = 'data',
       data = {
         tabs = { "heritage", 'face', 'hair', 'clothes', 'accessories','makeup', 'tattoos', 'outfits' },
         appearance = GetPlayerAppearance(),
         locale = locale,
-        models = {
-          { "mp_m_freemode_01" },
-          { "mp_f_freemode_01" }
-        },
+        models = models,
         blacklist = blacklist,
         tattoos = {},
         outfits = {},
@@ -142,6 +140,13 @@ RegisterNetEvent('tj_appearance:client:openAdminMenu', function()
     end
   end)
   
+  lib.callback('tj_appearance:admin:getModels', false, function(models)
+    print('[tj_appearance] Models count:', #models)
+    if models then
+      handleNuiMessage({ action = 'setModels', data = models }, true)
+    end
+  end)
+  
   print('[tj_appearance] Setting admin menu visible and focus')
   handleNuiMessage({ action = 'setVisibleAdminMenu', data = true }, true)
   SetNuiFocus(true, true)
@@ -182,6 +187,18 @@ RegisterNuiCallback('deleteRestriction', function(id, cb)
   lib.callback('tj_appearance:admin:deleteRestriction', false, function(success)
     cb(success)
   end, id)
+end)
+
+RegisterNuiCallback('addModel', function(modelName, cb)
+  lib.callback('tj_appearance:admin:addModel', false, function(success)
+    cb(success)
+  end, modelName)
+end)
+
+RegisterNuiCallback('deleteModel', function(modelName, cb)
+  lib.callback('tj_appearance:admin:deleteModel', false, function(success)
+    cb(success)
+  end, modelName)
 end)
 
 -- JSON blacklist management removed per request

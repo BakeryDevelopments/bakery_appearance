@@ -231,9 +231,9 @@ export const AppearanceNav: FC<AppearanceNavProps> = ({ animateIn }) => {
         style={{
           position: 'fixed',
           left: '50%',
-          top: '45%',
+          top: '50%',
           transform: 'translate(-50%, -50%)',
-          zIndex: 9999,
+          zIndex: -9999,
           width: '0',
           height: '0',
           pointerEvents: 'none',
@@ -283,10 +283,9 @@ export const AppearanceNav: FC<AppearanceNavProps> = ({ animateIn }) => {
                 style={{
                   width: '100%',
                   height: '100%',
-                  position: 'absolute',
+                  position: 'relative',
                   display: 'grid',
                   placeItems: 'center',
-                  transition: 'transform 0.15s ease-in-out',
                 }}
               >
                 <CameraShape
@@ -297,11 +296,11 @@ export const AppearanceNav: FC<AppearanceNavProps> = ({ animateIn }) => {
                 />
                 <Box
                   style={{
-                    width: '100%',
-                    height: '100%',
                     position: 'absolute',
-                    display: 'grid',
-                    placeItems: 'center',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    pointerEvents: 'none',
                   }}
                 >
                   {IconComponent && (
