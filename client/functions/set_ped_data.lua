@@ -11,7 +11,7 @@ function SetHeadOverlay(ped, HeadBlendData)
 
     local value = HeadBlendData.value or HeadBlendData.overlayValue
 
-    
+
 
     SetPedHeadOverlay(ped, HeadBlendData.index, value, Tofloat(HeadBlendData.overlayOpacity))
     SetPedHeadOverlayColor(ped, HeadBlendData.index, 1, HeadBlendData.firstColour, HeadBlendData.secondColour)
@@ -96,7 +96,7 @@ function SetModel(ped, Model)
         end
     end
 
-    return ped
+    return Model
 end
 
 exports('SetPedModel', SetModel);
@@ -146,12 +146,14 @@ RegisterNuiCallback('setHeadStructure', function(data, cb)
     cb(1)
 end)
 
-
 RegisterNuiCallback('setDrawable', function(data, cb)
     print('Setting drawable')
     local totalTextures = SetDrawable(cache.ped, data)
     cb(1)
 end)
 
-
-
+RegisterNuiCallback('setModel', function(data, cb)
+    local model = SetModel(cache.ped, data[1])
+    print('Model set to ', model)
+    cb(model)
+end)

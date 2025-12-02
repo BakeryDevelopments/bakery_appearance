@@ -27,13 +27,24 @@ export const useDebugDataReceiver = () => {
       : data.locale;
 
     // Set all the data
-    setLocale(locale);
-    setAppearance(data.appearance);
-    setAllowExit(data.allowExit);
-    setBlacklist(data.blacklist);
-    setTattoos(data.tattoos);
-    setOutfits(data.outfits);
-    setModels(data.models);
+      setLocale(locale);
+      // Ensure modelIndex is set in appearance
+      setAppearance(
+        data.appearance
+          ? {
+              ...data.appearance,
+              modelIndex:
+                typeof data.appearance.modelIndex === 'number'
+                  ? data.appearance.modelIndex
+                  : 0,
+            }
+          : data.appearance
+      );
+      setAllowExit(data.allowExit);
+      setBlacklist(data.blacklist);
+      setTattoos(data.tattoos);
+      setOutfits(data.outfits);
+      setModels(data.models);
 
     // Create tabs from the tab names
     const tabs = (Array.isArray(data.tabs) ? data.tabs : [data.tabs]).map((tabId) => ({

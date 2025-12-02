@@ -56,13 +56,10 @@ function GetPlayerAppearance()
   local headData, headTotal = GetHeadOverlay(cache.ped)
   local drawables, drawTotal = GetPedComponents(cache.ped)
 
-  print('Drawables: ' .. json.encode(drawables), 'Total: ' .. json.encode(drawTotal))
   local props, propTotal = GetPedProps(cache.ped)
   local model = GetEntityModel(cache.ped)
   local hairColour = GetHairColour(cache.ped)
   --local tattoos = cache.ped == PlayerPedId() and GetPedTattoos and GetPedTattoos(cache.ped) or {}
-
-  print('hairColour: ' .. json.encode(hairColour))
 
   local data = {
     model = model,

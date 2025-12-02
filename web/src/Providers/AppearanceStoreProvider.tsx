@@ -218,7 +218,14 @@ export const AppearanceStoreProvider: FC<{ children: ReactNode }> = ({ children 
 
   const setModel = (model: TModel) => {
     TriggerNuiCallback<TAppearance>(Send.setModel, model).then((data) => {
-      setAppearance(data);
+      // Ensure modelIndex is set
+      setAppearance(prev => {
+        const index = models?.indexOf(model) ?? 0;
+        return {
+          ...(data || prev),
+          modelIndex: typeof (data?.modelIndex) === 'number' ? data.modelIndex : index,
+        };
+      });
     });
 
     if (tattoos) {
@@ -245,27 +252,27 @@ export const AppearanceStoreProvider: FC<{ children: ReactNode }> = ({ children 
     });
   };
 
-const setHeadOverlay = (overlay: THeadOverlay[keyof THeadOverlay]) => {
-  if (!overlay || !overlay.id) {
-    console.warn('[setHeadOverlay] Ignored update: missing overlay.id', overlay);
-    return;
-  }
-  console.log('[setHeadOverlay] overlay.id:', overlay.id, 'overlay:', JSON.stringify(overlay));
-  TriggerNuiCallback(Send.setHeadOverlay, overlay, 1).then(() => {
-    setAppearance(prev => {
-      if (!prev) return prev;
-      const updated = {
-        ...prev,
-        headOverlay: {
-          ...prev.headOverlay,
-          [overlay.id]: overlay,
-        },
-      };
-      console.log('[setHeadOverlay] updated.headOverlay:', updated.headOverlay);
-      return updated;
+  const setHeadOverlay = (overlay: THeadOverlay[keyof THeadOverlay]) => {
+    if (!overlay || !overlay.id) {
+      console.warn('[setHeadOverlay] Ignored update: missing overlay.id', overlay);
+      return;
+    }
+    console.log('[setHeadOverlay] overlay.id:', overlay.id, 'overlay:', JSON.stringify(overlay));
+    TriggerNuiCallback(Send.setHeadOverlay, overlay, 1).then(() => {
+      setAppearance(prev => {
+        if (!prev) return prev;
+        const updated = {
+          ...prev,
+          headOverlay: {
+            ...prev.headOverlay,
+            [overlay.id]: overlay,
+          },
+        };
+        console.log('[setHeadOverlay] updated.headOverlay:', updated.headOverlay);
+        return updated;
+      });
     });
-  });
-};
+  };
 
   const setEyeColour = (eyeColour: TValue) => {
     TriggerNuiCallback(Send.setHeadOverlay, eyeColour);
