@@ -26,7 +26,6 @@ export const AppearanceMenu: FC<AppearanceMenuProps> = ({ animateIn, isVisible }
       setShowContent(false);
       const isInitial = !hasAnimatedRef.current;
       const delay = isInitial ? 2000 : 100;
-      console.log('Selected tab changed, setting content timeout', hasAnimatedRef.current);
       if (isInitial) {
         hasAnimatedRef.current = true;
       }

@@ -40,10 +40,6 @@ export const Hair: FC = () => {
     const headOverlayTotal = appearance?.headOverlayTotal;
     const hairColour = appearance?.hairColour;
 
-    console.log('Rendering Hair Component with appearance:', JSON.stringify(hairColour));
-    console.log('Hair drawables:', JSON.stringify(drawables?.hair));
-    console.log('Hair drawTotal:', JSON.stringify(drawTotal?.hair));
-
 
     return (
         <Stack spacing="lg"
@@ -115,7 +111,6 @@ export const Hair: FC = () => {
                                     index={typeof hairColour?.Colour === 'number' ? hairColour.Colour : 0}
                                     value={hairColour ?? null}
                                     onChange={(value) => {
-                                        console.log('Hair colour changed:', JSON.stringify(value));
                                         let colourIndex = 0;
                                         if (typeof value === 'object' && value !== null && 'index' in value) {
                                             colourIndex = typeof value.index === 'number' ? value.index : 0;

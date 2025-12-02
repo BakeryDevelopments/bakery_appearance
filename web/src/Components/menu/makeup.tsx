@@ -26,7 +26,6 @@ export const MakeupMenu: FC = () => {
             if ('overlayOpacity' in newOverlay && newOverlay.overlayOpacity !== current.overlayOpacity) changed = true;
             if (!changed) return;
         }
-        console.log("UPDATING HERE", newOverlay);
         setHeadOverlay(newOverlay);
     };
 

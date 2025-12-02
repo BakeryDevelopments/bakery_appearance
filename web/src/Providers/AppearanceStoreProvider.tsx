@@ -257,7 +257,6 @@ export const AppearanceStoreProvider: FC<{ children: ReactNode }> = ({ children 
       console.warn('[setHeadOverlay] Ignored update: missing overlay.id', overlay);
       return;
     }
-    console.log('[setHeadOverlay] overlay.id:', overlay.id, 'overlay:', JSON.stringify(overlay));
     TriggerNuiCallback(Send.setHeadOverlay, overlay, 1).then(() => {
       setAppearance(prev => {
         if (!prev) return prev;
@@ -268,7 +267,6 @@ export const AppearanceStoreProvider: FC<{ children: ReactNode }> = ({ children 
             [overlay.id]: overlay,
           },
         };
-        console.log('[setHeadOverlay] updated.headOverlay:', updated.headOverlay);
         return updated;
       });
     });

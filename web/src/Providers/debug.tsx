@@ -16,7 +16,6 @@ export const DebugProvider: FC = () => {
 
     const initialValues: Record<string, any> = {};
     SendDebuggers.forEach((section, sectionIndex) => {
-      console.log('Section:', section.label);
       section.actions.forEach((action, actionIndex) => {
         const key = `${sectionIndex}-${actionIndex}`;
         initialValues[key] = action.value ?? '';
