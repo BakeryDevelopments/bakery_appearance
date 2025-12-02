@@ -41,6 +41,8 @@ export const Hair: FC = () => {
     const hairColour = appearance?.hairColour;
 
     console.log('Rendering Hair Component with appearance:', JSON.stringify(hairColour));
+    console.log('Hair drawables:', JSON.stringify(drawables?.hair));
+    console.log('Hair drawTotal:', JSON.stringify(drawTotal?.hair));
 
 
     return (
@@ -74,7 +76,6 @@ export const Hair: FC = () => {
                                         max={drawTotal.hair.total}
                                         onChange={(value: number) => {
                                             if (drawables && drawables.hair) {
-                                                drawables.hair.texture = 0;
                                                 setDrawable(drawables.hair, value);
                                             }
                                         }}

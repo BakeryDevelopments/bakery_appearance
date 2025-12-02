@@ -317,23 +317,26 @@ export const AppearanceStoreProvider: FC<{ children: ReactNode }> = ({ children 
     if (isDrawableFetching.current || !appearance) return;
     isDrawableFetching.current = true;
 
-    if (isTexture) drawable.texture = value;
-    else drawable.value = value;
+    // Create a copy to avoid mutating the input
+    const updatedDrawable = { ...drawable };
+    
+    if (isTexture) updatedDrawable.texture = value;
+    else updatedDrawable.value = value;
 
     TriggerNuiCallback<number>(Send.setDrawable, {
-      value: drawable?.value ?? 0,
-      index: drawable?.index ?? 0,
-      texture: drawable?.texture ?? 0,
+      value: updatedDrawable?.value ?? 0,
+      index: updatedDrawable?.index ?? 0,
+      texture: updatedDrawable?.texture ?? 0,
       isTexture: isTexture ?? false,
     }, 7).then((drawableTotal) => {
       setAppearance((prev) => {
         if (!prev) return prev;
         const updated = { ...prev };
         if (!isTexture) {
-          updated.drawTotal[drawable.id!].textures = drawableTotal;
-          drawable.texture = 0;
+          updated.drawTotal[updatedDrawable.id!].textures = drawableTotal;
+          updatedDrawable.texture = 0;
         }
-        updated.drawables[drawable.id!] = drawable;
+        updated.drawables[updatedDrawable.id!] = updatedDrawable;
         return updated;
       });
       isDrawableFetching.current = false;

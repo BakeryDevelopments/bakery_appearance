@@ -60,7 +60,8 @@ function GetHeadOverlay(ped)
                 overlayValue = GetPedEyeColor(ped)
             }
         else
-            local _, ovalue, colourtype, firstcolour, secondcolour, oopacity = GetPedHeadOverlayData(ped, 1)
+            local _, ovalue, colourtype, firstcolour, secondcolour, oopacity = GetPedHeadOverlayData(ped, i)
+
             overlaydata[name] = {
                 index = i,
                 overlayValue = ovalue == 255 and -1 or ovalue,
@@ -102,7 +103,7 @@ function GetPedComponents(ped)
         components[name] = {
             id = name,
             index = i,
-            drawable = current,
+            value = current,
             texture = GetPedTextureVariation(ped, i)
         }
     end
@@ -134,7 +135,7 @@ function GetPedProps(ped)
         props[name] = {
             id = name,
             index = i,
-            prop = current,
+            value = current,
             texture = GetPedPropTextureIndex(ped, i)
         }
     end
