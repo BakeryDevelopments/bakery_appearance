@@ -1,4 +1,6 @@
 function SetHeadOverlay(ped, HeadBlendData)
+
+
     if HeadBlendData.index == 13 then
         SetPedEyeColor(ped, HeadBlendData.value)
     end
@@ -7,8 +9,12 @@ function SetHeadOverlay(ped, HeadBlendData)
         SetPedHairTint(ped, HeadBlendData.hairColour, HeadBlendData.hairHighlight)
     end
 
-    SetPedHeadOverlay(ped, HeadBlendData.index, HeadBlendData.value, Tofloat(HeadBlendData.overlayOpacity))
-    SetPedHeadOverlayColor(ped, HeadBlendData.index, 1, HeadBlendData.firstColor, HeadBlendData.secondColor)
+    local value = HeadBlendData.value or HeadBlendData.overlayValue
+
+    
+
+    SetPedHeadOverlay(ped, HeadBlendData.index, value, Tofloat(HeadBlendData.overlayOpacity))
+    SetPedHeadOverlayColor(ped, HeadBlendData.index, 1, HeadBlendData.firstColour, HeadBlendData.secondColour)
 end
 
 exports('SetPedHeadOverlay', SetHeadOverlay);
@@ -68,9 +74,14 @@ function SetModel(ped, Model)
         Wait(0)
     end
 
-    print('Setting model to ', hash )
 
-    SetPlayerModel(cache.playerId, hash)
+    if IsPedAPlayer(ped) then
+        SetPlayerModel(cache.playerId, hash)
+        ped = PlayerPedId()
+    else
+        SetPlayerModel(ped, hash)
+    end
+
     Wait(150)
     SetModelAsNoLongerNeeded(hash)
 
@@ -111,28 +122,35 @@ exports('SetPedFaceFeatures', SetFaceFeatures)
 --  NUI CALLBACKS --
 
 RegisterNuiCallback('setHeadBlend', function(data, cb)
+    print('Setting head blend')
     SetPedHeadBlend(cache.ped, data)
     cb(1)
 end)
 
 RegisterNuiCallback('setHeadOverlay', function(data, cb)
-    SetHeadOverlay(cache.pd, data)
+    print('Setting head overlay')
+    print(json.encode(data))
+    SetHeadOverlay(cache.ped, data)
     cb(1)
 end)
 
 RegisterNuiCallback('setHeadStructure', function(data, cb)
+    print('Setting head structure')
+    SetFaceFeatures(cache.ped, data)
+    cb(1)
+end)
+
+RegisterNuiCallback('setHeadStructure', function(data, cb)
+    print('Setting head structure')
     SetFaceFeatures(cache.ped, data)
     cb(1)
 end)
 
 
-RegisterNuiCallback('setModel', function(data, cb)
-    print('Set Model NUI Callback InvokedS')
-    local hash = data[1]
-    if type(hash) == "string" then data[1] = joaat(hash) end
-    local model = SetModel(cache.ped, hash)
-    print('Model set to ', model)
-    cb(model)
+RegisterNuiCallback('setDrawable', function(data, cb)
+    print('Setting drawable')
+    local totalTextures = SetDrawable(cache.ped, data)
+    cb(1)
 end)
 
 

@@ -13,11 +13,12 @@ client_scripts {'client/functions/*.lua','client/*.lua'}
 
 server_scripts {'server/*.lua'}
 
-ui_page 'web/build/index.html'
+-- ui_page 'web/build/index.html'
+ui_page 'http://localhost:5173/' --for dev
 
 files {
   'modules/*.lua',
   'web/build/index.html',
   'web/build/**/*',
-  'shared/locale/*.json'
+  'shared/locale/*.json',
 }

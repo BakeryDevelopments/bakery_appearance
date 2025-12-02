@@ -84,6 +84,7 @@ export const Face: FC = () => {
                                                             updateHeadOverlay({
                                                                 ...(headdata.Ageing || {}),
                                                                 overlayValue: val,
+                                                                id: 'Ageing',
                                                             })
                                                         }
                                                     />
@@ -156,6 +157,7 @@ export const Face: FC = () => {
                                                             updateHeadOverlay({
                                                                 ...(headdata.Blemishes || {}),
                                                                 overlayValue: val,
+                                                                id: 'Blemishes',
                                                             })
                                                         }
                                                     />
@@ -182,6 +184,7 @@ export const Face: FC = () => {
                                                             updateHeadOverlay({
                                                                 ...(headdata.Blemishes || {}),
                                                                 overlayOpacity: parseFloat(e.target.value),
+                                                                id: 'Blemishes',
                                                             })
                                                         }
                                                         style={{
@@ -399,6 +402,7 @@ export const Face: FC = () => {
                                                             updateHeadOverlay({
                                                                 ...(headdata.Complexion || {}),
                                                                 overlayValue: val,
+                                                                id: 'Complexion',
                                                             })
                                                         }
                                                     />
@@ -425,6 +429,7 @@ export const Face: FC = () => {
                                                             updateHeadOverlay({
                                                                 ...(headdata.Complexion || {}),
                                                                 overlayOpacity: parseFloat(e.target.value),
+                                                                id: 'Complexion',
                                                             })
                                                         }
                                                         style={{
@@ -937,6 +942,7 @@ export const Face: FC = () => {
                                                             updateHeadOverlay({
                                                                 ...(headdata.MolesFreckles || {}),
                                                                 overlayValue: val,
+                                                                id: 'MolesFreckles',
                                                             })
                                                         }
                                                     />
@@ -963,6 +969,7 @@ export const Face: FC = () => {
                                                             updateHeadOverlay({
                                                                 ...(headdata.MolesFreckles || {}),
                                                                 overlayOpacity: parseFloat(e.target.value),
+                                                                id: 'MolesFreckles',
                                                             })
                                                         }
                                                         style={{
@@ -1008,6 +1015,7 @@ export const Face: FC = () => {
                                                             updateHeadOverlay({
                                                                 ...(headdata.SunDamage || {}),
                                                                 overlayValue: val,
+                                                                id: 'SunDamage',
                                                             })
                                                         }
                                                     />
@@ -1034,6 +1042,7 @@ export const Face: FC = () => {
                                                             updateHeadOverlay({
                                                                 ...(headdata.SunDamage || {}),
                                                                 overlayOpacity: parseFloat(e.target.value),
+                                                                id: 'SunDamage',
                                                             })
                                                         }
                                                         style={{

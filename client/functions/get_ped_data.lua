@@ -1,4 +1,4 @@
-local peddata = require('modules.ped') 
+local peddata = require('modules.ped')
 
 local freemodepeds = {
     [`mp_m_freemode_01`] = true,
@@ -54,7 +54,7 @@ function GetHeadOverlay(ped)
         local name = peddata.Head[i]
         totals[name] = GetNumHeadOverlayValues(i)
 
-        if name == 'EyeColor' then
+        if name == 'EyeColour' then
             overlaydata[name] = {
                 index = i,
                 overlayValue = GetPedEyeColor(ped)
@@ -76,31 +76,86 @@ end
 
 function GetPedComponents(ped)
     local components = {}
+    local total = {}
+
+    local Isfreemode = IsFreemodePed(ped)
 
     for i = 0, 11 do
-        components[peddata.Components[i]] = {
-            id = peddata.Components[i],
-            drawable = GetPedDrawableVariation(ped, i),
-            texture = GetPedTextureVariation(ped, i),
-            index = i
+        local name = peddata.Components[i]
+        local current = GetPedDrawableVariation(ped, i)
+        local drawableCount = GetNumberOfPedDrawableVariations(ped, i)
+        local textureCount = GetNumberOfPedTextureVariations(ped, i, current)
+
+        if Isfreemode then
+            drawableCount = drawableCount - 1 -- exclude freemode extra drawable
+        end
+
+        -- drawTotal
+        total[name] = {
+            id = name,
+            total = drawableCount,
+            index = i,
+            textures = textureCount
+        }
+
+        -- drawables
+        components[name] = {
+            id = name,
+            index = i,
+            drawable = current,
+            texture = GetPedTextureVariation(ped, i)
         }
     end
 
-    return components
+    return components, total
 end
 
 function GetPedProps(ped)
-    local propdata = {}
+    local props = {}
+    local total = {}
 
     for i = 0, 7 do
-        propdata[peddata.Props[i]] = {
-            id = peddata
+        local name = peddata.Props[i]
+        local current = GetPedPropIndex(ped, i)
+        local textureCount = -1
+        if current ~= -1 then
+            textureCount = GetNumberOfPedPropTextureVariations(ped, i, current)
+        end
+
+        -- propTotal
+        total[name] = {
+            id = name,
+            total = GetNumberOfPedPropDrawableVariations(ped, i),
+            index = i,
+            textures = textureCount
+        }
+
+        -- props
+        props[name] = {
+            id = name,
+            index = i,
+            prop = current,
+            texture = GetPedPropTextureIndex(ped, i)
         }
     end
+
+    return props, total
 end
 
-function GetProps(ped)
+function GetHairColour(ped)
+    return {
+        Colour = GetPedHairColor(ped),
+        highlight = GetPedHairHighlightColor(ped)
+    }
+end
 
+function GetPedSkin(ped)
+    return {
+        headBlend = GetPedHeritageData(ped),
+        headStructure = GetHeadStructure(ped),
+        hairColour = GetHairColour(ped),
+        model = GetEntityModel(ped),
+    }
 end
 
 function IsFreemodePed(ped)

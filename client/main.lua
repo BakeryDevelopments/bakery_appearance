@@ -23,7 +23,7 @@ RegisterCommand('test_nui', function()
   handleNuiMessage({
     action = 'data',
     data = {
-      tabs = { "heritage", 'face' },
+      tabs = { "heritage", 'face', 'hair', 'clothes', 'accessories','makeup', 'tattoos', 'outfits' },
       appearance = GetPlayerAppearance(),
       locale = locale,
       models = {
@@ -50,30 +50,32 @@ function DebugPrint(msg)
   end
 end
 
-local function getPlayerInformation(_, cb)
-  local info = lib.callback.await('getplayerInformation')
-  local identifiers = {}
-  for _, identifier in pairs(info.identifiers) do identifiers[identifier:match('([^:]+):')] = identifier:match(':(.+)') end
-  cb({ name = info.name, identifiers = identifiers })
-end
-
-RegisterNUICallback('getplayerInformation', getPlayerInformation)
-
 
 function GetPlayerAppearance()
-  -- Dummy function to simulate getting player appearance
+  -- Expanded function to get player appearance
+  local headData, headTotal = GetHeadOverlay(cache.ped)
+  local drawables, drawTotal = GetPedComponents(cache.ped)
 
-  local headData, Headtotal = GetHeadOverlay(cache.ped)
+  print('Drawables: ' .. json.encode(drawables), 'Total: ' .. json.encode(drawTotal))
+  local props, propTotal = GetPedProps(cache.ped)
+  local model = GetEntityModel(cache.ped)
+  local hairColour = GetHairColour(cache.ped)
+  --local tattoos = cache.ped == PlayerPedId() and GetPedTattoos and GetPedTattoos(cache.ped) or {}
+
+  print('hairColour: ' .. json.encode(hairColour))
 
   local data = {
-    model = GetEntityModel(cache.ped),
+    model = model,
+    hairColour = hairColour,
     headBlend = GetPedHeritageData(cache.ped),
     headStructure = GetHeadStructure(cache.ped),
     headOverlay = headData,
-    headOverlayTotal = Headtotal,
-    components = GetPedComponents(cache.ped),
-    props = {},
-    tattoos = {}
+    headOverlayTotal = headTotal,
+    drawables = drawables,
+    drawTotal = drawTotal,
+    props = props,
+    propTotal = propTotal,
+    tattoos = nil
   }
 
   return data
