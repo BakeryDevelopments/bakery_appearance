@@ -209,57 +209,119 @@ lib.callback.register('tj_appearance:getPlayerRestrictions', function(source)
     local Player = QBCore.Functions.GetPlayer(source)
     if not Player then return {} end
     
-    -- Admins bypass all restrictions
-    --if IsAdmin(source) then return {} end
-    
     local job = Player.PlayerData.job.name
     local gang = Player.PlayerData.gang and Player.PlayerData.gang.name or nil
     
-    -- Legacy rows (simple model/clothing ids)
-    local legacy = MySQL.query.await([[SELECT * FROM appearance_restrictions WHERE (job = ? OR gang = ?)]], { job, gang })
-
     local out = {
-        male = { models = {}, clothing = {} },
-        female = { models = {}, clothing = {} }
+        male = { models = {}, drawables = {}, props = {} },
+        female = { models = {}, drawables = {}, props = {} }
     }
-
-    for _, row in ipairs(legacy or {}) do
-        local gender = row.gender
-        local itemType = row.type == 'model' and 'models' or 'clothing'
-        table.insert(out[gender][itemType], row.item_id)
-    end
-
-    -- Attach JSON sets under a unified key for consumers that expect TBlacklist
-    -- Note: Downstream UI can decide which gender to use based on ped
-    local jsonOut = { male = { models = {}, drawables = {}, props = {} }, female = { models = {}, drawables = {}, props = {} } }
-    for _, row in ipairs(sets or {}) do
-        local ok, decoded = pcall(json.decode, row.data)
-        if ok and decoded then
-            local g = row.gender
-            jsonOut[g] = decoded
+    
+    -- Iterate through ALL restrictions and lock items where player is NOT in the job/gang
+    for key, jobGangData in pairs(RestrictionsCache) do
+        for gender, restrictions in pairs(jobGangData) do
+            for _, restriction in ipairs(restrictions) do
+                -- Check if this restriction applies to a different job/gang than the player's
+                local isPlayerInGroup = false
+                
+                if restriction.job and restriction.job == job then
+                    isPlayerInGroup = true
+                end
+                
+                if restriction.gang and gang and restriction.gang == gang then
+                    isPlayerInGroup = true
+                end
+                
+                -- Only blacklist if player is NOT in the restricted group
+                if not isPlayerInGroup then
+                    if restriction.type == 'model' then
+                        -- Model blacklist
+                        table.insert(out[gender].models, restriction.itemId)
+                    else
+                        -- Clothing/prop blacklist
+                        local category = restriction.category
+                        local part = restriction.part -- 'drawable' or 'prop'
+                        local targetList = (part == 'prop') and out[gender].props or out[gender].drawables
+                        
+                        if restriction.texturesAll then
+                            -- Blacklist all textures for this item - add to values array
+                            if not targetList[category] then
+                                targetList[category] = { values = {} }
+                            end
+                            if not targetList[category].values then
+                                targetList[category].values = {}
+                            end
+                            table.insert(targetList[category].values, restriction.itemId)
+                        elseif restriction.textures and #restriction.textures > 0 then
+                            -- Blacklist specific textures only if textures array is not empty
+                            if not targetList[category] then
+                                targetList[category] = { textures = {} }
+                            end
+                            if not targetList[category].textures then
+                                targetList[category].textures = {}
+                            end
+                            targetList[category].textures[tostring(restriction.itemId)] = restriction.textures
+                        end
+                    end
+                end
+            end
         end
     end
 
-    return { legacy = out, json = jsonOut }
+    return { legacy = out }
 end)
 
 -- Add restriction
 lib.callback.register('tj_appearance:admin:addRestriction', function(source, restriction)
     if not IsAdmin(source) then return false end
     
+    local textures_json = nil
+    if restriction.textures and type(restriction.textures) == 'table' then
+        textures_json = json.encode(restriction.textures)
+    end
+    
     local result = MySQL.insert.await([[
-        INSERT INTO appearance_restrictions (job, gang, gender, type, item_id, name)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO appearance_restrictions (job, gang, gender, type, part, category, item_id, textures_all, textures)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     ]], {
         restriction.job,
         restriction.gang,
         restriction.gender,
         restriction.type,
+        restriction.part or 'drawable',
+        restriction.category,
         restriction.itemId,
-        restriction.name
+        (restriction.texturesAll and 1 or 0),
+        textures_json
     })
     
-    return result and result > 0
+    if result and result > 0 then
+        -- Update cache
+        local key = string.format('%s_%s', restriction.job or 'none', restriction.gang or 'none')
+        if not RestrictionsCache[key] then
+            RestrictionsCache[key] = { male = {}, female = {} }
+        end
+        if not RestrictionsCache[key][restriction.gender] then
+            RestrictionsCache[key][restriction.gender] = {}
+        end
+        
+        table.insert(RestrictionsCache[key][restriction.gender], {
+            id = tostring(result),
+            job = restriction.job,
+            gang = restriction.gang,
+            gender = restriction.gender,
+            type = restriction.type,
+            part = restriction.part,
+            category = restriction.category,
+            itemId = restriction.itemId,
+            texturesAll = restriction.texturesAll,
+            textures = restriction.textures
+        })
+        
+        return true
+    end
+    
+    return false
 end)
 
 -- Delete restriction
@@ -267,6 +329,10 @@ lib.callback.register('tj_appearance:admin:deleteRestriction', function(source, 
     if not IsAdmin(source) then return false end
     
     MySQL.query.await('DELETE FROM appearance_restrictions WHERE id = ?', { tonumber(id) })
+    
+    -- Update cache - reload entire cache for simplicity
+    LoadRestrictionsCache()
+    
     return true
 end)
 

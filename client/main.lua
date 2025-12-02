@@ -26,15 +26,12 @@ RegisterCommand('appearance', function()
   
   -- Fetch restrictions for this player
   lib.callback('tj_appearance:getPlayerRestrictions', false, function(restrictions)
-    local blacklist = {}
+    local blacklist = { models = {}, drawables = {}, props = {} }
     
     if restrictions and restrictions.legacy then
       local genderData = restrictions.legacy[gender]
       if genderData then
-        -- Convert legacy format to blacklist format
-        -- Models are just IDs, clothing needs to be structured per category
-        blacklist.models = genderData.models or {}
-        blacklist.clothing = genderData.clothing or {}
+        blacklist = genderData
       end
     end
     

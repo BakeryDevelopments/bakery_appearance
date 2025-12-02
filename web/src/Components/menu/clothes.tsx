@@ -37,6 +37,7 @@ export const ClothesMenu: FC = () => {
                                         value={drawables.masks.value || 0}
                                         min={0}
                                         max={drawTotal.masks.total}
+                                        blacklist={blacklist?.drawables?.masks?.values || null}
                                         onChange={(val: number) => {
                                             drawables.masks.texture = 0;
                                             setDrawable(drawables.masks, val);
@@ -82,6 +83,7 @@ export const ClothesMenu: FC = () => {
                                         value={drawables.jackets.value || 0}
                                         min={0}
                                         max={drawTotal.jackets.total}
+                                        blacklist={blacklist?.drawables?.jackets?.values || null}
                                         onChange={(val: number) => {
                                             drawables.jackets.texture = 0;
                                             setDrawable(drawables.jackets, val);
@@ -127,6 +129,7 @@ export const ClothesMenu: FC = () => {
                                         value={drawables.shirts.value || 0}
                                         min={0}
                                         max={drawTotal.shirts.total}
+                                        blacklist={blacklist?.drawables?.shirts?.values || null}
                                         onChange={(val: number) => {
                                             drawables.shirts.texture = 0;
                                             setDrawable(drawables.shirts, val);
@@ -172,6 +175,7 @@ export const ClothesMenu: FC = () => {
                                         value={drawables.torsos.value || 0}
                                         min={0}
                                         max={drawTotal.torsos.total}
+                                        blacklist={blacklist?.drawables?.torsos?.values || null}
                                         onChange={(val: number) => {
                                             drawables.torsos.texture = 0;
                                             setDrawable(drawables.torsos, val);
@@ -217,6 +221,7 @@ export const ClothesMenu: FC = () => {
                                         value={drawables.vest.value || 0}
                                         min={0}
                                         max={drawTotal.vest.total}
+                                        blacklist={blacklist?.drawables?.vest?.values || null}
                                         onChange={(val: number) => {
                                             drawables.vest.texture = 0;
                                             setDrawable(drawables.vest, val);
@@ -262,6 +267,7 @@ export const ClothesMenu: FC = () => {
                                         value={drawables.legs.value || 0}
                                         min={0}
                                         max={drawTotal.legs.total}
+                                        blacklist={blacklist?.drawables?.legs?.values || null}
                                         onChange={(val: number) => {
                                             drawables.legs.texture = 0;
                                             setDrawable(drawables.legs, val);
@@ -307,6 +313,7 @@ export const ClothesMenu: FC = () => {
                                         value={drawables.shoes.value || 0}
                                         min={0}
                                         max={drawTotal.shoes.total}
+                                        blacklist={blacklist?.drawables?.shoes?.values || null}
                                         onChange={(val: number) => {
                                             drawables.shoes.texture = 0;
                                             setDrawable(drawables.shoes, val);
@@ -352,6 +359,7 @@ export const ClothesMenu: FC = () => {
                                         value={drawables.bags.value || 0}
                                         min={0}
                                         max={drawTotal.bags.total}
+                                        blacklist={blacklist?.drawables?.bags?.values || null}
                                         onChange={(val: number) => {
                                             drawables.bags.texture = 0;
                                             setDrawable(drawables.bags, val);
@@ -397,6 +405,7 @@ export const ClothesMenu: FC = () => {
                                         value={drawables.neck.value || 0}
                                         min={0}
                                         max={drawTotal.neck.total}
+                                        blacklist={blacklist?.drawables?.neck?.values || null}
                                         onChange={(val: number) => {
                                             drawables.neck.texture = 0;
                                             setDrawable(drawables.neck, val);
@@ -442,6 +451,7 @@ export const ClothesMenu: FC = () => {
                                         value={drawables.decals.value || 0}
                                         min={0}
                                         max={drawTotal.decals.total}
+                                        blacklist={blacklist?.drawables?.decals?.values || null}
                                         onChange={(val: number) => {
                                             drawables.decals.texture = 0;
                                             setDrawable(drawables.decals, val);

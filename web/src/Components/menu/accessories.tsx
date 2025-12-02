@@ -40,6 +40,7 @@ export const Props: FC = () => {
                                                 value={props?.hats.value || 0}
                                                 min={-1}
                                                 max={propTotal.hats.total}
+                                                blacklist={blacklist?.props?.hats?.values || null}
                                                 onChange={(val: number) => {
                                                     if (props && props.hats) {
                                                         props.hats.texture = 0;
@@ -94,6 +95,7 @@ export const Props: FC = () => {
                                                 value={props?.glasses.value || 0}
                                                 min={-1}
                                                 max={propTotal.glasses.total}
+                                                blacklist={blacklist?.props?.glasses?.values || null}
                                                 onChange={(val: number) => {
                                                     if (props && props.glasses) {
                                                         props.glasses.texture = 0;
@@ -148,6 +150,7 @@ export const Props: FC = () => {
                                                 value={props?.earrings.value || 0}
                                                 min={-1}
                                                 max={propTotal.earrings.total}
+                                                blacklist={blacklist?.props?.earrings?.values || null}
                                                 onChange={(val: number) => {
                                                     if (props && props.earrings) {
                                                         props.earrings.texture = 0;
@@ -202,6 +205,7 @@ export const Props: FC = () => {
                                                 value={props?.watches.value || 0}
                                                 min={-1}
                                                 max={propTotal.watches.total}
+                                                blacklist={blacklist?.props?.watches?.values || null}
                                                 onChange={(val: number) => {
                                                     if (props && props.watches) {
                                                         props.watches.texture = 0;
@@ -256,6 +260,7 @@ export const Props: FC = () => {
                                                 value={props?.bracelets.value || 0}
                                                 min={-1}
                                                 max={propTotal.bracelets.total}
+                                                blacklist={blacklist?.props?.bracelets?.values || null}
                                                 onChange={(val: number) => {
                                                     if (props && props.bracelets) {
                                                         props.bracelets.texture = 0;
