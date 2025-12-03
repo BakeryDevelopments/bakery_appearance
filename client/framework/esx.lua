@@ -43,5 +43,3 @@ end
 function Framework.OnGangUpdate(callback)
     -- ESX doesn't have gangs by default
 end
-
-print('[tj_appearance] ESX client framework loaded')

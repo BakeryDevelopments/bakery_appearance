@@ -1,6 +1,5 @@
 import { DebugSection } from '../../types/debug';
 
-// TODO: Implement your debug actions
 const SendDebuggers: DebugSection[] = [
   {
     label: 'Example Section',
@@ -8,19 +7,19 @@ const SendDebuggers: DebugSection[] = [
       {
         type: 'button',
         label: 'Test Button',
-        action: () => console.log('Button clicked'),
+        action: () => {},
       },
       {
         type: 'text',
         label: 'Test Input',
         value: '',
-        action: (value) => console.log('Text value:', value),
+        action: (value) => {},
       },
       {
         type: 'checkbox',
         label: 'Test Checkbox',
         value: false,
-        action: (value) => console.log('Checkbox value:', value),
+        action: (value) => {},
       },
       {
         type: 'slider',
@@ -29,7 +28,7 @@ const SendDebuggers: DebugSection[] = [
         min: 0,
         max: 100,
         step: 1,
-        action: (value) => console.log('Slider value:', value),
+        action: (value) => {},
       },
     ],
   },

@@ -155,8 +155,6 @@ export const AdminMenu: FC = () => {
   });
 
   HandleNuiMessage<{lockedModels: string[]}>('setSettings', (data) => {
-    console.log('[AdminMenu] setSettings received:', data);
-    // Show which models are already locked from DB, but don't pre-select
     setLockedModelsSaved(data.lockedModels || []);
   });
 
@@ -770,9 +768,7 @@ export const AdminMenu: FC = () => {
                   <Button 
                     size="sm"
                     onClick={() => {
-                      TriggerNuiCallback('saveShopSettings', { settings: shopSettings, configs: shopConfigs }).then(() => {
-                        console.log('Shop settings saved');
-                      });
+                      TriggerNuiCallback('saveShopSettings', { settings: shopSettings, configs: shopConfigs }).then(() => {});
                     }}
                   >
                     Save All Shop Settings
@@ -1343,7 +1339,6 @@ export const AdminMenu: FC = () => {
                     try {
                       polyzone = JSON.parse(polyzonePointsInput);
                     } catch (e) {
-                      console.error('Invalid polyzone JSON');
                       return;
                     }
                   }

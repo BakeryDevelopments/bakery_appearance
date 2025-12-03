@@ -3,8 +3,6 @@
  * Uses postMessage to simulate NUI callbacks
  */
 export function DebugEventSend<T = unknown>(event: string, data?: unknown): void {
-  console.log('[Debug Event]', event, data);
-  
   // Use postMessage to simulate NUI message
   window.postMessage({
     action: event,
