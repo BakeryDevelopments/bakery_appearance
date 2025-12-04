@@ -1,15 +1,14 @@
--- Client-side cache loader for appearance data
--- Loads all data from JSON files directly instead of requesting from server
 local handleNuiMessage = require('modules.nui')
 local Cache = {
     theme = {},
-    modelssorted = false,
     models = {},
+    modelhash = {},
     zones = {},
     outfits = {},
     shopSettings = {},
     shopConfigs = {},
     blacklist = {},
+    locale = {}
 }
 
 -- Load settings (locked models) from JSON
@@ -21,15 +20,12 @@ local function loadSettings()
         shape = 'hexagon',
     }
 
+    -- Just load the flat array of restrictions
     local restrictionsFile = LoadResourceFile('tj_appearance', 'shared/data/restrictions.json')
     Cache.blacklist.restrictions = restrictionsFile and json.decode(restrictionsFile) or {}
 
-
     local settingsFile = LoadResourceFile('tj_appearance', 'shared/data/locked_models.json')
     Cache.blacklist.lockedModels = settingsFile and json.decode(settingsFile) or {}
-
-
-
 
     return Cache
 end
@@ -37,15 +33,30 @@ end
 -- Load models from JSON
 local function loadModels()
     local modelsFile = LoadResourceFile('tj_appearance', 'shared/data/models.json')
-    Cache.models = modelsFile and json.decode(modelsFile) or {}
+    local rawModels = modelsFile and json.decode(modelsFile) or {}
 
+    table.sort(rawModels)
+
+    -- Preallocate table with freemode models first
+    local sortedModels = { 'mp_m_freemode_01', 'mp_f_freemode_01' }
+    local insertIndex = #sortedModels + 1
+
+    -- Single loop to add all other models
+    for _, model in ipairs(rawModels) do
+        if model ~= 'mp_m_freemode_01' and model ~= 'mp_f_freemode_01' then
+            sortedModels[insertIndex] = model
+            insertIndex = insertIndex + 1
+        end
+    end
+
+    Cache.models = sortedModels
     return Cache.models
 end
 
 -- Load zones from JSON
 local function loadZones()
     local zonesFile = LoadResourceFile('tj_appearance', 'shared/data/zones.json')
-        Cache.zones = zonesFile and json.decode(zonesFile) or {}
+    Cache.zones = zonesFile and json.decode(zonesFile) or {}
 
     return Cache.zones
 end
@@ -76,10 +87,133 @@ local function loadShopConfigs()
     return Cache.shopConfigs
 end
 
+local function GetPlayerRestrictions()
+    local player = Framework and Framework.GetPlayerData() or nil
+    if not player then return nil end
+
+    local playerJob = player.job and player.job.name or nil
+    local playerGang = player.gang and player.gang.name or nil
+
+    local blocklist = {
+        male = { models = {}, drawables = {}, props = {} },
+        female = { models = {}, drawables = {}, props = {} }
+    }
+
+    if not Cache.blacklist.restrictions or type(Cache.blacklist.restrictions) ~= 'table' then
+        return blocklist
+    end
+
+    -- Process each restriction in the flat array
+    for _, restriction in ipairs(Cache.blacklist.restrictions) do
+        local isBlocked = false
+
+        -- If restriction has a group, check if player has it (as job OR gang)
+        if restriction.group and restriction.group ~= '' then
+            -- Player needs to have this group (as job or gang) to access the item
+            -- If they don't have it, block them
+            if playerJob ~= restriction.group and playerGang ~= restriction.group then
+                isBlocked = true
+            end
+        end
+        -- No group = available to everyone, so isBlocked stays false
+
+        -- Only add to blacklist if player is blocked from this restriction
+        if isBlocked then
+            -- Filter by gender if specified
+            local gender = restriction.gender
+            if gender and (gender == 'male' or gender == 'female') then
+                if restriction.type == 'model' then
+                    local modelName = restriction.itemId
+                    -- Don't block freemode models
+                    if modelName ~= 'mp_m_freemode_01' and modelName ~= 'mp_f_freemode_01' then
+                        table.insert(blocklist[gender].models, modelName)
+                    end
+                elseif restriction.type == 'clothing' then
+                    -- Handle clothing/prop restrictions
+                    local targetList = (restriction.part == 'prop') and blocklist[gender].props or
+                    blocklist[gender].drawables
+
+                    if restriction.texturesAll then
+                        if not targetList[restriction.category] then
+                            targetList[restriction.category] = { values = {} }
+                        end
+                        table.insert(targetList[restriction.category].values, restriction.itemId)
+                    elseif restriction.textures and #restriction.textures > 0 then
+                        if not targetList[restriction.category] then
+                            targetList[restriction.category] = { textures = {} }
+                        end
+                        targetList[restriction.category].textures[tostring(restriction.itemId)] = restriction.textures
+                    end
+                end
+            end
+        end
+    end
+
+    -- Merge model restrictions across genders
+    local merged, seen = {}, {}
+    for _, m in ipairs(blocklist.male.models) do
+        if not seen[m] then
+            table.insert(merged, m)
+            seen[m] = true
+        end
+    end
+    for _, m in ipairs(blocklist.female.models) do
+        if not seen[m] then
+            table.insert(merged, m)
+            seen[m] = true
+        end
+    end
+    blocklist.male.models = merged
+    blocklist.female.models = merged
+
+    -- Add locked models to blacklist
+    if Cache.blacklist.lockedModels then
+        for _, lockedModel in ipairs(Cache.blacklist.lockedModels) do
+            if lockedModel ~= 'mp_m_freemode_01' and lockedModel ~= 'mp_f_freemode_01' then
+                local alreadyBlacklisted = false
+                for _, m in ipairs(blocklist.male.models) do
+                    if m == lockedModel then
+                        alreadyBlacklisted = true
+                        break
+                    end
+                end
+                if not alreadyBlacklisted then
+                    table.insert(blocklist.male.models, lockedModel)
+                    table.insert(blocklist.female.models, lockedModel)
+                end
+            end
+        end
+    end
+
+    return blocklist
+end
+
+local function loadLocale()
+    local localeFile = LoadResourceFile('tj_appearance', 'shared/data/locale/en.json')
+    Cache.locale = localeFile and json.decode(localeFile) or {}
+    return Cache.locale
+end
+
+local function getmodelhashname(hash)
+    if hash == `mp_m_freemode_01` then
+        return 'mp_m_freemode_01'
+    elseif hash == `mp_f_freemode_01` then
+        return 'mp_f_freemode_01'
+    end
+
+    for _, modelName in pairs(Cache.models) do
+        if joaat(modelName) == hash then
+            return modelName
+        end
+    end
+    return nil
+end
+
 
 
 -- Initialize all caches on startup
 local function initializeCache()
+    loadLocale()
     loadSettings()
     loadModels()
     loadZones()
@@ -90,8 +224,10 @@ local function initializeCache()
     -- Load theme (includes shape) from cache
     handleNuiMessage({ action = 'setThemeConfig', data = Cache.theme }, true)
 
-    -- Load all restrictions from cache
-    handleNuiMessage({ action = 'setRestrictions', data = Cache.restrictions }, true)
+    -- Load all restrictions from cache for admin UI
+    if Cache.blacklist.restrictions and type(Cache.blacklist.restrictions) == 'table' then
+        handleNuiMessage({ action = 'setRestrictions', data = Cache.blacklist.restrictions }, true)
+    end
 end
 
 
@@ -110,46 +246,12 @@ local CacheAPI = {
     getOutfits = function() return Cache.outfits end,
     getShopSettings = function() return Cache.shopSettings end,
     getShopConfigs = function() return Cache.shopConfigs end,
-    getRestrictions = function() return Cache.blacklist.restrictions end,
-
-    -- Helper to get models in sorted order (freemode first)
-    getSortedModels = function()
-
-        if Cache.modelssorted then
-            return Cache.models
-        end
-
-        local freemodeModels = { 'mp_m_freemode_01', 'mp_f_freemode_01' }
-        local otherModels = {}
-
-        for _, model in ipairs(Cache.models) do
-            if model ~= 'mp_m_freemode_01' and model ~= 'mp_f_freemode_01' then
-                table.insert(otherModels, model)
-            end
-        end
-
-        local sortedModels = {}
-        -- Add freemode models first if they exist in cache
-        for _, freemodel in ipairs(freemodeModels) do
-            for _, model in ipairs(Cache.models) do
-                if model == freemodel then
-                    table.insert(sortedModels, model)
-                    break
-                end
-            end
-        end
-
-        -- Add other models
-        for _, model in ipairs(otherModels) do
-            table.insert(sortedModels, model)
-        end
-
-        Cache.modelssorted = true
-        Cache.models = sortedModels
-
-        return sortedModels
+    getLocale = function() return Cache.locale end,
+    getRestrictions = function()
+        -- Return all restrictions for admin UI
+        return Cache.blacklist.restrictions or {}
     end,
+    getPlayerRestrictions = GetPlayerRestrictions,
+    getModelHashName = getmodelhashname,
 
 }
-
-return CacheAPI

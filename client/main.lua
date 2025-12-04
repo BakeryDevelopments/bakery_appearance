@@ -1,85 +1,71 @@
 local handleNuiMessage = require('modules.nui')
 local CacheAPI = require('client.functions.cache')
 
+
 -- Initialize cache on resource start
 CreateThread(function()
   CacheAPI.init()
 end)
 
 RegisterCommand('appearance', function()
-  local localeFile = LoadResourceFile(GetCurrentResourceName(), "shared/locale/en.json")
-
-  if not localeFile then
-    return
-  end
-
-  local locale = json.decode(localeFile)
-
-  if not locale then
-    return
-  end
-
   -- Get player's current model to determine gender
   local model = GetEntityModel(cache.ped)
   local isMale = model == GetHashKey("mp_m_freemode_01")
   local gender = isMale and 'male' or 'female'
 
-    local blacklist = { models = {}, drawables = {}, props = {} }
 
-    local restrictions = CacheAPI.getRestrictions()
-    
-    if restrictions and restrictions.legacy then
-      local genderData = restrictions.legacy[gender]
-      if genderData then
-        blacklist = genderData
-      end
+  -- Get player-specific restrictions from cache
+  local restrictions = CacheAPI.getPlayerRestrictions()
+  local blacklist = { models = {}, drawables = {}, props = {} }
+
+  if restrictions then
+    local genderData = restrictions[gender]
+    if genderData then
+      blacklist = genderData
     end
+  end
 
-    local models = CacheAPI.getSortedModels()
-    
-    -- Cache models globally for hash-to-string conversion
-    _G.cachedModels = models
-    
-    -- Get locked models from cache
-    local settings = CacheAPI.getSettings()
-    local lockedModels = (settings and settings.lockedModels) or {}
-    
-    -- Get player data from framework
-    local playerData = Framework and Framework.GetPlayerData() or nil
-    local jobData = { name = "", isBoss = false }
-    
-    if playerData and playerData.job then
-      jobData = {
-        name = playerData.job.name,
-        isBoss = playerData.job.isBoss
-      }
-    end
-    
-    handleNuiMessage({
-      action = 'data',
-      data = {
-        tabs = { "heritage", 'face', 'hair', 'clothes', 'accessories','makeup', 'tattoos', 'outfits' },
-        appearance = GetPlayerAppearance(),
-        locale = locale,
-        models = models,
-        blacklist = blacklist,
-        tattoos = {},
-        outfits = {},
-        allowExit = true,
-        job = jobData
-      }
-    }, true)
-    
-    -- Send locked models separately
-    handleNuiMessage({
-      action = 'setLockedModels',
-      data = lockedModels
-    }, true)
-    
-    Wait(100)
-    ToggleCam(true)
-    handleNuiMessage({ action = 'setVisibleApp', data = true }, true)
+  local models = CacheAPI.getModels()
 
+  -- Get locked models from cache
+  local settings = CacheAPI.getSettings()
+  local lockedModels = (settings and settings.lockedModels) or {}
+
+  -- Get player data from framework
+  local playerData = Framework and Framework.GetPlayerData() or nil
+  local jobData = { name = "", isBoss = false }
+
+  if playerData and playerData.job then
+    jobData = {
+      name = playerData.job.name,
+      isBoss = playerData.job.isBoss
+    }
+  end
+
+  handleNuiMessage({
+    action = 'data',
+    data = {
+      tabs = { "heritage", 'face', 'hair', 'clothes', 'accessories', 'makeup', 'tattoos', 'outfits' },
+      appearance = GetPlayerAppearance(),
+      locale = CacheAPI.getLocale(),
+      models = models,
+      blacklist = blacklist,
+      tattoos = {},
+      outfits = {},
+      allowExit = true,
+      job = jobData
+    }
+  }, true)
+
+  -- Send locked models separately
+  handleNuiMessage({
+    action = 'setLockedModels',
+    data = lockedModels
+  }, true)
+
+  Wait(100)
+  ToggleCam(true)
+  handleNuiMessage({ action = 'setVisibleApp', data = true }, true)
 end, false)
 
 RegisterNuiCallback('save', function(data, cb)
@@ -119,25 +105,8 @@ function GetPlayerAppearance()
   --local tattoos = cache.ped == PlayerPedId() and GetPedTattoos and GetPedTattoos(cache.ped) or {}
 
   -- Convert model hash to string by checking against available models
-  local modelString = modelHash
-  
-  -- Check common freemode models first
-  if modelHash == `mp_m_freemode_01` then
-    modelString = "mp_m_freemode_01"
-  elseif modelHash == `mp_f_freemode_01` then
-    modelString = "mp_f_freemode_01"
-  else
-    -- For other models, try to find matching hash in models list
-    if _G.cachedModels then
-      for _, modelName in ipairs(_G.cachedModels) do
-        local calculatedHash = joaat(modelName)
-        if calculatedHash == modelHash then
-          modelString = modelName
-          break
-        end
-      end
-    end
-  end
+  local modelString = CacheAPI.getModelHashName(modelHash)
+
 
   local data = {
     model = modelString,
@@ -158,16 +127,8 @@ end
 
 -- Admin Menu
 RegisterNetEvent('tj_appearance:client:openAdminMenu', function()
-  -- Load all data from cache instead of server callbacks
-  handleNuiMessage({ action = 'setThemeConfig', data = CacheAPI.getTheme() }, true)
-  handleNuiMessage({ action = 'setRestrictions', data = CacheAPI.getRestrictions() }, true)
-  handleNuiMessage({ action = 'setModels', data = CacheAPI.getSortedModels() }, true)
-  handleNuiMessage({ action = 'setSettings', data = CacheAPI.getSettings() }, true)
-  handleNuiMessage({ action = 'setShopSettings', data = CacheAPI.getShopSettings() }, true)
-  handleNuiMessage({ action = 'setShopConfigs', data = CacheAPI.getShopConfigs() }, true)
-  handleNuiMessage({ action = 'setZones', data = CacheAPI.getZones() }, true)
-  handleNuiMessage({ action = 'setOutfits', data = CacheAPI.getOutfits() }, true)
-  
+  -- Load all data from cache instead of server callback
+
   handleNuiMessage({ action = 'setVisibleAdminMenu', data = true }, true)
   SetNuiFocus(true, true)
 end)
@@ -270,4 +231,3 @@ RegisterNuiCallback('getPlayerCoords', function(_, cb)
   local heading = GetEntityHeading(ped)
   cb({ x = x, y = y, z = z, heading = heading })
 end)
-

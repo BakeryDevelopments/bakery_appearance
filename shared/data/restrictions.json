@@ -1,16 +1,9 @@
-{
-    "female": [
-        {
-            "group": "gang",
-            "name": "ballas",
-            "gender": "female",
-            "type": "clothing",
-            "item_id": 4,
-            "label": null,
-            "part": "drawable",
-            "category": "jackets",
-            "textures_all": 1,
-            "textures": null
-        }
-    ]
-}
+[
+    {
+        "id": "1",
+        "group": "ballas",
+        "gender": "male",
+        "type": "model",
+        "itemId": "a_m_y_business_01"
+    }
+]
