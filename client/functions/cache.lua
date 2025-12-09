@@ -5,6 +5,7 @@ local Cache = {
     modelhash = {},
     zones = {},
     outfits = {},
+    tattoos = {},
     shopSettings = {},
     shopConfigs = {},
     blacklist = {},
@@ -66,6 +67,13 @@ local function loadOutfits()
     local outfitsFile = LoadResourceFile('tj_appearance', 'shared/data/outfits.json')
     Cache.outfits = outfitsFile and json.decode(outfitsFile) or {}
     return Cache.outfits
+end
+
+-- Load tattoos from JSON
+local function loadTattoos()
+    local tattoosFile = LoadResourceFile('tj_appearance', 'shared/data/tattoos.json')
+    Cache.tattoos = tattoosFile and json.decode(tattoosFile) or {}
+    return Cache.tattoos
 end
 
 -- Load shop settings from JSON
@@ -189,7 +197,7 @@ local function GetPlayerRestrictions()
 end
 
 local function loadLocale()
-    local localeFile = LoadResourceFile('tj_appearance', 'shared/data/locale/en.json')
+    local localeFile = LoadResourceFile('tj_appearance', 'shared/locale/'..Config.Locale..'.json')
     Cache.locale = localeFile and json.decode(localeFile) or {}
     return Cache.locale
 end
@@ -218,22 +226,40 @@ local function initializeCache()
     loadModels()
     loadZones()
     loadOutfits()
+    loadTattoos()
     loadShopSettings()
     loadShopConfigs()
 
-    -- Load theme (includes shape) from cache
-    handleNuiMessage({ action = 'setThemeConfig', data = Cache.theme }, true)
+    -- Wait a bit for NUI to be ready
+    Wait(100)
 
-    -- Load all restrictions from cache for admin UI
-    if Cache.blacklist.restrictions and type(Cache.blacklist.restrictions) == 'table' then
-        handleNuiMessage({ action = 'setRestrictions', data = Cache.blacklist.restrictions }, true)
-    end
+    handleNuiMessage({ action = 'setRestrictions', data = Cache.blacklist.restrictions or {} }, false)
+    handleNuiMessage({ action = 'setModels', data = Cache.models }, false)
+    handleNuiMessage({ action = 'setLockedModels', data = Cache.blacklist.lockedModels or {} }, false)
+    handleNuiMessage({ action = 'setShopSettings', data = Cache.shopSettings }, false)
+    handleNuiMessage({ action = 'setShopConfigs', data = Cache.shopConfigs }, false)
+    handleNuiMessage({ action = 'setZones', data = Cache.zones }, false)
+    handleNuiMessage({ action = 'setOutfits', data = Cache.outfits }, false)
+    handleNuiMessage({ action = 'setTattoos', data = Cache.tattoos }, false)
+    
+    -- Send theme and locale with a small delay to ensure NUI handlers are ready
+    SetTimeout(200, function()
+        handleNuiMessage({ action = 'setThemeConfig', data = Cache.theme }, false)
+        handleNuiMessage({ action = 'setLocale', data = Cache.locale }, false)
+    end)
+    
+    print('[tj_appearance] Cache initialized and sent to NUI')
 end
 
 
 RegisterNetEvent('tj_appearance:client:updateTheme', function(theme)
     Cache.theme = theme
     handleNuiMessage({ action = 'setThemeConfig', data = theme }, true)
+end)
+
+RegisterNetEvent('tj_appearance:client:updateTattoos', function(tattoos)
+    Cache.tattoos = tattoos or {}
+    handleNuiMessage({ action = 'setTattoos', data = Cache.tattoos }, true)
 end)
 
 -- Public API to get cache data
@@ -244,14 +270,33 @@ local CacheAPI = {
     getModels = function() return Cache.models end,
     getZones = function() return Cache.zones end,
     getOutfits = function() return Cache.outfits end,
+    getTattoos = function() return Cache.tattoos end,
     getShopSettings = function() return Cache.shopSettings end,
     getShopConfigs = function() return Cache.shopConfigs end,
     getLocale = function() return Cache.locale end,
+    getBlacklistSettings = function() return Cache.blacklist end,
     getRestrictions = function()
-        -- Return all restrictions for admin UI
-        return Cache.blacklist.restrictions or {}
+        -- Flatten nested restrictions structure for AdminMenu
+        local flattened = {}
+        local restrictions = Cache.blacklist.restrictions
+        if restrictions and type(restrictions) == 'table' then
+            for groupKey, genderRestrictions in pairs(restrictions) do
+                if type(genderRestrictions) == 'table' then
+                    for gender, items in pairs(genderRestrictions) do
+                        if type(items) == 'table' then
+                            for _, restriction in ipairs(items) do
+                                table.insert(flattened, restriction)
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        return flattened
     end,
     getPlayerRestrictions = GetPlayerRestrictions,
     getModelHashName = getmodelhashname,
 
 }
+
+return CacheAPI

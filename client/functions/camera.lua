@@ -176,10 +176,17 @@ end
 RegisterNuiCallback('scrollWheel', function(direction, cb)
   local maxZoom = currentBone == 'whole' and CAM_CONFIG.Body_Distance or CAM_CONFIG.Default_Distance
 
+  local cache = cameraDistance
+
   if direction == 'in' then
-    cameraDistance = math.max(0.2, cameraDistance - 0.05)
+    cameraDistance = math.max(0.3, cameraDistance - 0.05)
   elseif direction == 'out' then
     cameraDistance = math.min(maxZoom, cameraDistance + 0.05)
+  end
+
+  if cache == cameraDistance then
+    cb('ok')
+    return
   end
   SetCamPosition()
   cb('ok')

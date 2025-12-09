@@ -1,3 +1,6 @@
+local CacheAPI = require('client.functions.cache')
+_CurrentTattoos = _CurrentTattoos or {}
+
 function SetHeadOverlay(ped, HeadBlendData)
 
 
@@ -41,7 +44,8 @@ function SetDrawable(ped, Drawdata)
     if not Drawdata then return end
 
     SetPedComponentVariation(ped, Drawdata.index, Drawdata.value, Drawdata.texture, 0)
-    return GetNumberOfPedTextureVariations(ped, Drawdata.index, Drawdata.value)
+    local variations =  GetNumberOfPedTextureVariations(ped, Drawdata.index, Drawdata.value)
+    return variations
 end
 
 exports('SetPedDrawable', SetDrawable);
@@ -142,6 +146,33 @@ end
 exports('SetPedFaceFeature', SetFaceFeatures)
 exports('SetPedFaceFeatures', SetFaceFeatures)
 
+local function ApplyTattoos(ped, tattoos)
+    if not ped then return end
+
+    ClearPedDecorations(ped)
+    if not tattoos or type(tattoos) ~= 'table' then return end
+
+    local tattooOptions = CacheAPI and CacheAPI.getTattoos and CacheAPI.getTattoos() or nil
+
+    for _, entry in ipairs(tattoos) do
+        local tattooData = entry and entry.tattoo
+        if tattooData then
+            local collection = tattooData.dlc
+            if not collection and tattooOptions then
+                local zoneIndex = (entry.zoneIndex or 0) + 1
+                local dlcIndex = (entry.dlcIndex or 0) + 1
+                local zone = tattooOptions[zoneIndex]
+                local dlc = zone and zone.dlcs and zone.dlcs[dlcIndex]
+                collection = dlc and dlc.label
+            end
+
+            if collection and tattooData.hash then
+                AddPedDecorationFromHashes(ped, joaat(collection), tattooData.hash)
+            end
+        end
+    end
+end
+
 
 --  NUI CALLBACKS --
 
@@ -167,7 +198,17 @@ end)
 
 RegisterNuiCallback('setDrawable', function(data, cb)
     local totalTextures = SetDrawable(cache.ped, data)
-    cb(1)
+    cb(totalTextures)
+end)
+
+RegisterNuiCallback('setTattoos', function(data, cb)
+    _CurrentTattoos = data or {}
+    ApplyTattoos(cache.ped, _CurrentTattoos)
+    cb(true)
+end)
+
+RegisterNuiCallback('getModelTattoos', function(_, cb)
+    cb(CacheAPI.getTattoos())
 end)
 
 RegisterNuiCallback('setModel', function(data, cb)

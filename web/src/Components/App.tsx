@@ -9,6 +9,7 @@ import { useDebugDataReceiver } from '../Hooks/useDebugDataReceiver';
 import { IsRunningInBrowser } from '../Utils/Misc';
 import { useCustomization } from '../Providers/CustomizationProvider';
 import { CameraShape } from './micro/CameraShape';
+import { useAppearanceStore } from '../Providers/AppearanceStoreProvider';
 
 import { AppearanceMenu } from './menu';
 import { AppearanceNav } from './nav';

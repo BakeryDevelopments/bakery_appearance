@@ -1,6 +1,7 @@
-import { createContext, useContext, ReactNode, FC, useState, useRef } from 'react';
+import { createContext, useContext, ReactNode, FC, useState, useRef, useEffect } from 'react';
 import { Send } from '../enums/events';
 import { TriggerNuiCallback } from '../Utils/TriggerNuiCallback';
+import { HandleNuiMessage } from '../Hooks/HandleNuiMessage';
 
 import type {
   TAppearance,
@@ -22,7 +23,6 @@ import type {
   TTattoo,
   TJOBDATA,
 } from '../types/appearance';
-import { debugAppearance } from '../Utils/debug/debug_content';
 
 interface AppearanceStoreContextType {
   // State
@@ -125,6 +125,23 @@ export const AppearanceStoreProvider: FC<{ children: ReactNode }> = ({ children 
   const isDrawableFetching = useRef(false);
   const isToggling = useRef(false);
 
+  // Listen for locale updates from NUI
+  HandleNuiMessage<{ [key: string]: string }>('setLocale', (data) => {
+    setLocale(data);
+  });
+
+  HandleNuiMessage<TModel[]>('setModels', (data) => {
+    setModels(data);
+  });
+
+  HandleNuiMessage<string[]>('setLockedModels', (data) => {
+    setLockedModels(data || []);
+  });
+
+  HandleNuiMessage<TZoneTattoo[]>('setTattoos', (data) => {
+    setTattoos(data);
+  });
+
   // Outfits methods
   const saveOutfit = (label: string, job?: { name: string; rank: number } | null) => {
     if (!appearance) return;
@@ -222,7 +239,7 @@ export const AppearanceStoreProvider: FC<{ children: ReactNode }> = ({ children 
   const setModel = (model: TModel) => {
     TriggerNuiCallback<TAppearance>(Send.setModel, model).then((data) => {
       if (!data) return;
-      
+
       // Update appearance with all new model data
       setAppearance(prev => {
         const index = models?.indexOf(model) ?? 0;
@@ -322,7 +339,7 @@ export const AppearanceStoreProvider: FC<{ children: ReactNode }> = ({ children 
 
     // Create a copy to avoid mutating the input
     const updatedDrawable = { ...drawable };
-    
+
     if (isTexture) updatedDrawable.texture = value;
     else updatedDrawable.value = value;
 

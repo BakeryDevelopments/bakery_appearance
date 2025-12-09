@@ -60,13 +60,13 @@ export const Hair: FC = () => {
                 <>
                     {/* HAIR */}
                     <Box>
-                        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale.HAIR_TITLE || 'Mother'}</Text>
+                        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.HAIR_TITLE || 'Mother'}</Text>
                         <Grid gutter="sm">
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale.DESIGN_SUBTITLE || 'Design'}</Text>
-                                        <Text size="sm" c="dimmed">{locale.TOTAL_SUBTITLE || 'Total'}: {drawTotal.hair.total}</Text>
+                                        <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Design'}</Text>
+                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.hair.total}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={drawables?.hair.value || 0}
@@ -83,8 +83,8 @@ export const Hair: FC = () => {
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale.TEXTURE_SUBTITLE || 'Texture'}</Text>
-                                        <Text size="sm" c="dimmed">{locale.TOTAL_SUBTITLE || 'Total'}: {drawTotal.hair.textures}</Text>
+                                        <Text size="sm" c="dimmed">{locale?.TEXTURE_SUBTITLE || 'Texture'}</Text>
+                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.hair.textures}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={drawables?.hair.texture || 0}
@@ -106,7 +106,7 @@ export const Hair: FC = () => {
 
                             <Box>
                                 <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '6px' }}>
-                                    <Text size="sm" c="dimmed">{locale.COLOUR_SUBTITLE || 'Colour'}</Text>
+                                    <Text size="sm" c="dimmed">{locale?.COLOUR_SUBTITLE || 'Colour'}</Text>
                                 </Box>
                                 <ColourDropdown
                                     colourType="hair"
@@ -132,7 +132,7 @@ export const Hair: FC = () => {
                         <Grid.Col span={6}>
                             <Box>
                                 <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '6px' }}>
-                                    <Text size="sm" c="dimmed">{locale.HIGHLIGHT_SUBTITLE || 'Hightlight'}</Text>
+                                    <Text size="sm" c="dimmed">{locale?.HIGHLIGHT_SUBTITLE || 'Hightlight'}</Text>
                                 </Box>
                                 <ColourDropdown
                                     colourType="hair"
@@ -165,12 +165,12 @@ export const Hair: FC = () => {
                     {/* FACIAL HAIR */}
                     <Divider />
                     <Box>
-                        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale.FACIALHAIR_TITLE || 'Mother'}</Text>
+                        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.FACIALHAIR_TITLE || 'Mother'}</Text>
 
                         <Box>
                             <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                <Text size="sm" c="dimmed">{locale.TEXTURE_SUBTITLE || 'Texture'}</Text>
-                                <Text size="sm" c="dimmed">{locale.TOTAL_SUBTITLE || 'Total'}: {headOverlayTotal.FacialHair}</Text>
+                                <Text size="sm" c="dimmed">{locale?.TEXTURE_SUBTITLE || 'Texture'}</Text>
+                                <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {headOverlayTotal.FacialHair}</Text>
                             </Box>
                             <NumberStepper
                                 value={(headOverlay?.FacialHair?.overlayValue ?? 0)}
@@ -195,7 +195,7 @@ export const Hair: FC = () => {
                         <Grid.Col span={6}>
                             <Box>
                                 <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '6px' }}>
-                                    <Text size="sm" c="dimmed">{locale.COLOUR_SUBTITLE || 'Colour'}</Text>
+                                    <Text size="sm" c="dimmed">{locale?.COLOUR_SUBTITLE || 'Colour'}</Text>
                                 </Box>
                                 <ColourDropdown
                                     colourType="hair"
@@ -222,7 +222,7 @@ export const Hair: FC = () => {
 
                             <Box>
                                 <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '6px' }}>
-                                    <Text size="sm" c="dimmed">{locale.HIGHLIGHT_SUBTITLE || 'Hightlight'}</Text>
+                                    <Text size="sm" c="dimmed">{locale?.HIGHLIGHT_SUBTITLE || 'Hightlight'}</Text>
                                 </Box>
                                 <ColourDropdown
                                     colourType="hair"
@@ -250,13 +250,13 @@ export const Hair: FC = () => {
                     <Box>
                         <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.625rem' }}>
                             <Text size="sm" c="dimmed" ta="right">
-                                {locale.OPACITY_SUBTITLE || 'Opacity'}
+                                {locale?.OPACITY_SUBTITLE || 'Opacity'}
                             </Text>
                         </Box>
                         <Box style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                             <input
                                 type="range"
-                                min={-1}
+                                min={0}
                                 max={1}
                                 step={0.01}
                                 value={headOverlay.FacialHair.overlayOpacity ?? 0}
@@ -288,12 +288,12 @@ export const Hair: FC = () => {
                     {/* CHEST HAIR */}
                     <Divider />
                     <Box>
-                        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale.CHESTHAIR_TITLE || 'Mother'}</Text>
+                        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.CHESTHAIR_TITLE || 'Mother'}</Text>
 
                         <Box>
                             <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                <Text size="sm" c="dimmed">{locale.TEXTURE_SUBTITLE || 'Texture'}</Text>
-                                <Text size="sm" c="dimmed">{locale.TOTAL_SUBTITLE || 'Total'}: {headOverlayTotal.ChestHair}</Text>
+                                <Text size="sm" c="dimmed">{locale?.TEXTURE_SUBTITLE || 'Texture'}</Text>
+                                <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {headOverlayTotal.ChestHair}</Text>
                             </Box>
                             <NumberStepper
                                 value={(headOverlay?.ChestHair?.overlayValue ?? 0)}
@@ -318,7 +318,7 @@ export const Hair: FC = () => {
                         <Grid.Col span={6}>
                             <Box>
                                 <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '6px' }}>
-                                    <Text size="sm" c="dimmed">{locale.COLOUR_SUBTITLE || 'Colour'}</Text>
+                                    <Text size="sm" c="dimmed">{locale?.COLOUR_SUBTITLE || 'Colour'}</Text>
                                 </Box>
                                 <ColourDropdown
                                     colourType="hair"
@@ -345,7 +345,7 @@ export const Hair: FC = () => {
 
                             <Box>
                                 <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '6px' }}>
-                                    <Text size="sm" c="dimmed">{locale.HIGHLIGHT_SUBTITLE || 'Hightlight'}</Text>
+                                    <Text size="sm" c="dimmed">{locale?.HIGHLIGHT_SUBTITLE || 'Hightlight'}</Text>
                                 </Box>
                                 <ColourDropdown
                                     colourType="hair"
@@ -373,13 +373,13 @@ export const Hair: FC = () => {
                     <Box>
                         <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.625rem' }}>
                             <Text size="sm" c="dimmed" ta="right">
-                                {locale.OPACITY_SUBTITLE || 'Opacity'}
+                                {locale?.OPACITY_SUBTITLE || 'Opacity'}
                             </Text>
                         </Box>
                         <Box style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                             <input
                                 type="range"
-                                min={-1}
+                                min={0}
                                 max={1}
                                 step={0.01}
                                 value={headOverlay.ChestHair.overlayOpacity ?? 0}
@@ -411,12 +411,12 @@ export const Hair: FC = () => {
                     {/* CHEST HAIR */}
                     <Divider />
                     <Box>
-                        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale.EYEBROWS_TITLE || 'Mother'}</Text>
+                        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.EYEBROWS_TITLE || 'Mother'}</Text>
 
                         <Box>
                             <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                <Text size="sm" c="dimmed">{locale.TEXTURE_SUBTITLE || 'Texture'}</Text>
-                                <Text size="sm" c="dimmed">{locale.TOTAL_SUBTITLE || 'Total'}: {headOverlayTotal.Eyebrows}</Text>
+                                <Text size="sm" c="dimmed">{locale?.TEXTURE_SUBTITLE || 'Texture'}</Text>
+                                <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {headOverlayTotal.Eyebrows}</Text>
                             </Box>
                             <NumberStepper
                                 value={(headOverlay?.Eyebrows?.overlayValue ?? 0)}
@@ -441,7 +441,7 @@ export const Hair: FC = () => {
                         <Grid.Col span={6}>
                             <Box>
                                 <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '6px' }}>
-                                    <Text size="sm" c="dimmed">{locale.COLOUR_SUBTITLE || 'Colour'}</Text>
+                                    <Text size="sm" c="dimmed">{locale?.COLOUR_SUBTITLE || 'Colour'}</Text>
                                 </Box>
                                 <ColourDropdown
                                     colourType="hair"
@@ -468,7 +468,7 @@ export const Hair: FC = () => {
 
                             <Box>
                                 <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '6px' }}>
-                                    <Text size="sm" c="dimmed">{locale.HIGHLIGHT_SUBTITLE || 'Hightlight'}</Text>
+                                    <Text size="sm" c="dimmed">{locale?.HIGHLIGHT_SUBTITLE || 'Hightlight'}</Text>
                                 </Box>
                                 <ColourDropdown
                                     colourType="hair"
@@ -496,16 +496,16 @@ export const Hair: FC = () => {
                     <Box>
                         <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.625rem' }}>
                             <Text size="sm" c="dimmed" ta="right">
-                                {locale.OPACITY_SUBTITLE || 'Opacity'}
+                                {locale?.OPACITY_SUBTITLE || 'Opacity'}
                             </Text>
                         </Box>
                         <Box style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                             <input
                                 type="range"
-                                min={-1}
+                                min={0}
                                 max={1}
                                 step={0.01}
-                                value={headOverlay.Eyebrows.overlayOpacity ?? 0}
+                                value={headOverlay.Eyebrows.overlayOpacity ?? 1}
                                 onChange={(e) => {
                                     if (headOverlay && headOverlay.Eyebrows) {
                                         updateHeadOverlay({

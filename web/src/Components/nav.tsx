@@ -211,6 +211,8 @@ export const AppearanceNav: FC<AppearanceNavProps> = ({ animateIn }) => {
   };
 
   const handleSaveOrClose = () => {
+    setModal(null);
+    
     if (modal === 'save') {
       if (appearance) {
         TriggerNuiCallback(Send.save, appearance);
@@ -220,7 +222,6 @@ export const AppearanceNav: FC<AppearanceNavProps> = ({ animateIn }) => {
         TriggerNuiCallback(Send.cancel, originalAppearance);
       }
     }
-    setModal(null);
   };
 
   return (
@@ -560,29 +561,36 @@ export const AppearanceNav: FC<AppearanceNavProps> = ({ animateIn }) => {
           })}
       </Box>
 
-      {/* Modal */}
-      <Modal
-        opened={modal !== null}
-        onClose={() => setModal(null)}
-        centered
-        withCloseButton={false}
-        overlayProps={{
-          opacity: 0.5,
-          blur: 3,
-        }}
-        styles={{
-          content: {
-            background: 'rgba(0, 0, 0, 0.9)',
-            border: '0.0625rem solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '0.25rem',
-            filter: 'drop-shadow(0 0 0.25rem rgba(0, 0, 0, 1))',
-          },
-          body: {
-            padding: '1rem 2rem',
-          },
-        }}
-      >
-        <Stack spacing="2vh" align="center">
+      {/* Modal - Custom Implementation */}
+      {modal !== null && (
+        <Box
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: 'grid',
+            placeItems: 'center',
+            zIndex: 9999,
+            pointerEvents: 'auto',
+            color: 'white',
+          }}
+          onClick={() => setModal(null)}
+        >
+          <Box
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: 'rgba(20, 20, 30, 0.95)',
+              border: '2px solid rgba(255, 255, 255, 0.3)',
+              borderRadius: '0.75rem',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.8)',
+              padding: '2rem',
+              minWidth: '400px',
+              maxWidth: '600px',
+            }}
+          >
+            <Stack spacing="2vh" align="center">
           <Box style={{ width: '100%', display: 'grid', placeItems: 'center' }}>
             <Text
               size="2vh"
@@ -592,9 +600,9 @@ export const AppearanceNav: FC<AppearanceNavProps> = ({ animateIn }) => {
             >
               {allValid || modal === 'close'
                 ? modal === 'close'
-                  ? locale.CLOSE_TITLE
-                  : locale.SAVE_TITLE
-                : locale.LOCKED_TITLE}
+                  ? locale?.CLOSE_TITLE || 'Close'
+                  : locale?.SAVE_TITLE || 'Save'
+                : locale?.LOCKED_TITLE || 'Locked'}
             </Text>
           </Box>
 
@@ -609,9 +617,9 @@ export const AppearanceNav: FC<AppearanceNavProps> = ({ animateIn }) => {
               }}
             >
               {allValid || modal === 'close'
-                ? `${locale.CLOSE_SUBTITLE} ${modal === 'close' ? locale.CLOSELOSE_SUBTITLE : locale.SAVEAPPLY_SUBTITLE
-                } ${locale.CLOSE2_SUBTITLE}`
-                : locale.CANT_SAVE}
+                ? `${locale?.CLOSE_SUBTITLE || 'Are you sure you want to'} ${modal === 'close' ? locale?.CLOSELOSE_SUBTITLE || 'close without saving' : locale?.SAVEAPPLY_SUBTITLE || 'save and apply changes'
+                } ${locale?.CLOSE2_SUBTITLE || '?'}`
+                : locale?.CANT_SAVE || 'You cannot save with locked items selected.'}
             </Text>
           </Box>
 
@@ -643,7 +651,7 @@ export const AppearanceNav: FC<AppearanceNavProps> = ({ animateIn }) => {
                 },
               }}
             >
-              <Text>{allValid || modal === 'close' ? locale.CANCEL_TITLE : locale.OK_TITLE}</Text>
+              <Text>{allValid || modal === 'close' ? locale?.CANCEL_TITLE || 'Cancel' : locale?.OK_TITLE || 'OK'}</Text>
             </Button>
 
             {(allValid || modal === 'close') && (
@@ -665,12 +673,15 @@ export const AppearanceNav: FC<AppearanceNavProps> = ({ animateIn }) => {
                   },
                 }}
               >
-                <Text>{modal === 'close' ? locale.CLOSE_TITLE : locale.SAVE_TITLE}</Text>
+                <Text>{modal === 'close' ? locale?.CLOSE_TITLE || 'Close' : locale?.SAVE_TITLE || 'Save'}</Text>
               </Button>
             )}
           </Box>
+
         </Stack>
-      </Modal>
+          </Box>
+        </Box>
+      )}
 
       <style>
         {`

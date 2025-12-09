@@ -6,6 +6,7 @@ local ServerCache = {
     models = {},
     zones = {},
     outfits = {},
+    tattoos = {},
     shopSettings = {},
     shopConfigs = {},
     restrictions = {},
@@ -28,6 +29,13 @@ local function LoadCache()
         ServerCache.restrictions = json.decode(restrictionsFile) or {}
     else
         ServerCache.restrictions = {}
+    end
+
+    local tattoosFile = LoadResourceFile('tj_appearance', 'shared/data/tattoos.json')
+    if tattoosFile then
+        ServerCache.tattoos = json.decode(tattoosFile) or {}
+    else
+        ServerCache.tattoos = {}
     end
 
     -- Load settings (theme + locked models)
@@ -115,9 +123,20 @@ end)
 lib.callback.register('tj_appearance:admin:saveSettings', function(source, settings)
     if not IsAdmin(source) then return false end
 
-    ServerCache.settings.LockedModels = settings
+    ServerCache.settings.lockedModels = settings
     SaveResourceFile(GetCurrentResourceName(), 'shared/data/locked_models.json', json.encode(settings), -1)
+    TriggerClientEvent('tj_appearance:client:updateLockedModels', -1, settings)
 
+    return true
+end)
+
+lib.callback.register('tj_appearance:admin:saveTattoos', function(source, tattoos)
+    if not IsAdmin(source) then return false end
+
+    ServerCache.tattoos = tattoos or {}
+    SaveResourceFile(GetCurrentResourceName(), 'shared/data/tattoos.json', json.encode(ServerCache.tattoos), -1)
+
+    TriggerClientEvent('tj_appearance:client:updateTattoos', -1, ServerCache.tattoos)
     return true
 end)
 
@@ -128,10 +147,10 @@ lib.callback.register('tj_appearance:admin:addLockedModels', function(source, pa
     if type(modelsToAdd) ~= 'table' or #modelsToAdd == 0 then return false end
 
     -- Ensure cache initialized
-    if not Settings.LockedModels then
-        Settings.LockedModels = {}
+    if not ServerCache.settings.lockedModels then
+        ServerCache.settings.lockedModels = {}
     end
-    local current = Settings.LockedModels or {}
+    local current = ServerCache.settings.lockedModels or {}
 
     -- Merge unique
     local seen = {}
@@ -145,13 +164,13 @@ lib.callback.register('tj_appearance:admin:addLockedModels', function(source, pa
         end
     end
 
-    if not changed then return Settings.LockedModels end
+    if not changed then return ServerCache.settings.lockedModels end
 
     -- Persist to JSON
-    Settings.LockedModels = current
+    ServerCache.settings.lockedModels = current
     SaveResourceFile(GetCurrentResourceName(), 'shared/data/locked_models.json', json.encode(current), -1)
 
-    return Settings.LockedModels
+    return ServerCache.settings.lockedModels
 end)
 
 -- Save shop settings and configs
@@ -178,11 +197,12 @@ lib.callback.register('tj_appearance:admin:addZone', function(source, zone)
 
     -- Generate an ID for the new zone
     local newZone = table.deepcopy(zone)
-    newZone.id = #ZonesCache + 1
+    newZone.id = #ServerCache.zones + 1
 
-    table.insert(ZonesCache, newZone)
-    SaveResourceFile(GetCurrentResourceName(), 'shared/data/zones.json', json.encode(ZonesCache), -1)
+    table.insert(ServerCache.zones, newZone)
+    SaveResourceFile(GetCurrentResourceName(), 'shared/data/zones.json', json.encode(ServerCache.zones), -1)
 
+    TriggerClientEvent('tj_appearance:client:updateZones', -1, ServerCache.zones)
     return true
 end)
 
@@ -190,10 +210,11 @@ end)
 lib.callback.register('tj_appearance:admin:updateZone', function(source, zone)
     if not IsAdmin(source) then return false end
 
-    for i, z in ipairs(ZonesCache) do
+    for i, z in ipairs(ServerCache.zones) do
         if z.id == zone.id then
-            ZonesCache[i] = zone
-            SaveResourceFile(GetCurrentResourceName(), 'shared/data/zones.json', json.encode(ZonesCache), -1)
+            ServerCache.zones[i] = zone
+            SaveResourceFile(GetCurrentResourceName(), 'shared/data/zones.json', json.encode(ServerCache.zones), -1)
+            TriggerClientEvent('tj_appearance:client:updateZones', -1, ServerCache.zones)
             return true
         end
     end
@@ -205,10 +226,11 @@ end)
 lib.callback.register('tj_appearance:admin:deleteZone', function(source, id)
     if not IsAdmin(source) then return false end
 
-    for i, zone in ipairs(ZonesCache) do
+    for i, zone in ipairs(ServerCache.zones) do
         if zone.id == id then
-            table.remove(ZonesCache, i)
-            SaveResourceFile(GetCurrentResourceName(), 'shared/data/zones.json', json.encode(ZonesCache), -1)
+            table.remove(ServerCache.zones, i)
+            SaveResourceFile(GetCurrentResourceName(), 'shared/data/zones.json', json.encode(ServerCache.zones), -1)
+            TriggerClientEvent('tj_appearance:client:updateZones', -1, ServerCache.zones)
             return true
         end
     end
@@ -221,10 +243,11 @@ lib.callback.register('tj_appearance:admin:addOutfit', function(source, outfit)
     if not IsAdmin(source) then return false end
 
     local newOutfit = table.deepcopy(outfit)
-    newOutfit.id = #OutfitsCache + 1
+    newOutfit.id = #ServerCache.outfits + 1
 
-    table.insert(OutfitsCache, newOutfit)
-    SaveResourceFile(GetCurrentResourceName(), 'shared/data/outfits.json', json.encode(OutfitsCache), -1)
+    table.insert(ServerCache.outfits, newOutfit)
+    SaveResourceFile(GetCurrentResourceName(), 'shared/data/outfits.json', json.encode(ServerCache.outfits), -1)
+    TriggerClientEvent('tj_appearance:client:updateOutfits', -1, ServerCache.outfits)
 
     return { id = newOutfit.id }
 end)
@@ -233,10 +256,11 @@ end)
 lib.callback.register('tj_appearance:admin:deleteOutfit', function(source, id)
     if not IsAdmin(source) then return false end
 
-    for i, outfit in ipairs(OutfitsCache) do
+    for i, outfit in ipairs(ServerCache.outfits) do
         if outfit.id == id then
-            table.remove(OutfitsCache, i)
-            SaveResourceFile(GetCurrentResourceName(), 'shared/data/outfits.json', json.encode(OutfitsCache), -1)
+            table.remove(ServerCache.outfits, i)
+            SaveResourceFile(GetCurrentResourceName(), 'shared/data/outfits.json', json.encode(ServerCache.outfits), -1)
+            TriggerClientEvent('tj_appearance:client:updateOutfits', -1, ServerCache.outfits)
             return true
         end
     end
@@ -254,16 +278,17 @@ lib.callback.register('tj_appearance:admin:addModel', function(source, modelName
     end
 
     -- Check if model already exists
-    for _, model in ipairs(ModelsCache) do
+    for _, model in ipairs(ServerCache.models) do
         if model == modelName then
             return false
         end
     end
 
     -- Update cache and save
-    table.insert(ModelsCache, modelName)
-    table.sort(ModelsCache)
-    SaveResourceFile(GetCurrentResourceName(), 'shared/data/models.json', json.encode(ModelsCache), -1)
+    table.insert(ServerCache.models, modelName)
+    table.sort(ServerCache.models)
+    SaveResourceFile(GetCurrentResourceName(), 'shared/data/models.json', json.encode(ServerCache.models), -1)
+    TriggerClientEvent('tj_appearance:client:updateModels', -1, ServerCache.models)
 
     return true
 end)
@@ -278,10 +303,11 @@ lib.callback.register('tj_appearance:admin:deleteModel', function(source, modelN
     end
 
     -- Update cache
-    for i, model in ipairs(ModelsCache) do
+    for i, model in ipairs(ServerCache.models) do
         if model == modelName then
-            table.remove(ModelsCache, i)
-            SaveResourceFile(GetCurrentResourceName(), 'shared/data/models.json', json.encode(ModelsCache), -1)
+            table.remove(ServerCache.models, i)
+            SaveResourceFile(GetCurrentResourceName(), 'shared/data/models.json', json.encode(ServerCache.models), -1)
+            TriggerClientEvent('tj_appearance:client:updateModels', -1, ServerCache.models)
             return true
         end
     end
@@ -300,9 +326,9 @@ lib.callback.register('tj_appearance:admin:deleteModels', function(source, model
         -- Prevent deletion of freemode models
         if modelName ~= 'mp_m_freemode_01' and modelName ~= 'mp_f_freemode_01' then
             -- Update cache
-            for i, model in ipairs(ModelsCache) do
+            for i, model in ipairs(ServerCache.models) do
                 if model == modelName then
-                    table.remove(ModelsCache, i)
+                    table.remove(ServerCache.models, i)
                     deletedCount = deletedCount + 1
                     break
                 end
@@ -311,7 +337,8 @@ lib.callback.register('tj_appearance:admin:deleteModels', function(source, model
     end
 
     if deletedCount > 0 then
-        SaveResourceFile(GetCurrentResourceName(), 'shared/data/models.json', json.encode(ModelsCache), -1)
+        SaveResourceFile(GetCurrentResourceName(), 'shared/data/models.json', json.encode(ServerCache.models), -1)
+        TriggerClientEvent('tj_appearance:client:updateModels', -1, ServerCache.models)
     end
 
     return true
@@ -322,7 +349,7 @@ lib.callback.register('tj_appearance:admin:addRestriction', function(source, res
 
     -- Generate ID based on existing restrictions
     local maxId = 0
-    for _, genderRestrictions in pairs(RestrictionsCache) do
+    for _, genderRestrictions in pairs(ServerCache.restrictions) do
         for _, restrictions in pairs(genderRestrictions) do
             if type(restrictions) == 'table' then
                 for _, r in ipairs(restrictions) do
@@ -337,17 +364,18 @@ lib.callback.register('tj_appearance:admin:addRestriction', function(source, res
 
     -- Update cache
     local key = string.format('%s_%s', restriction.job or 'none', restriction.gang or 'none')
-    if not RestrictionsCache[key] then
-        RestrictionsCache[key] = { male = {}, female = {} }
+    if not ServerCache.restrictions[key] then
+        ServerCache.restrictions[key] = { male = {}, female = {} }
     end
-    if not RestrictionsCache[key][restriction.gender] then
-        RestrictionsCache[key][restriction.gender] = {}
+    if not ServerCache.restrictions[key][restriction.gender] then
+        ServerCache.restrictions[key][restriction.gender] = {}
     end
 
-    table.insert(RestrictionsCache[key][restriction.gender], {
+    table.insert(ServerCache.restrictions[key][restriction.gender], {
         id = newId,
-        job = restriction.job,
-        gang = restriction.gang,
+        group = restriction.group,  -- Use unified field
+        job = restriction.job,       -- Legacy support
+        gang = restriction.gang,     -- Legacy support
         gender = restriction.gender,
         type = restriction.type,
         part = restriction.part,
@@ -358,7 +386,8 @@ lib.callback.register('tj_appearance:admin:addRestriction', function(source, res
     })
 
     -- Persist to JSON
-    SaveResourceFile('tj_appearance', 'shared/data/restrictions.json', json.encode(RestrictionsCache), -1)
+    SaveResourceFile('tj_appearance', 'shared/data/restrictions.json', json.encode(ServerCache.restrictions), -1)
+    TriggerClientEvent('tj_appearance:client:updateRestrictions', -1, ServerCache.restrictions)
 
     return true
 end)
@@ -371,12 +400,12 @@ lib.callback.register('tj_appearance:admin:deleteRestriction', function(source, 
     local restrictionId = tonumber(id)
     local found = false
     
-    for key, genderRestrictions in pairs(RestrictionsCache) do
+    for key, genderRestrictions in pairs(ServerCache.restrictions) do
         for gender, restrictions in pairs(genderRestrictions) do
             if type(restrictions) == 'table' then
                 for i, restriction in ipairs(restrictions) do
                     if tonumber(restriction.id) == restrictionId then
-                        table.remove(RestrictionsCache[key][gender], i)
+                        table.remove(ServerCache.restrictions[key][gender], i)
                         found = true
                         break
                     end
@@ -389,7 +418,8 @@ lib.callback.register('tj_appearance:admin:deleteRestriction', function(source, 
 
     if found then
         -- Persist to JSON
-        SaveResourceFile('tj_appearance', 'shared/data/restrictions.json', json.encode(RestrictionsCache), -1)
+        SaveResourceFile('tj_appearance', 'shared/data/restrictions.json', json.encode(ServerCache.restrictions), -1)
+        TriggerClientEvent('tj_appearance:client:updateRestrictions', -1, ServerCache.restrictions)
     end
 
     return found

@@ -201,7 +201,6 @@ local function StartZoneRaycastMode(multiPoint)
     DestroyCam(cam, false)
     -- Restore player and UI focus
     FreezeEntityPosition(cache.ped, false)
-    SetNuiFocus(true, true)
     -- Notify UI capture finished
     SendNUIMessage({ action = 'zoneCaptureActive', data = { active = false } })
   end)
@@ -211,7 +210,6 @@ end
 
 RegisterNuiCallback('startZoneRaycast', function(data, cb)
   StartZoneRaycastMode(data.multiPoint)
-  SetNuiFocus(false, false)
   cb(true)
 end)
 
@@ -227,7 +225,6 @@ RegisterNuiCallback('stopZoneRaycast', function(_, cb)
     return
   end
   StopZoneRaycastMode()
-  SetNuiFocus(true, true)
   cb(true)
 end)
 

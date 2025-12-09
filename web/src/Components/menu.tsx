@@ -145,7 +145,7 @@ export const AppearanceMenu: FC<AppearanceMenuProps> = ({ animateIn, isVisible }
         </Box>
 
         <Text style={{ color: theme.primaryColor }}>
-          {locale.MENU_TITLE}
+          {locale?.MENU_TITLE || 'Menu'}
         </Text>
 
         <Box

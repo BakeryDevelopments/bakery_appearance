@@ -147,7 +147,7 @@ const Outfits: React.FC = () => {
                                 style={{ fontWeight: 600, letterSpacing: 1, marginBottom: 4, background: "rgba(0,0,0,0.6)", }}
                                 onClick={() => setActiveDropdownIndex(activeDropdownIndex === i ? -1 : i)}
                             >
-                                {locale.OPTIONS_TITLE ?? "Options"}
+                                {locale?.OPTIONS_TITLE ?? "Options"}
                             </Button>
                             {activeDropdownIndex === i && (
 
@@ -172,7 +172,7 @@ const Outfits: React.FC = () => {
                                         width: '100%',
                                     }}>
                                         <Button size="xs" variant="light" color="blue" radius="md" style={{ fontWeight: 500, minWidth: 70, paddingLeft: 4, paddingRight: 4 }} onClick={() => handleOutfitAction('use', i, outfit)}>
-                                            <ShrinkText>{locale.USE_TITLE}</ShrinkText>
+                                            <ShrinkText>{locale?.USE_TITLE || 'Use'}</ShrinkText>
                                         </Button>
                                         <Button
                                             size="xs"
@@ -183,7 +183,7 @@ const Outfits: React.FC = () => {
                                             style={{ fontWeight: 500, minWidth: 70, paddingLeft: 4, paddingRight: 4 }}
                                             onClick={() => { setRenameIndex(i); setRenameLabel(label); }}
                                         >
-                                            <ShrinkText>{locale.EDIT_TITLE}</ShrinkText>
+                                            <ShrinkText>{locale?.EDIT_TITLE || 'Edit'}</ShrinkText>
                                         </Button>
                                         {!jobname && (
                                             <Button
@@ -195,11 +195,11 @@ const Outfits: React.FC = () => {
                                                 style={{ fontWeight: 500, minWidth: 70, paddingLeft: 4, paddingRight: 4 }}
                                                 onClick={() => handleOutfitAction('share', id)}
                                             >
-                                                <ShrinkText>{locale.SHAREOUTFIT_TITLE}</ShrinkText>
+                                                <ShrinkText>{locale?.SHAREOUTFIT_TITLE || 'Share'}</ShrinkText>
                                             </Button>
-                                        )}
+                                        )}  
                                         <Button size="xs" variant="light" color="grape" radius="md" style={{ fontWeight: 500, minWidth: 70, paddingLeft: 4, paddingRight: 4 }} onClick={() => handleOutfitAction('item', i, outfit, label)}>
-                                            <ShrinkText>{locale.ITEMOUTFIT_TITLE}</ShrinkText>
+                                            <ShrinkText>{locale?.ITEMOUTFIT_TITLE || 'Item'}</ShrinkText>
                                         </Button>
                                         <Button
                                             size="xs"
@@ -232,8 +232,8 @@ const Outfits: React.FC = () => {
 
                                     {deleteIndex === i && (
                                         <Group spacing="xs" style={{ justifyContent: 'center', gap: '0.5vh', width: '100%', marginTop: '0.5vh' }}>
-                                            <Button size="xs" radius="md" onClick={() => setDeleteIndex(-1)}>{locale.CANCEL_TITLE}</Button>
-                                            <Button size="xs" color="red" radius="md" onClick={() => handleOutfitAction('delete', id)}>{locale.CONFIRMREM_SUBTITLE}</Button>
+                                            <Button size="xs" radius="md" onClick={() => setDeleteIndex(-1)}>{locale?.CANCEL_TITLE || 'Cancel'}</Button>
+                                            <Button size="xs" color="red" radius="md" onClick={() => handleOutfitAction('delete', id)}>{locale?.CONFIRMREM_SUBTITLE || 'Confirm'}</Button>
                                         </Group>
                                     )}
                                 </Paper>
@@ -246,7 +246,7 @@ const Outfits: React.FC = () => {
                 ))
             ) : (
                 <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">
-                    {locale.NO_OUTFITS || "You can't modify your makeup"}
+                    {locale?.NO_OUTFITS || "You can't modify your makeup"}
                 </Text>
             )}
 

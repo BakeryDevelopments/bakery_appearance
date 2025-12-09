@@ -22,13 +22,7 @@ export const useDebugDataReceiver = () => {
 
   HandleNuiMessage<TMenuData>('data', (data) => {
 
-    // Parse locale if it's a string
-    const locale = typeof data.locale === 'string' 
-      ? JSON.parse(data.locale) 
-      : data.locale;
-
     // Set all the data
-      setLocale(locale);
       setModels(data.models);
       
       // Calculate modelIndex based on the model name
@@ -57,10 +51,10 @@ export const useDebugDataReceiver = () => {
       setTattoos(data.tattoos);
       setOutfits(data.outfits);
 
-    // Create tabs from the tab names
+    // Create tabs from the tab names (locale will be loaded from cache via setLocale handler)
     const tabs = (Array.isArray(data.tabs) ? data.tabs : [data.tabs]).map((tabId) => ({
       id: tabId,
-      label: locale[tabId.toUpperCase()] || tabId,
+      label: tabId,
       icon: `Icon${tabId.charAt(0).toUpperCase() + tabId.slice(1)}`,
       src: tabId,
     }));

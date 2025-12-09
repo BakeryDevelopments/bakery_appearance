@@ -1,6 +1,7 @@
 local handleNuiMessage = require('modules.nui')
 local CacheAPI = require('client.functions.cache')
 
+_CurrentTattoos = _CurrentTattoos or {}
 
 -- Initialize cache on resource start
 CreateThread(function()
@@ -26,6 +27,7 @@ RegisterCommand('appearance', function()
   end
 
   local models = CacheAPI.getModels()
+  local tattoos = CacheAPI.getTattoos()
 
   -- Get locked models from cache
   local settings = CacheAPI.getSettings()
@@ -47,10 +49,9 @@ RegisterCommand('appearance', function()
     data = {
       tabs = { "heritage", 'face', 'hair', 'clothes', 'accessories', 'makeup', 'tattoos', 'outfits' },
       appearance = GetPlayerAppearance(),
-      locale = CacheAPI.getLocale(),
       models = models,
       blacklist = blacklist,
-      tattoos = {},
+      tattoos = tattoos,
       outfits = {},
       allowExit = true,
       job = jobData
@@ -75,7 +76,6 @@ RegisterNuiCallback('save', function(data, cb)
     return
   end
   handleNuiMessage({ action = 'setVisibleApp', data = false }, false)
-  SetNuiFocus(false, false)
   ToggleCam(false)
   cb('ok')
 end)
@@ -86,7 +86,6 @@ RegisterNuiCallback('cancel', function(data, cb)
     return
   end
   handleNuiMessage({ action = 'setVisibleApp', data = false }, false)
-  SetNuiFocus(false, false)
   ToggleCam(false)
   cb('ok')
 end)
@@ -119,7 +118,7 @@ function GetPlayerAppearance()
     drawTotal = drawTotal,
     props = props,
     propTotal = propTotal,
-    tattoos = nil
+    tattoos = _CurrentTattoos or {}
   }
 
   return data
@@ -130,7 +129,18 @@ RegisterNetEvent('tj_appearance:client:openAdminMenu', function()
   -- Load all data from cache instead of server callback
 
   handleNuiMessage({ action = 'setVisibleAdminMenu', data = true }, true)
-  SetNuiFocus(true, true)
+  
+  -- Send all cache data to admin menu
+  Wait(50)
+  handleNuiMessage({ action = 'setThemeConfig', data = CacheAPI.getTheme() }, true)
+  handleNuiMessage({ action = 'setRestrictions', data = CacheAPI.getRestrictions() }, true)
+  handleNuiMessage({ action = 'setModels', data = CacheAPI.getModels() }, true)
+  handleNuiMessage({ action = 'setLockedModels', data = CacheAPI.getBlacklistSettings().lockedModels or {} }, true)
+  handleNuiMessage({ action = 'setZones', data = CacheAPI.getZones() }, true)
+  handleNuiMessage({ action = 'setOutfits', data = CacheAPI.getOutfits() }, true)
+  handleNuiMessage({ action = 'setShopSettings', data = CacheAPI.getShopSettings() }, true)
+  handleNuiMessage({ action = 'setShopConfigs', data = CacheAPI.getShopConfigs() }, true)
+  handleNuiMessage({ action = 'setTattoos', data = CacheAPI.getTattoos() }, true)
 end)
 
 RegisterNuiCallback('closeAdminMenu', function(data, cb)
@@ -220,6 +230,32 @@ RegisterNuiCallback('deleteOutfit', function(id, cb)
   lib.callback('tj_appearance:admin:deleteOutfit', false, function(success)
     cb(success)
   end, id)
+end)
+
+RegisterNuiCallback('saveTattoos', function(tattoos, cb)
+  lib.callback('tj_appearance:admin:saveTattoos', false, function(success)
+    cb(success)
+  end, tattoos)
+end)
+
+RegisterNetEvent('tj_appearance:client:updateTheme', function(theme)
+    handleNuiMessage({ action = 'setThemeConfig', data = theme }, true)
+end)
+
+RegisterNetEvent('tj_appearance:client:updateRestrictions', function(restrictions)
+    handleNuiMessage({ action = 'setRestrictions', data = restrictions }, true)
+end)
+
+RegisterNetEvent('tj_appearance:client:updateZones', function(zones)
+    handleNuiMessage({ action = 'setZones', data = zones }, true)
+end)
+
+RegisterNetEvent('tj_appearance:client:updateOutfits', function(outfits)
+    handleNuiMessage({ action = 'setOutfits', data = outfits }, true)
+end)
+
+RegisterNetEvent('tj_appearance:client:updateTattoos', function(tattoos)
+    handleNuiMessage({ action = 'setTattoos', data = tattoos }, true)
 end)
 
 -- JSON blacklist management removed per request

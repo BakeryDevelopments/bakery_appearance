@@ -1,9 +1,10 @@
 import { FC, useEffect, useState } from 'react';
 import { Tabs, ColorPicker, Button, Stack, Group, Text, TextInput, Select, ActionIcon, Modal, Checkbox, Accordion, Badge, Box, NumberInput } from '@mantine/core';
-import { IconPalette, IconLock, IconPlus, IconTrash, IconChevronDown, IconUser, IconShoppingCart, IconMapPin, IconHanger, IconDownload } from '@tabler/icons-react';
+import { IconPalette, IconLock, IconPlus, IconTrash, IconChevronDown, IconUser, IconShoppingCart, IconMapPin, IconHanger, IconDownload, IconFeather } from '@tabler/icons-react';
 import { TriggerNuiCallback } from '../Utils/TriggerNuiCallback';
 import { HandleNuiMessage } from '../Hooks/HandleNuiMessage';
 import { CameraShape } from './micro/CameraShape';
+import type { TZoneTattoo } from '../types/appearance';
 
 interface ThemeConfig {
   primaryColor: string; // Active tab color
@@ -13,8 +14,9 @@ interface ThemeConfig {
 
 interface ClothingRestriction {
   id: string;
-  job?: string;
-  gang?: string;
+  group?: string;  // New unified field replacing job/gang
+  job?: string;    // Legacy support
+  gang?: string;   // Legacy support
   identifier?: string;
   gender: 'male' | 'female';
   type?: 'model' | 'clothing';
@@ -114,6 +116,9 @@ export const AdminMenu: FC = () => {
   const [addOutfitModalOpen, setAddOutfitModalOpen] = useState(false);
   const [newOutfit, setNewOutfit] = useState<Partial<JobOutfit>>({ gender: 'male' });
 
+  // Tattoos State
+  const [tattoos, setTattoos] = useState<TZoneTattoo[]>([]);
+
   const categoryOptionsByPart: Record<PartType, { value: string; label: string }[]> = {
     model: [{ value: 'model', label: 'Model' }],
     drawable: [
@@ -135,22 +140,15 @@ export const AdminMenu: FC = () => {
   });
 
   HandleNuiMessage<ClothingRestriction[]>('setRestrictions', (data) => {
-    setRestrictions(data);
-  });
-
-  // no JSON sets
-
-  HandleNuiMessage<ThemeConfig>('setThemeConfig', (data) => {
-    setTheme(data);
+    setRestrictions(data || []);
   });
 
   HandleNuiMessage<string[]>('setModels', (data) => {
-    console.log('Received models:', JSON.stringify(data));
-    setModels(data);
+    setModels(data || []);
   });
 
-  HandleNuiMessage<{lockedModels: string[]}>('setSettings', (data) => {
-    setLockedModelsSaved(data.lockedModels || []);
+  HandleNuiMessage<string[]>('setLockedModels', (data) => {
+    setLockedModelsSaved(data || []);
   });
 
   HandleNuiMessage<ShopSettings>('setShopSettings', (data) => {
@@ -165,9 +163,14 @@ export const AdminMenu: FC = () => {
     setZones(data);
   });
 
-  HandleNuiMessage<JobOutfit[]>('setOutfits', (data) => {
-    setOutfits(data);
+  HandleNuiMessage<TZoneTattoo[]>('setTattoos', (data) => {
+    setTattoos(data || []);
   });
+
+  HandleNuiMessage<JobOutfit[]>('setOutfits', (data) => {
+    setOutfits(data || []);
+  });
+
 
   // Keep UI hidden while capture is active; show again when it ends
   HandleNuiMessage<{ active: boolean }>('zoneCaptureActive', (data) => {
@@ -267,6 +270,162 @@ export const AdminMenu: FC = () => {
     setIsVisible(false);
   };
 
+  const normalizeTattooData = (data: TZoneTattoo[]) =>
+    (data || []).map((zone, zoneIndex) => ({
+      ...zone,
+      zoneIndex,
+      dlcs: (zone.dlcs || []).map((dlc, dlcIndex) => ({
+        ...dlc,
+        dlcIndex,
+        tattoos: (dlc.tattoos || []).map((tattoo) => ({
+          ...tattoo,
+          opacity: typeof tattoo.opacity === 'number' ? tattoo.opacity : 1,
+          dlc: dlc.label,
+        })),
+      })),
+    }));
+
+  const updateTattoos = (updater: (prev: TZoneTattoo[]) => TZoneTattoo[]) => {
+    setTattoos((prev) => normalizeTattooData(updater(prev || [])));
+  };
+
+  const handleAddZone = () => {
+    updateTattoos((prev) => [
+      ...prev,
+      { label: `Zone ${prev.length + 1}`, zone: `zone_${prev.length + 1}`, zoneIndex: prev.length, dlcs: [] },
+    ]);
+  };
+
+  const handleUpdateZoneLabel = (index: number, field: 'label' | 'zone', value: string) => {
+    updateTattoos((prev) => prev.map((zone, idx) => (idx === index ? { ...zone, [field]: value } : zone)));
+  };
+
+  const handleDeleteZone = (index: number) => {
+    updateTattoos((prev) => prev.filter((_, idx) => idx !== index));
+  };
+
+  const handleAddDlc = (zoneIndex: number) => {
+    updateTattoos((prev) =>
+      prev.map((zone, idx) =>
+        idx === zoneIndex
+          ? {
+              ...zone,
+              dlcs: [
+                ...(zone.dlcs || []),
+                { label: `dlc_${(zone.dlcs?.length || 0) + 1}`, dlcIndex: zone.dlcs?.length || 0, tattoos: [] },
+              ],
+            }
+          : zone
+      )
+    );
+  };
+
+  const handleUpdateDlcLabel = (zoneIndex: number, dlcIndex: number, label: string) => {
+    updateTattoos((prev) =>
+      prev.map((zone, zIdx) =>
+        zIdx === zoneIndex
+          ? {
+              ...zone,
+              dlcs: (zone.dlcs || []).map((dlc, dIdx) =>
+                dIdx === dlcIndex
+                  ? {
+                      ...dlc,
+                      label,
+                      tattoos: (dlc.tattoos || []).map((tattoo) => ({ ...tattoo, dlc: label })),
+                    }
+                  : dlc
+              ),
+            }
+          : zone
+      )
+    );
+  };
+
+  const handleDeleteDlc = (zoneIndex: number, dlcIndex: number) => {
+    updateTattoos((prev) =>
+      prev.map((zone, zIdx) =>
+        zIdx === zoneIndex ? { ...zone, dlcs: (zone.dlcs || []).filter((_, dIdx) => dIdx !== dlcIndex) } : zone
+      )
+    );
+  };
+
+  const handleAddTattooEntry = (zoneIndex: number, dlcIndex: number) => {
+    updateTattoos((prev) =>
+      prev.map((zone, zIdx) =>
+        zIdx === zoneIndex
+          ? {
+              ...zone,
+              dlcs: (zone.dlcs || []).map((dlc, dIdx) =>
+                dIdx === dlcIndex
+                  ? {
+                      ...dlc,
+                      tattoos: [
+                        ...(dlc.tattoos || []),
+                        { label: 'New Tattoo', hash: 0, zone: zone.zoneIndex ?? zIdx, opacity: 1, dlc: dlc.label },
+                      ],
+                    }
+                  : dlc
+              ),
+            }
+          : zone
+      )
+    );
+  };
+
+  const handleUpdateTattooField = (
+    zoneIndex: number,
+    dlcIndex: number,
+    tattooIndex: number,
+    field: 'label' | 'hash' | 'opacity'
+  ) => (value: string | number) => {
+    updateTattoos((prev) =>
+      prev.map((zone, zIdx) =>
+        zIdx === zoneIndex
+          ? {
+              ...zone,
+              dlcs: (zone.dlcs || []).map((dlc, dIdx) =>
+                dIdx === dlcIndex
+                  ? {
+                      ...dlc,
+                      tattoos: (dlc.tattoos || []).map((tattoo, tIdx) => {
+                        if (tIdx !== tattooIndex) return tattoo;
+                        if (field === 'label') return { ...tattoo, label: String(value) };
+                        if (field === 'hash') return { ...tattoo, hash: Number(value) || 0 };
+                        const nextOpacity = Math.max(0, Math.min(1, Number(value) || 0));
+                        return { ...tattoo, opacity: nextOpacity };
+                      }),
+                    }
+                  : dlc
+              ),
+            }
+          : zone
+      )
+    );
+  };
+
+  const handleDeleteTattooEntry = (zoneIndex: number, dlcIndex: number, tattooIndex: number) => {
+    updateTattoos((prev) =>
+      prev.map((zone, zIdx) =>
+        zIdx === zoneIndex
+          ? {
+              ...zone,
+              dlcs: (zone.dlcs || []).map((dlc, dIdx) =>
+                dIdx === dlcIndex
+                  ? { ...dlc, tattoos: (dlc.tattoos || []).filter((_, tIdx) => tIdx !== tattooIndex) }
+                  : dlc
+              ),
+            }
+          : zone
+      )
+    );
+  };
+
+  const handleSaveTattoos = () => {
+    const normalized = normalizeTattooData(tattoos);
+    setTattoos(normalized);
+    TriggerNuiCallback('saveTattoos', normalized).then(() => {});
+  };
+
   if (!isVisible || captureActive) return null;
 
   return (
@@ -318,6 +477,10 @@ export const AdminMenu: FC = () => {
             <Tabs.Tab value="shops">
               <IconShoppingCart size={16} style={{ marginRight: 8, verticalAlign: 'middle' }} />
               Shop Options
+            </Tabs.Tab>
+            <Tabs.Tab value="tattoos">
+              <IconFeather size={16} style={{ marginRight: 8, verticalAlign: 'middle' }} />
+              Tattoos
             </Tabs.Tab>
             <Tabs.Tab value="zones">
               <IconMapPin size={16} style={{ marginRight: 8, verticalAlign: 'middle' }} />
@@ -490,9 +653,9 @@ export const AdminMenu: FC = () => {
                     }}
                   >
                     {(() => {
-                      // Group restrictions by job/gang, then by identifier
+                      // Group restrictions by group (or job/gang), then by identifier
                       const grouped = restrictions.reduce((acc, r) => {
-                        const key = r.job || r.gang || 'Unknown';
+                        const key = r.group || r.job || r.gang || 'Unknown';
                         const identifierKey = r.identifier || 'all';
                         if (!acc[key]) acc[key] = {};
                         if (!acc[key][identifierKey]) acc[key][identifierKey] = [];
@@ -502,7 +665,7 @@ export const AdminMenu: FC = () => {
 
                       return Object.entries(grouped).map(([jobGang, identifierGroups]) => {
                         const totalCount = Object.values(identifierGroups).flat().length;
-                        const type = restrictions.find(r => (r.job || r.gang) === jobGang)?.job ? 'Job' : 'Gang';
+                        const type = restrictions.find(r => (r.group || r.job || r.gang) === jobGang)?.job ? 'Job' : 'Gang';
                         
                         return (
                           <Accordion.Item key={jobGang} value={jobGang}>
@@ -870,6 +1033,147 @@ export const AdminMenu: FC = () => {
                   ))}
                 </Stack>
               </div>
+            </Stack>
+          </Tabs.Panel>
+
+          <Tabs.Panel value="tattoos" pt="xl">
+            <Stack spacing="lg">
+              <Group position="apart">
+                <Text c="white" fw={500}>
+                  Tattoo Catalog
+                </Text>
+                <Group>
+                  <Button size="sm" variant="light" onClick={handleAddZone}>
+                    <IconPlus size={14} style={{ marginRight: 8 }} />
+                    Add Zone
+                  </Button>
+                  <Button size="sm" onClick={handleSaveTattoos}>
+                    Save Tattoos
+                  </Button>
+                </Group>
+              </Group>
+
+              {tattoos.length === 0 ? (
+                <Box style={{ padding: '2rem', textAlign: 'center', color: '#888', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
+                  No tattoos configured
+                </Box>
+              ) : (
+                <Accordion
+                  chevronPosition="right"
+                  variant="separated"
+                  styles={{
+                    item: {
+                      backgroundColor: 'rgba(255,255,255,0.03)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      marginBottom: '0.5rem',
+                    },
+                  }}
+                >
+                  {tattoos.map((zone, zoneIdx) => {
+                    const tattooCount = (zone.dlcs || []).reduce((acc, dlc) => acc + (dlc.tattoos?.length || 0), 0);
+                    return (
+                      <Accordion.Item key={`zone-${zoneIdx}`} value={`zone-${zoneIdx}`}>
+                        <Accordion.Control>
+                          <Group position="apart" style={{ width: '100%', paddingRight: '1rem' }}>
+                            <Group spacing="sm">
+                              <Text fw={600} c="white">
+                                {zone.label || `Zone ${zoneIdx + 1}`}
+                              </Text>
+                              <Badge size="xs" color="blue" variant="light">
+                                DLCs {zone.dlcs?.length || 0}
+                              </Badge>
+                              <Badge size="xs" color="grape" variant="outline">
+                                Tattoos {tattooCount}
+                              </Badge>
+                            </Group>
+                            <ActionIcon color="red" onClick={(e) => { e.stopPropagation(); handleDeleteZone(zoneIdx); }}>
+                              <IconTrash size={16} />
+                            </ActionIcon>
+                          </Group>
+                        </Accordion.Control>
+                        <Accordion.Panel>
+                          <Stack spacing="sm">
+                            <Group grow>
+                              <TextInput
+                                label="Zone Label"
+                                value={zone.label || ''}
+                                onChange={(e) => handleUpdateZoneLabel(zoneIdx, 'label', e.currentTarget.value)}
+                              />
+                              <TextInput
+                                label="Zone Key"
+                                value={zone.zone || ''}
+                                onChange={(e) => handleUpdateZoneLabel(zoneIdx, 'zone', e.currentTarget.value)}
+                              />
+                            </Group>
+
+                            <Divider />
+
+                            <Stack spacing="sm">
+                              {(zone.dlcs || []).map((dlc, dlcIdx) => (
+                                <Box key={`dlc-${dlcIdx}`} style={{ padding: '0.75rem', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 8, border: '1px solid rgba(255,255,255,0.05)' }}>
+                                  <Group position="apart" mb="sm">
+                                    <TextInput
+                                      label={`DLC ${dlcIdx + 1}`}
+                                      value={dlc.label || ''}
+                                      onChange={(e) => handleUpdateDlcLabel(zoneIdx, dlcIdx, e.currentTarget.value)}
+                                      style={{ flex: 1 }}
+                                    />
+                                    <ActionIcon color="red" variant="subtle" onClick={() => handleDeleteDlc(zoneIdx, dlcIdx)}>
+                                      <IconTrash size={16} />
+                                    </ActionIcon>
+                                  </Group>
+
+                                  <Stack spacing="xs">
+                                    {(dlc.tattoos || []).map((tattoo, tattooIdx) => (
+                                      <Box key={`tattoo-${tattooIdx}`} style={{ padding: '0.5rem', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 6, border: '1px solid rgba(255,255,255,0.04)' }}>
+                                        <Group align="flex-end" spacing="sm">
+                                          <TextInput
+                                            label="Label"
+                                            value={tattoo.label || ''}
+                                            onChange={(e) => handleUpdateTattooField(zoneIdx, dlcIdx, tattooIdx, 'label')(e.currentTarget.value)}
+                                            style={{ flex: 1 }}
+                                          />
+                                          <NumberInput
+                                            label="Hash"
+                                            value={tattoo.hash}
+                                            onChange={(val) => handleUpdateTattooField(zoneIdx, dlcIdx, tattooIdx, 'hash')(val as number)}
+                                            style={{ width: 140 }}
+                                          />
+                                          <NumberInput
+                                            label="Opacity"
+                                            value={tattoo.opacity ?? 1}
+                                            min={0}
+                                            max={1}
+                                            step={0.05}
+                                            precision={2}
+                                            onChange={(val) => handleUpdateTattooField(zoneIdx, dlcIdx, tattooIdx, 'opacity')(val as number)}
+                                            style={{ width: 140 }}
+                                          />
+                                          <ActionIcon color="red" variant="light" onClick={() => handleDeleteTattooEntry(zoneIdx, dlcIdx, tattooIdx)}>
+                                            <IconTrash size={16} />
+                                          </ActionIcon>
+                                        </Group>
+                                      </Box>
+                                    ))}
+                                    <Button size="xs" variant="light" onClick={() => handleAddTattooEntry(zoneIdx, dlcIdx)}>
+                                      <IconPlus size={14} style={{ marginRight: 6 }} />
+                                      Add Tattoo
+                                    </Button>
+                                  </Stack>
+                                </Box>
+                              ))}
+                              <Button size="xs" variant="outline" onClick={() => handleAddDlc(zoneIdx)}>
+                                <IconPlus size={14} style={{ marginRight: 6 }} />
+                                Add DLC
+                              </Button>
+                            </Stack>
+                          </Stack>
+                        </Accordion.Panel>
+                      </Accordion.Item>
+                    );
+                  })}
+                </Accordion>
+              )}
             </Stack>
           </Tabs.Panel>
 
