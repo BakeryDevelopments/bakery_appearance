@@ -24,11 +24,13 @@ CREATE TABLE IF NOT EXISTS `player_outfits` (
     `gender` ENUM('male', 'female') NOT NULL,
     `outfit_name` VARCHAR(100) NOT NULL,
     `outfit_data` LONGTEXT NOT NULL COMMENT 'JSON: outfit data',
+    `share_code` VARCHAR(8) NULL UNIQUE COMMENT '8-character unique code for outfit sharing',
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     UNIQUE KEY `unique_citizenid_outfit` (`citizenid`, `outfit_name`, `gender`),
-    INDEX `idx_citizenid_gender` (`citizenid`, `gender`)
+    INDEX `idx_citizenid_gender` (`citizenid`, `gender`),
+    INDEX `idx_share_code` (`share_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Job and gang persistent outfits

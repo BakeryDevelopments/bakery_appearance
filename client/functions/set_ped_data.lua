@@ -194,6 +194,28 @@ local function ApplyTattoos(ped, tattoos)
     end
 end
 
+RegisterNuiCallback('useOutfit', function(outfitData, cb)
+  -- Apply outfit (components and props) to the player
+  if not outfitData then
+    cb({})
+    return
+  end
+
+  local ped = cache.ped
+  
+  -- Apply components (clothes)
+  if outfitData.components then
+    SetDrawables(ped, outfitData.components)
+  end
+  
+  -- Apply props (accessories)
+  if outfitData.props then
+    SetProps(ped, outfitData.props)
+  end
+  cb({})
+end)
+
+
 
 --  NUI CALLBACKS --
 
@@ -265,7 +287,6 @@ local function SetPedAppearance(ped, data)
         -- Handle drawables
         if data.drawables then
             if type(data.drawables) == 'table' then
-                print('Setting drawables...')
                 SetDrawables(ped, data.drawables)
             end
         end

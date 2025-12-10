@@ -25,6 +25,7 @@ interface ShopsTabProps {
   shopConfigs: ShopConfig[];
   setShopConfigs: (configs: ShopConfig[]) => void;
   onSave?: () => void;
+  locale: { [key: string]: string };
 }
 
 export const ShopsTab: FC<ShopsTabProps> = ({
@@ -33,6 +34,7 @@ export const ShopsTab: FC<ShopsTabProps> = ({
   shopConfigs,
   setShopConfigs,
   onSave,
+  locale,
 }) => {
   const handleSave = () => {
     TriggerNuiCallback('saveShopSettings', { settings: shopSettings, configs: shopConfigs }).then(() => {

@@ -25,18 +25,9 @@ interface TattoosTabProps {
   setExpandedDlc: (value: string | null) => void;
   isLoading: boolean;
   isReady: boolean;
+  locale: { [key: string]: string };
+  tattooZoneOptions: { value: string; label: string; zoneIndex: number }[];
 }
-
-const tattooZoneOptions = [
-  { value: 'ZONE_TORSO', label: 'Torso', zoneIndex: 0 },
-  { value: 'ZONE_HEAD', label: 'Head', zoneIndex: 1 },
-  { value: 'ZONE_LEFT_ARM', label: 'Left Arm', zoneIndex: 2 },
-  { value: 'ZONE_RIGHT_ARM', label: 'Right Arm', zoneIndex: 3 },
-  { value: 'ZONE_LEFT_LEG', label: 'Left Leg', zoneIndex: 4 },
-  { value: 'ZONE_RIGHT_LEG', label: 'Right Leg', zoneIndex: 5 },
-  { value: 'ZONE_UNKNOWN', label: 'Unknown', zoneIndex: 6 },
-  { value: 'ZONE_NONE', label: 'None', zoneIndex: 7 },
-];
 
 export const TattoosTab: FC<TattoosTabProps> = ({
   tattoos,
@@ -45,6 +36,8 @@ export const TattoosTab: FC<TattoosTabProps> = ({
   setExpandedDlc,
   isLoading,
   isReady,
+  locale,
+  tattooZoneOptions,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
 

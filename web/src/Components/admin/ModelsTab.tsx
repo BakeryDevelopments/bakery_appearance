@@ -13,6 +13,7 @@ interface ModelsTabProps {
   setLockedModelsSaved: Dispatch<SetStateAction<string[]>>;
   isLoading: boolean;
   isReady: boolean;
+  locale: { [key: string]: string };
 }
 
 export const ModelsTab: FC<ModelsTabProps> = ({
@@ -24,6 +25,7 @@ export const ModelsTab: FC<ModelsTabProps> = ({
   setLockedModelsSaved,
   isLoading,
   isReady,
+  locale,
 }) => {
   const [addModelModalOpen, setAddModelModalOpen] = useState(false);
   const [newModelName, setNewModelName] = useState<string>('');

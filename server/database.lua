@@ -52,27 +52,42 @@ end
 ---@param outfitName string Name of the outfit
 ---@param outfitData table Outfit data (JSON serializable)
 ---@return boolean success
+---@return string|nil shareCode The generated share code
 function Database.SaveOutfit(citizenid, job, gang, gender, outfitName, outfitData)
     if not outfitName or not outfitData or not gender then
-        return false
+        return false, nil
+    end
+
+    -- Generate unique 8-character share code
+    local function generateShareCode()
+        local chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789' -- Removed similar looking chars
+        local code = ''
+        for i = 1, 8 do
+            local rand = math.random(1, #chars)
+            code = code .. chars:sub(rand, rand)
+        end
+        return code
     end
 
     -- Determine if this is a personal outfit or job/gang outfit
     local isPersonal = citizenid and not job and not gang
 
     if isPersonal then
+        local shareCode = generateShareCode()
+        
         -- Save to personal outfits table
-        local success = MySQL.query.await([[
-            INSERT INTO player_outfits (citizenid, gender, outfit_name, outfit_data, created_at, updated_at)
-            VALUES (?, ?, ?, ?, NOW(), NOW())
+        local result = MySQL.query.await([[
+            INSERT INTO player_outfits (citizenid, gender, outfit_name, outfit_data, share_code, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, NOW(), NOW())
             ON DUPLICATE KEY UPDATE
                 outfit_data = VALUES(outfit_data),
+                share_code = VALUES(share_code),
                 updated_at = NOW()
-        ]], {citizenid, gender, outfitName, json.encode(outfitData)})
+        ]], {citizenid, gender, outfitName, json.encode(outfitData), shareCode})
 
-        return success ~= nil
+        return result ~= nil, shareCode
     else
-        -- Save to job/gang outfits table
+        -- Save to job/gang outfits table (no share codes for job outfits)
         local success = MySQL.query.await([[
             INSERT INTO appearance_job_outfits (job, gang, gender, outfit_name, outfit_data, created_at, updated_at)
             VALUES (?, ?, ?, ?, ?, NOW(), NOW())
@@ -81,7 +96,7 @@ function Database.SaveOutfit(citizenid, job, gang, gender, outfitName, outfitDat
                 updated_at = NOW()
         ]], {job or '', gang or '', gender, outfitName, json.encode(outfitData)})
 
-        return success ~= nil
+        return success ~= nil, nil
     end
 end
 
@@ -95,7 +110,7 @@ function Database.GetPersonalOutfits(citizenid, gender)
     end
 
     local result = MySQL.query.await([[
-        SELECT outfit_name, outfit_data, created_at, updated_at
+        SELECT id, outfit_name, outfit_data, created_at, updated_at
         FROM player_outfits
         WHERE citizenid = ? AND gender = ?
         ORDER BY created_at DESC
@@ -115,6 +130,26 @@ function Database.GetPersonalOutfits(citizenid, gender)
     return result
 end
 
+--- Rename a personal outfit
+---@param citizenid string Player's citizen ID
+---@param outfitId number Outfit ID
+---@param newName string New outfit name
+---@param gender string Gender filter (male/female)
+---@return boolean success
+function Database.RenamePersonalOutfit(citizenid, outfitId, newName, gender)
+    if not citizenid or not outfitId or not newName then
+        return false
+    end
+
+    local result = MySQL.query.await([[
+        UPDATE player_outfits
+        SET outfit_name = ?, updated_at = NOW()
+        WHERE citizenid = ? AND id = ? AND gender = ?
+    ]], {newName, citizenid, outfitId, gender})
+
+    return result and result.affectedRows > 0
+end
+
 --- Get job/gang outfits
 ---@param job string|nil Job name
 ---@param gang string|nil Gang name
@@ -122,7 +157,7 @@ end
 ---@return table outfits Array of outfit records
 function Database.GetJobGangOutfits(job, gang, gender)
     local result = MySQL.query.await([[
-        SELECT outfit_name, outfit_data, job, gang, created_at, updated_at
+        SELECT id, outfit_name, outfit_data, job, gang, created_at, updated_at
         FROM appearance_job_outfits
         WHERE (job = ? OR gang = ?) AND gender = ?
         ORDER BY created_at DESC
@@ -131,7 +166,7 @@ function Database.GetJobGangOutfits(job, gang, gender)
     if not result then
         return {}
     end
-
+    
     -- Decode JSON outfit data
     for i = 1, #result do
         if result[i].outfit_data then
@@ -186,6 +221,79 @@ function Database.DeletePersonalOutfit(citizenid, outfitName, gender)
     ]], {citizenid, outfitName, gender})
 
     return success ~= nil
+end
+
+--- Delete a personal outfit by ID
+---@param citizenid string Player's citizen ID
+---@param outfitId number ID of outfit to delete
+---@param gender string Gender of outfit
+---@return boolean success
+function Database.DeletePersonalOutfitById(citizenid, outfitId, gender)
+    if not citizenid or not outfitId then
+        return false
+    end
+
+    local result = MySQL.query.await([[
+        DELETE FROM player_outfits
+        WHERE citizenid = ? AND id = ? AND gender = ?
+    ]], {citizenid, outfitId, gender})
+
+    return result and result.affectedRows > 0
+end
+
+--- Get share code for an outfit
+---@param citizenid string Player's citizen ID
+---@param outfitId number Outfit ID
+---@return string|nil shareCode
+function Database.GetOutfitShareCode(citizenid, outfitId)
+    local result = MySQL.query.await([[
+        SELECT share_code
+        FROM player_outfits
+        WHERE citizenid = ? AND id = ?
+    ]], {citizenid, outfitId})
+
+    if result and result[1] then
+        return result[1].share_code
+    end
+    return nil
+end
+
+--- Import outfit by share code
+---@param shareCode string The share code
+---@param targetCitizenid string The citizen ID of the player importing
+---@param newOutfitName string Name for the imported outfit
+---@return boolean success
+function Database.ImportOutfitByShareCode(shareCode, targetCitizenid, newOutfitName)
+    -- Find the outfit with this share code
+    local result = MySQL.query.await([[
+        SELECT outfit_data, gender
+        FROM player_outfits
+        WHERE share_code = ?
+        LIMIT 1
+    ]], {shareCode})
+
+    if not result or not result[1] then
+        return false
+    end
+
+    local outfitData = result[1].outfit_data
+    local gender = result[1].gender
+
+    -- Generate new share code for the imported outfit
+    local chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+    local newShareCode = ''
+    for i = 1, 8 do
+        local rand = math.random(1, #chars)
+        newShareCode = newShareCode .. chars:sub(rand, rand)
+    end
+
+    -- Save as new outfit for target player
+    local insertResult = MySQL.query.await([[
+        INSERT INTO player_outfits (citizenid, gender, outfit_name, outfit_data, share_code, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, NOW(), NOW())
+    ]], {targetCitizenid, gender, newOutfitName, outfitData, newShareCode})
+
+    return insertResult ~= nil
 end
 
 --- Delete a job/gang outfit (admin only)

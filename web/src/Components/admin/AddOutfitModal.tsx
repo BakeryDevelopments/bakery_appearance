@@ -19,6 +19,7 @@ interface AddOutfitModalProps {
 
 export const AddOutfitModal: FC<AddOutfitModalProps> = ({ opened, onClose, onAddOutfit }) => {
   const [newOutfit, setNewOutfit] = useState<Partial<JobOutfit>>({ gender: 'male' });
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleClose = () => {
     setNewOutfit({ gender: 'male' });
@@ -28,14 +29,37 @@ export const AddOutfitModal: FC<AddOutfitModalProps> = ({ opened, onClose, onAdd
   const handleAdd = () => {
     if (!newOutfit.outfitName || (!newOutfit.job && !newOutfit.gang)) return;
 
-    TriggerNuiCallback('addOutfit', newOutfit).then((result: any) => {
-      const newOutfitItem: JobOutfit = {
+    setIsLoading(true);
+
+    // First, request the current player's appearance data from the client
+    TriggerNuiCallback('getAppearanceData', {}).then((appearanceData: any) => {
+      // Extract only components and props from the appearance data
+      const outfitData = {
+        components: appearanceData?.components || {},
+        props: appearanceData?.props || {},
+      };
+
+      const outfitToSave: Partial<JobOutfit> = {
         ...newOutfit,
-        ...result,
-        id: Date.now(),
-      } as JobOutfit;
-      onAddOutfit(newOutfitItem);
-      handleClose();
+        outfitData,
+      };
+
+      TriggerNuiCallback('addOutfit', outfitToSave).then((result: any) => {
+        const newOutfitItem: JobOutfit = {
+          ...outfitToSave,
+          ...result,
+          id: Date.now(),
+        } as JobOutfit;
+        onAddOutfit(newOutfitItem);
+        setIsLoading(false);
+        handleClose();
+      }).catch((error) => {
+        console.error('Failed to add outfit:', error);
+        setIsLoading(false);
+      });
+    }).catch((error) => {
+      console.error('Failed to get appearance data:', error);
+      setIsLoading(false);
     });
   };
 
@@ -53,6 +77,7 @@ export const AddOutfitModal: FC<AddOutfitModalProps> = ({ opened, onClose, onAdd
           placeholder="Police Uniform"
           value={newOutfit.outfitName || ''}
           onChange={(e) => setNewOutfit({ ...newOutfit, outfitName: e.target.value })}
+          disabled={isLoading}
         />
         <Select
           label="Gender"
@@ -62,6 +87,7 @@ export const AddOutfitModal: FC<AddOutfitModalProps> = ({ opened, onClose, onAdd
             { value: 'male', label: 'Male' },
             { value: 'female', label: 'Female' },
           ]}
+          disabled={isLoading}
         />
         <TextInput
           label="Job (Optional)"
@@ -69,6 +95,7 @@ export const AddOutfitModal: FC<AddOutfitModalProps> = ({ opened, onClose, onAdd
           description="Leave blank if this is for a gang"
           value={newOutfit.job || ''}
           onChange={(e) => setNewOutfit({ ...newOutfit, job: e.target.value || undefined })}
+          disabled={isLoading}
         />
         <TextInput
           label="Gang (Optional)"
@@ -76,19 +103,21 @@ export const AddOutfitModal: FC<AddOutfitModalProps> = ({ opened, onClose, onAdd
           description="Leave blank if this is for a job"
           value={newOutfit.gang || ''}
           onChange={(e) => setNewOutfit({ ...newOutfit, gang: e.target.value || undefined })}
+          disabled={isLoading}
         />
         <Text c="dimmed" size="xs">
           Note: Outfit appearance data will be captured from your current character when you save.
         </Text>
         <Group position="right" mt="md">
-          <Button variant="subtle" onClick={handleClose}>
+          <Button variant="subtle" onClick={handleClose} disabled={isLoading}>
             Cancel
           </Button>
           <Button
             onClick={handleAdd}
-            disabled={!newOutfit.outfitName || (!newOutfit.job && !newOutfit.gang)}
+            disabled={!newOutfit.outfitName || (!newOutfit.job && !newOutfit.gang) || isLoading}
+            loading={isLoading}
           >
-            Add
+            {isLoading ? 'Saving...' : 'Add'}
           </Button>
         </Group>
       </Stack>

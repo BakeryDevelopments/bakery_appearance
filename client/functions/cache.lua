@@ -9,7 +9,8 @@ local Cache = {
     shopSettings = {},
     shopConfigs = {},
     blacklist = {},
-    locale = {}
+    locale = {},
+    appearanceSettings = {}
 }
 
 local TattooZones = {
@@ -68,6 +69,31 @@ local function loadSettings()
     Cache.blacklist.lockedModels = settingsFile and json.decode(settingsFile) or {}
 
     return Cache
+end
+
+-- Load appearance settings (useTarget, blip defaults, ped toggle)
+local function loadAppearanceSettings()
+    local settingsFile = LoadResourceFile('tj_appearance', 'shared/data/appearance_settings.json')
+    local defaults = {
+        useTarget = Config.UseTarget ~= false,
+        enablePedsForShops = Config.EnablePedsForShops ~= false,
+        blips = Config.Blips or {}
+    }
+
+    if settingsFile then
+        local decoded = json.decode(settingsFile) or {}
+        Cache.appearanceSettings = defaults
+
+        if type(decoded) == 'table' then
+            Cache.appearanceSettings.useTarget = decoded.useTarget ~= nil and decoded.useTarget or defaults.useTarget
+            Cache.appearanceSettings.enablePedsForShops = decoded.enablePedsForShops ~= nil and decoded.enablePedsForShops or defaults.enablePedsForShops
+            Cache.appearanceSettings.blips = decoded.blips or defaults.blips
+        end
+    else
+        Cache.appearanceSettings = defaults
+    end
+
+    return Cache.appearanceSettings
 end
 
 -- Load models from JSON
@@ -344,6 +370,7 @@ local function initializeCache()
     loadTattoos()
     loadShopSettings()
     loadShopConfigs()
+    loadAppearanceSettings()
 
     -- Wait a bit for NUI to be ready
     Wait(100)
@@ -356,6 +383,7 @@ local function initializeCache()
     handleNuiMessage({ action = 'setZones', data = Cache.zones }, false)
     handleNuiMessage({ action = 'setOutfits', data = Cache.outfits }, false)
     handleNuiMessage({ action = 'setTattoos', data = Cache.tattoos }, false)
+    handleNuiMessage({ action = 'setAppearanceSettings', data = Cache.appearanceSettings }, false)
     
     -- Send theme and locale with a small delay to ensure NUI handlers are ready
     SetTimeout(200, function()
@@ -363,7 +391,6 @@ local function initializeCache()
         handleNuiMessage({ action = 'setLocale', data = Cache.locale }, false)
     end)
     
-    print('[tj_appearance] Cache initialized and sent to NUI')
 end
 
 
@@ -375,6 +402,11 @@ end)
 RegisterNetEvent('tj_appearance:client:updateTattoos', function(tattoos)
     Cache.tattoos = tattoos or {}
     handleNuiMessage({ action = 'setTattoos', data = Cache.tattoos }, true)
+end)
+
+RegisterNetEvent('tj_appearance:client:updateAppearanceSettings', function(settings)
+    Cache.appearanceSettings = settings or Cache.appearanceSettings or {}
+    handleNuiMessage({ action = 'setAppearanceSettings', data = Cache.appearanceSettings }, true)
 end)
 
 -- Public API to get cache data
@@ -390,6 +422,7 @@ local CacheAPI = {
     getShopConfigs = function() return Cache.shopConfigs end,
     getLocale = function() return Cache.locale end,
     getBlacklistSettings = function() return Cache.blacklist end,
+    getAppearanceSettings = function() return Cache.appearanceSettings end,
     updateCache = function(key, value)
         if key == 'restrictions' then
             Cache.blacklist.restrictions = value
@@ -401,6 +434,8 @@ local CacheAPI = {
             Cache.zones = value
         elseif key == 'outfits' then
             Cache.outfits = value
+        elseif key == 'appearanceSettings' then
+            Cache.appearanceSettings = value
         end
     end,
     getRestrictions = function()

@@ -2,18 +2,19 @@ local handleNuiMessage = require('modules.nui')
 local CacheAPI = require('client.functions.cache')
 
 _CurrentTattoos = _CurrentTattoos or {}
+_CurrentMenuType = 'clothing' -- Track current menu type for pricing
 
 -- Initialize cache on resource start
 CreateThread(function()
   CacheAPI.init()
 end)
 
-RegisterCommand('appearance', function()
+-- Function to open appearance menu for a player
+local function OpenAppearanceMenu()
   -- Get player's current model to determine gender
   local model = GetEntityModel(cache.ped)
   local isMale = model == GetHashKey("mp_m_freemode_01")
   local gender = isMale and 'male' or 'female'
-
 
   -- Get player-specific restrictions from cache
   local restrictions = CacheAPI.getPlayerRestrictions()
@@ -70,23 +71,73 @@ RegisterCommand('appearance', function()
     ToggleCam(true)
     handleNuiMessage({ action = 'setVisibleApp', data = true }, true)
   end)
-end, false)
+end
+
+-- Listen for server event to open appearance menu
+RegisterNetEvent('tj_appearance:client:openAppearanceMenu', function()
+  OpenAppearanceMenu()
+end)
 
 RegisterNuiCallback('save', function(data, cb)
 
+  -- Store current appearance before saving (in case we need to revert)
+  local beforeAppearance = GetPlayerAppearance()
+  
   -- Get current appearance and save to database
   local appearance = GetPlayerAppearance()
+  appearance.menuType = _CurrentMenuType or 'clothing'  -- Include menu type for pricing
+  
   lib.callback('tj_appearance:saveAppearance', false, function(success)
     if success then
-      print('[tj_appearance] Appearance saved successfully')
+      --print('[tj_appearance] Appearance saved successfully')
+      handleNuiMessage({ action = 'setVisibleApp', data = false }, false)
+      ToggleCam(false)
+      cb('ok')
     else
-      print('[tj_appearance] Failed to save appearance')
+      -- Save failed (likely due to insufficient funds), revert appearance
+      print('[tj_appearance] Save failed, reverting appearance')
+      
+      -- Revert to previous appearance
+      if beforeAppearance and beforeAppearance.model then
+        local ped = cache.ped
+        
+        -- Restore model if changed
+        if beforeAppearance.model ~= appearance.model then
+          local modelHash = GetHashKey(beforeAppearance.model)
+          lib.requestModel(modelHash, 1000)
+          SetPlayerModel(PlayerId(), modelHash)
+          SetModelAsNoLongerNeeded(modelHash)
+        end
+        
+        -- Restore appearance components
+        if beforeAppearance.drawables then
+          for key, drawable in pairs(beforeAppearance.drawables) do
+            if drawable.drawable >= 0 and drawable.texture >= 0 then
+              SetPedComponentVariation(ped, tonumber(key), drawable.drawable, drawable.texture, 0)
+            end
+          end
+        end
+        
+        -- Restore props
+        if beforeAppearance.props then
+          for key, prop in pairs(beforeAppearance.props) do
+            if prop.drawable >= 0 and prop.texture >= 0 then
+              SetPedPropIndex(ped, tonumber(key), prop.drawable, prop.texture, true)
+            end
+          end
+        end
+        
+        -- Restore head blend (heritage)
+        if beforeAppearance.headBlend then
+          SetPedHeadBlend(ped, beforeAppearance.headBlend)
+        end
+      end
+      
+      handleNuiMessage({ action = 'setVisibleApp', data = false }, false)
+      ToggleCam(false)
+      cb('ok')
     end
   end, appearance)
-
-  handleNuiMessage({ action = 'setVisibleApp', data = false }, false)
-  ToggleCam(false)
-  cb('ok')
 end)
 
 RegisterNuiCallback('saveOutfit', function(outfitData, cb)
@@ -108,6 +159,63 @@ RegisterNuiCallback('saveOutfit', function(outfitData, cb)
       cb({ success = false, error = 'Failed to save outfit' })
     end
   end, outfitData)
+end)
+
+RegisterNuiCallback('renameOutfit', function(data, cb)
+  local outfitId = data.id
+  local newLabel = data.label
+  
+  lib.callback('tj_appearance:renameOutfit', false, function(success)
+    if success then
+      -- Fetch updated outfits list
+      lib.callback('tj_appearance:getOutfits', false, function(outfits)
+        cb({ 
+          outfits = outfits 
+        })
+      end)
+    else
+      cb({})
+    end
+  end, { id = outfitId, label = newLabel })
+end)
+
+RegisterNuiCallback('getOutfitShareCode', function(data, cb)
+  local outfitId = data.id
+  
+  lib.callback('tj_appearance:getOutfitShareCode', false, function(shareCode)
+    cb({ shareCode = shareCode })
+  end, outfitId)
+end)
+
+RegisterNuiCallback('importOutfitByCode', function(data, cb)
+  lib.callback('tj_appearance:importOutfitByCode', false, function(success)
+    if success then
+      -- Fetch updated outfits list
+      lib.callback('tj_appearance:getOutfits', false, function(outfits)
+        cb({ 
+          success = true,
+          outfits = outfits 
+        })
+      end)
+    else
+      cb({ success = false })
+    end
+  end, data)
+end)
+
+RegisterNuiCallback('deleteOutfitPlayer', function(data, cb)
+  lib.callback('tj_appearance:deleteOutfit', false, function(success)
+    if success then
+      -- Fetch updated outfits list
+      lib.callback('tj_appearance:getOutfits', false, function(outfits)
+        cb({ 
+          outfits = outfits 
+        })
+      end)
+    else
+      cb({})
+    end
+  end, data)
 end)
 
 RegisterNuiCallback('cancel', function(data, cb)
@@ -225,6 +333,7 @@ RegisterNetEvent('tj_appearance:client:openAdminMenu', function()
   handleNuiMessage({ action = 'setShopSettings', data = CacheAPI.getShopSettings() }, true)
   handleNuiMessage({ action = 'setShopConfigs', data = CacheAPI.getShopConfigs() }, true)
   handleNuiMessage({ action = 'setTattoos', data = CacheAPI.getTattoos() }, true)
+  handleNuiMessage({ action = 'setAppearanceSettings', data = CacheAPI.getAppearanceSettings() }, true)
 end)
 
 RegisterNuiCallback('closeAdminMenu', function(data, cb)
@@ -240,6 +349,12 @@ end)
 
 RegisterNuiCallback('saveSettings', function(settings, cb)
   lib.callback('tj_appearance:admin:saveSettings', false, function(success)
+    cb(success)
+  end, settings)
+end)
+
+RegisterNuiCallback('saveAppearanceSettings', function(settings, cb)
+  lib.callback('tj_appearance:admin:saveAppearanceSettings', false, function(success)
     cb(success)
   end, settings)
 end)
@@ -294,27 +409,24 @@ end)
 
 RegisterNuiCallback('addZone', function(zone, cb)
   lib.callback('tj_appearance:admin:addZone', false, function(success)
-    if success then
-      CacheAPI.updateCache('zones', zone, 'add')
-    end
+    -- Server will broadcast the updated zones list via event
+    -- No need to update cache here as the event handler will do it
     cb(success)
   end, zone)
 end)
 
 RegisterNuiCallback('updateZone', function(zone, cb)
   lib.callback('tj_appearance:admin:updateZone', false, function(success)
-    if success then
-      CacheAPI.updateCache('zones', zone, 'update')
-    end
+    -- Server will broadcast the updated zones list via event
+    -- No need to update cache here as the event handler will do it
     cb(success)
   end, zone)
 end)
 
 RegisterNuiCallback('deleteZone', function(id, cb)
   lib.callback('tj_appearance:admin:deleteZone', false, function(success)
-    if success then
-      CacheAPI.updateCache('zones', { id = id }, 'delete')
-    end
+    -- Server will broadcast the updated zones list via event
+    -- No need to update cache here as the event handler will do it
     cb(success)
   end, id)
 end)
@@ -387,4 +499,26 @@ RegisterNuiCallback('getPlayerCoords', function(_, cb)
   local x, y, z = table.unpack(GetEntityCoords(ped))
   local heading = GetEntityHeading(ped)
   cb({ x = x, y = y, z = z, heading = heading })
+end)
+
+-- Get current player appearance data (components and props only)
+RegisterNuiCallback('getAppearanceData', function(_, cb)
+  local ped = cache.ped
+  
+  -- Get components and props (ignoring the totals return value)
+  local components = GetPedComponents(ped)
+  local props = GetPedProps(ped)
+  
+  -- Filter out face, hair, and neck from components
+  local filteredComponents = {}
+  for key, value in pairs(components) do
+    if key ~= 'face' and key ~= 'hair' and key ~= 'neck' then
+      filteredComponents[key] = value
+    end
+  end
+  
+  cb({
+    components = filteredComponents,
+    props = props,
+  })
 end)

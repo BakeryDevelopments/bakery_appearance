@@ -1,9 +1,7 @@
 -- Guard: ensure qb-core is started before loading (QBox is based on QBCore)
-if GetResourceState('qb-core') ~= 'started' then
+if GetResourceState('qbx_core') ~= 'started' then
     return
 end
-
-local QBCore = exports['qb-core']:GetCoreObject()
 
 Framework = {}
 
@@ -11,7 +9,7 @@ Framework = {}
 ---@param source number Player server ID
 ---@return table|nil playerData Player data including job, gang, citizenid, etc.
 function Framework.GetPlayer(source)
-    local Player = QBCore.Functions.GetPlayer(source)
+    local Player = exports.qbx_core:GetPlayer(source)
     if not Player then return nil end
     
     return {
@@ -53,7 +51,7 @@ end
 ---@param source number Player server ID
 ---@return string|nil jobName
 function Framework.GetJob(source)
-    local Player = QBCore.Functions.GetPlayer(source)
+    local Player = exports.qbx_core:GetPlayer(source)
     if not Player then return nil end
     return Player.PlayerData.job.name
 end
@@ -62,7 +60,7 @@ end
 ---@param source number Player server ID
 ---@return string|nil gangName
 function Framework.GetGang(source)
-    local Player = QBCore.Functions.GetPlayer(source)
+    local Player = exports.qbx_core:GetPlayer(source)
     if not Player then return nil end
     return Player.PlayerData.gang and Player.PlayerData.gang.name or 'none'
 end
@@ -71,9 +69,52 @@ end
 ---@param source number Player server ID
 ---@return string|nil citizenid
 function Framework.GetCitizenId(source)
-    local Player = QBCore.Functions.GetPlayer(source)
+    local Player = exports.qbx_core:GetPlayer(source)
     if not Player then return nil end
     return Player.PlayerData.citizenid
+end
+
+--- Remove money from player (prioritize cash, then bank)
+---@param source number Player server ID
+---@param amount number Amount to remove
+---@return boolean success Whether the operation was successful
+function Framework.RemoveMoney(source, amount)
+    local Player = exports.qbx_core:GetPlayer(source)
+    if not Player then return false end
+    
+    local cash = Player.PlayerData.money.cash or 0
+    local bank = Player.PlayerData.money.bank or 0
+    
+    if cash + bank < amount then
+        return false  -- Insufficient funds
+    end
+    
+    if cash >= amount then
+        Player.Functions.RemoveMoney('cash', amount)
+    else
+        local cashToTake = cash
+        local bankToTake = amount - cashToTake
+        if cashToTake > 0 then
+            Player.Functions.RemoveMoney('cash', cashToTake)
+        end
+        if bankToTake > 0 then
+            Player.Functions.RemoveMoney('bank', bankToTake)
+        end
+    end
+    
+    return true
+end
+
+--- Add money to player (to bank account)
+---@param source number Player server ID
+---@param amount number Amount to add
+---@return boolean success Whether the operation was successful
+function Framework.AddMoney(source, amount)
+    local Player = exports.qbx_core:GetPlayer(source)
+    if not Player then return false end
+    
+    Player.Functions.AddMoney('bank', amount)
+    return true
 end
 
 return Framework

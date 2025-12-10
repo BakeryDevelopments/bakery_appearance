@@ -1,6 +1,23 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
-local ServerCache = {
+-- Helper function for deep copying tables
+local function deepcopy(orig)
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in next, orig, nil do
+            copy[deepcopy(orig_key)] = deepcopy(orig_value)
+        end
+        setmetatable(copy, deepcopy(getmetatable(orig)))
+    else
+        copy = orig
+    end
+    return copy
+end
+
+-- Make ServerCache global so it can be accessed from main.lua
+ServerCache = {
     theme = {},
     settings = {},
     models = {},
@@ -10,6 +27,7 @@ local ServerCache = {
     shopSettings = {},
     shopConfigs = {},
     restrictions = {},
+    appearanceSettings = {},
 } 
 
 local TattooZones = {
@@ -170,6 +188,29 @@ local function LoadCache()
     ServerCache.settings.lockedModels = lockedmodels and json.decode(lockedmodels) or { lockedModels = {} }
 end
 
+-- Load appearance settings (useTarget, blip defaults, ped toggles)
+local function LoadAppearanceSettingsCache()
+    local settingsFile = LoadResourceFile(GetCurrentResourceName(), 'shared/data/appearance_settings.json')
+    local defaults = {
+        useTarget = Config.UseTarget ~= false,
+        enablePedsForShops = Config.EnablePedsForShops ~= false,
+        blips = Config.Blips or {}
+    }
+
+    if settingsFile then
+        local decoded = json.decode(settingsFile) or {}
+        ServerCache.appearanceSettings = defaults
+
+        if type(decoded) == 'table' then
+            ServerCache.appearanceSettings.useTarget = decoded.useTarget ~= nil and decoded.useTarget or defaults.useTarget
+            ServerCache.appearanceSettings.enablePedsForShops = decoded.enablePedsForShops ~= nil and decoded.enablePedsForShops or defaults.enablePedsForShops
+            ServerCache.appearanceSettings.blips = decoded.blips or defaults.blips
+        end
+    else
+        ServerCache.appearanceSettings = defaults
+    end
+end
+
 -- Load shop settings into cache
 local function LoadShopSettingsCache()
     local jsonData = LoadResourceFile(GetCurrentResourceName(), 'shared/data/shop_settings.json')
@@ -205,6 +246,7 @@ CreateThread(function()
     LoadShopConfigsCache()
     LoadZonesCache()
     LoadOutfitsCache()
+    LoadAppearanceSettingsCache()
 end)
 
 -- Save cache to database on resource stop
@@ -213,7 +255,7 @@ AddEventHandler('onResourceStop', function(resourceName)
 end)
 
 -- Admin permission check
-local function IsAdmin(source)
+function IsAdmin(source)
     -- Check for ACE permission
     local isAdmin = IsPlayerAceAllowed(source, 'command')
     return isAdmin
@@ -238,6 +280,28 @@ lib.callback.register('tj_appearance:admin:saveSettings', function(source, setti
     ServerCache.settings.lockedModels = settings
     SaveResourceFile(GetCurrentResourceName(), 'shared/data/locked_models.json', json.encode(settings), -1)
     TriggerClientEvent('tj_appearance:client:updateLockedModels', -1, settings)
+
+    return true
+end)
+
+-- Save appearance settings (useTarget, blip defaults, ped toggle)
+lib.callback.register('tj_appearance:admin:saveAppearanceSettings', function(source, settings)
+    if not IsAdmin(source) then return false end
+
+    if type(settings) ~= 'table' then return false end
+
+    -- Merge with defaults to avoid nils
+    local merged = {
+        useTarget = settings.useTarget ~= nil and settings.useTarget or (Config.UseTarget ~= false),
+        enablePedsForShops = settings.enablePedsForShops ~= nil and settings.enablePedsForShops or (Config.EnablePedsForShops ~= false),
+        blips = settings.blips or Config.Blips or {}
+    }
+
+    ServerCache.appearanceSettings = merged
+    SaveResourceFile(GetCurrentResourceName(), 'shared/data/appearance_settings.json', json.encode(merged), -1)
+
+    -- Broadcast to all clients so menus/zones can reflect changes
+    TriggerClientEvent('tj_appearance:client:updateAppearanceSettings', -1, merged)
 
     return true
 end)
@@ -380,7 +444,7 @@ lib.callback.register('tj_appearance:admin:addZone', function(source, zone)
     if not IsAdmin(source) then return false end
 
     -- Generate an ID for the new zone
-    local newZone = table.deepcopy(zone)
+    local newZone = deepcopy(zone)
     newZone.id = #ServerCache.zones + 1
 
     table.insert(ServerCache.zones, newZone)

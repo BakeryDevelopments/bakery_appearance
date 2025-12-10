@@ -1,16 +1,16 @@
 import { FC, useEffect, useState, useMemo, lazy, Suspense, useCallback } from 'react';
 import { Tabs, Button, Stack, Group, Text, TextInput, Select, ActionIcon, Modal, Checkbox, Accordion, Badge, Box, NumberInput, Divider, Loader, Overlay } from '@mantine/core';
-import { IconPalette, IconLock, IconUser, IconShoppingCart, IconMapPin, IconHanger, IconDownload, IconFeather, IconMars, IconVenus } from '@tabler/icons-react';
+import { IconPalette, IconLock, IconUser, IconShoppingCart, IconMapPin, IconHanger, IconDownload, IconFeather, IconMars, IconVenus, IconAdjustments } from '@tabler/icons-react';
 import { TriggerNuiCallback } from '../Utils/TriggerNuiCallback';
 import { HandleNuiMessage } from '../Hooks/HandleNuiMessage';
 import { AddOutfitModal } from './admin/AddOutfitModal';
 
 import { useCustomization } from '../Providers/CustomizationProvider';
+import { useAppearanceStore } from '../Providers/AppearanceStoreProvider';
 const TattoosTab = lazy(() => import('./admin/TattoosTab').then(mod => ({ default: mod.TattoosTab })));
 const ThemeTab = lazy(() => import('./admin/ThemeTab').then(mod => ({ default: mod.ThemeTab })));
 const ModelsTab = lazy(() => import('./admin/ModelsTab').then(mod => ({ default: mod.ModelsTab })));
 const RestrictionsTab = lazy(() => import('./admin/RestrictionsTab').then(mod => ({ default: mod.RestrictionsTab })));
-const ShopsTab = lazy(() => import('./admin/ShopsTab').then(mod => ({ default: mod.ShopsTab })));
 const ZonesTab = lazy(() => import('./admin/ZonesTab').then(mod => ({ default: mod.ZonesTab })));
 const OutfitsTab = lazy(() => import('./admin/OutfitsTab').then(mod => ({ default: mod.OutfitsTab })));
 
@@ -38,32 +38,26 @@ interface ClothingRestriction {
   textures?: number[];
 }
 
-interface ShopConfig {
-  id?: number;
-  type: 'clothing' | 'barber' | 'tattoo' | 'surgeon';
-  blipShow: boolean;
-  blipSprite: number;
-  blipColor: number;
-  blipScale: number;
-  blipName: string;
-  cost: number;
-}
-
-interface ShopSettings {
-  enablePedsForShops: boolean;
-  enablePedsForClothingRooms: boolean;
-  enablePedsForPlayerOutfitRooms: boolean;
-}
-
 interface Zone {
   id?: number;
-  type: 'clothing' | 'barber' | 'tattoo' | 'surgeon';
+  type: 'clothing' | 'barber' | 'tattoo' | 'surgeon' | 'outfits';
   coords: { x: number; y: number; z: number; heading?: number };
   polyzone?: { x: number; y: number }[];
   showBlip: boolean;
+  blipSprite?: number;
+  blipColor?: number;
+  blipScale?: number;
+  blipName?: string;
+  enablePed?: boolean;
   job?: string;
   gang?: string;
   name?: string;
+}
+
+interface AppearanceSettings {
+  useTarget: boolean;
+  enablePedsForShops: boolean;
+  blips: Record<string, { sprite?: number; color?: number; scale?: number; name?: string }>;
 }
 
 interface JobOutfit {
@@ -95,6 +89,7 @@ export const AdminMenu: FC = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [captureActive, setCaptureActive] = useState(false);
   const { theme: cachedTheme } = useCustomization();
+  const { locale } = useAppearanceStore();
   const [theme, setTheme] = useState<ThemeConfig>(cachedTheme);
   const [restrictions, setRestrictions] = useState<ClothingRestriction[]>([]);
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -110,19 +105,6 @@ export const AdminMenu: FC = () => {
   const [lockedModelsSaved, setLockedModelsSaved] = useState<string[]>([]);
   const [addModelModalOpen, setAddModelModalOpen] = useState(false);
   const [newModelName, setNewModelName] = useState<string>('');
-
-  // Shop Options State
-  const [shopSettings, setShopSettings] = useState<ShopSettings>({
-    enablePedsForShops: true,
-    enablePedsForClothingRooms: true,
-    enablePedsForPlayerOutfitRooms: true,
-  });
-  const [shopConfigs, setShopConfigs] = useState<ShopConfig[]>([
-    { type: 'clothing', blipShow: true, blipSprite: 366, blipColor: 47, blipScale: 0.7, blipName: 'Clothing Store', cost: 0 },
-    { type: 'barber', blipShow: true, blipSprite: 71, blipColor: 47, blipScale: 0.7, blipName: 'Barber Shop', cost: 0 },
-    { type: 'tattoo', blipShow: true, blipSprite: 75, blipColor: 47, blipScale: 0.7, blipName: 'Tattoo Shop', cost: 0 },
-    { type: 'surgeon', blipShow: true, blipSprite: 102, blipColor: 47, blipScale: 0.7, blipName: 'Surgeon', cost: 0 },
-  ]);
 
   // Zones State
   const [zones, setZones] = useState<Zone[]>([]);
@@ -141,6 +123,13 @@ export const AdminMenu: FC = () => {
   const [expandedDlc, setExpandedDlc] = useState<string | null>(null);
   const [expandedRestriction, setExpandedRestriction] = useState<string | null>(null);
 
+  // Appearance settings (runtime defaults for zones)
+  const [appearanceSettings, setAppearanceSettings] = useState<AppearanceSettings>({
+    useTarget: true,
+    enablePedsForShops: true,
+    blips: {}
+  });
+
   // Loading State
   const [activeTab, setActiveTab] = useState<string | null>('theme');
   const [isLoadingTab, setIsLoadingTab] = useState(false);
@@ -148,32 +137,32 @@ export const AdminMenu: FC = () => {
   const [themeReady, setThemeReady] = useState(false);
   const [menuMounted, setMenuMounted] = useState(false);
 
-  const categoryOptionsByPart: Record<PartType, { value: string; label: string }[]> = {
-    model: [{ value: 'model', label: 'Model' }],
+  const categoryOptionsByPart: Record<PartType, { value: string; label: string }[]> = useMemo(() => ({
+    model: [{ value: 'model', label: locale.ADMIN_PART_MODEL || 'Model' }],
     drawable: [
-      { value: 'masks', label: 'Masks' },
-      { value: 'shirts', label: 'Undershirts' },
-      { value: 'jackets', label: 'Tops/Jackets' },
-      { value: 'vest', label: 'Vest' },
-      { value: 'legs', label: 'Legs' },
-      { value: 'shoes', label: 'Shoes' },
+      { value: 'masks', label: locale.ADMIN_CATEGORY_MASKS || 'Masks' },
+      { value: 'shirts', label: locale.ADMIN_CATEGORY_UNDERSHIRTS || 'Undershirts' },
+      { value: 'jackets', label: locale.ADMIN_CATEGORY_TOPS || 'Tops/Jackets' },
+      { value: 'vest', label: locale.ADMIN_CATEGORY_VEST || 'Vest' },
+      { value: 'legs', label: locale.ADMIN_CATEGORY_LEGS || 'Legs' },
+      { value: 'shoes', label: locale.ADMIN_CATEGORY_SHOES || 'Shoes' },
     ],
     prop: [
-      { value: 'hats', label: 'Hats' },
-      { value: 'glasses', label: 'Glasses' },
+      { value: 'hats', label: locale.ADMIN_CATEGORY_HATS || 'Hats' },
+      { value: 'glasses', label: locale.ADMIN_CATEGORY_GLASSES || 'Glasses' },
     ],
-  };
+  }), [locale]);
 
-  const tattooZoneOptions = [
-    { value: 'ZONE_TORSO', label: 'Torso', zoneIndex: 0 },
-    { value: 'ZONE_HEAD', label: 'Head', zoneIndex: 1 },
-    { value: 'ZONE_LEFT_ARM', label: 'Left Arm', zoneIndex: 2 },
-    { value: 'ZONE_RIGHT_ARM', label: 'Right Arm', zoneIndex: 3 },
-    { value: 'ZONE_LEFT_LEG', label: 'Left Leg', zoneIndex: 4 },
-    { value: 'ZONE_RIGHT_LEG', label: 'Right Leg', zoneIndex: 5 },
-    { value: 'ZONE_UNKNOWN', label: 'Unknown', zoneIndex: 6 },
-    { value: 'ZONE_NONE', label: 'None', zoneIndex: 7 },
-  ];
+  const tattooZoneOptions = useMemo(() => [
+    { value: 'ZONE_TORSO', label: locale.ADMIN_TATTOO_ZONE_TORSO || 'Torso', zoneIndex: 0 },
+    { value: 'ZONE_HEAD', label: locale.ADMIN_TATTOO_ZONE_HEAD || 'Head', zoneIndex: 1 },
+    { value: 'ZONE_LEFT_ARM', label: locale.ADMIN_TATTOO_ZONE_LEFT_ARM || 'Left Arm', zoneIndex: 2 },
+    { value: 'ZONE_RIGHT_ARM', label: locale.ADMIN_TATTOO_ZONE_RIGHT_ARM || 'Right Arm', zoneIndex: 3 },
+    { value: 'ZONE_LEFT_LEG', label: locale.ADMIN_TATTOO_ZONE_LEFT_LEG || 'Left Leg', zoneIndex: 4 },
+    { value: 'ZONE_RIGHT_LEG', label: locale.ADMIN_TATTOO_ZONE_RIGHT_LEG || 'Right Leg', zoneIndex: 5 },
+    { value: 'ZONE_UNKNOWN', label: locale.ADMIN_TATTOO_ZONE_UNKNOWN || 'Unknown', zoneIndex: 6 },
+    { value: 'ZONE_NONE', label: locale.ADMIN_TATTOO_ZONE_NONE || 'None', zoneIndex: 7 },
+  ], [locale]);
 
   HandleNuiMessage<boolean>('setVisibleAdminMenu', (visible) => {
     setIsVisible(visible);
@@ -212,14 +201,6 @@ export const AdminMenu: FC = () => {
 
   HandleNuiMessage<string[]>('setLockedModels', (data) => {
     setLockedModelsSaved(data || []);
-  });
-
-  HandleNuiMessage<ShopSettings>('setShopSettings', (data) => {
-    setShopSettings(data);
-  });
-
-  HandleNuiMessage<ShopConfig[]>('setShopConfigs', (data) => {
-    setShopConfigs(data);
   });
 
   HandleNuiMessage<Zone[]>('setZones', (data) => {
@@ -276,6 +257,10 @@ export const AdminMenu: FC = () => {
         setDataLoadProgress(prev => ({ ...prev, tattoos: true }));
       }
     });
+  });
+
+  HandleNuiMessage<AppearanceSettings>('setAppearanceSettings', (data) => {
+    if (data) setAppearanceSettings(data);
   });
 
   HandleNuiMessage<JobOutfit[]>('setOutfits', (data) => {
@@ -578,7 +563,7 @@ export const AdminMenu: FC = () => {
       {!menuMounted ? (
         <div style={{ textAlign: 'center' }}>
           <Loader color="blue" size="xl" />
-          <Text c="white" mt="lg" size="md">Loading admin menu...</Text>
+          <Text c="white" mt="lg" size="md">{locale.ADMIN_MSG_LOADING || 'Loading admin menu...'}</Text>
         </div>
       ) : (
       <div
@@ -594,10 +579,10 @@ export const AdminMenu: FC = () => {
       >
         <Group position="apart" mb="xl">
           <Text size="xl" fw={700} c="white">
-            Appearance Admin Menu
+            {locale.ADMIN_MENU_TITLE || 'Appearance Admin Menu'}
           </Text>
           <Button onClick={handleClose} variant="subtle" color="red">
-            Close
+            {locale.CLOSE_TITLE || 'Close'}
           </Button>
         </Group>
 
@@ -606,31 +591,31 @@ export const AdminMenu: FC = () => {
           <Tabs.List>
             <Tabs.Tab value="theme">
               <IconPalette size={16} style={{ marginRight: 8, verticalAlign: 'middle' }} />
-              Appearance Settings
+              {locale.ADMIN_TAB_THEME || 'Appearance Settings'}
+            </Tabs.Tab>
+            <Tabs.Tab value="settings">
+              <IconAdjustments size={16} style={{ marginRight: 8, verticalAlign: 'middle' }} />
+              {locale.ADMIN_TAB_CONFIG || 'Config'}
             </Tabs.Tab>
             <Tabs.Tab value="restrictions">
               <IconLock size={16} style={{ marginRight: 8, verticalAlign: 'middle' }} />
-              Restrictions
+              {locale.ADMIN_TAB_RESTRICTIONS || 'Restrictions'}
             </Tabs.Tab>
             <Tabs.Tab value="models">
               <IconUser size={16} style={{ marginRight: 8, verticalAlign: 'middle' }} />
-              Models
-            </Tabs.Tab>
-            <Tabs.Tab value="shops">
-              <IconShoppingCart size={16} style={{ marginRight: 8, verticalAlign: 'middle' }} />
-              Shop Options
+              {locale.ADMIN_TAB_MODELS || 'Models'}
             </Tabs.Tab>
             <Tabs.Tab value="tattoos">
               <IconFeather size={16} style={{ marginRight: 8, verticalAlign: 'middle' }} />
-              Tattoos
+              {locale.ADMIN_TAB_TATTOOS || 'Tattoos'}
             </Tabs.Tab>
             <Tabs.Tab value="zones">
               <IconMapPin size={16} style={{ marginRight: 8, verticalAlign: 'middle' }} />
-              Zones
+              {locale.ADMIN_TAB_ZONES || 'Zones'}
             </Tabs.Tab>
             <Tabs.Tab value="outfits">
               <IconHanger size={16} style={{ marginRight: 8, verticalAlign: 'middle' }} />
-              Outfits
+              {locale.ADMIN_TAB_OUTFITS || 'Outfits'}
             </Tabs.Tab>
           </Tabs.List>
 
@@ -644,6 +629,102 @@ export const AdminMenu: FC = () => {
             />
           </Tabs.Panel>
 
+          <Tabs.Panel value="settings" pt="xl">
+            <Stack spacing="md">
+              <Checkbox
+                label={locale.ADMIN_USE_TARGET || 'Use ox_target for peds'}
+                checked={appearanceSettings.useTarget}
+                onChange={(e) => setAppearanceSettings({ ...appearanceSettings, useTarget: e.currentTarget.checked })}
+              />
+              <Checkbox
+                label={locale.ADMIN_ENABLE_PEDS || 'Enable peds for shops'}
+                checked={appearanceSettings.enablePedsForShops}
+                onChange={(e) => setAppearanceSettings({ ...appearanceSettings, enablePedsForShops: e.currentTarget.checked })}
+              />
+
+              <Divider label={locale.ADMIN_BLIP_DEFAULTS || 'Blip defaults'} labelPosition="left" />
+              <Stack spacing="sm">
+                {['clothing','barber','tattoo','surgeon','outfits'].map((key) => {
+                  const blip = appearanceSettings.blips?.[key] || {};
+                  return (
+                    <Box key={key} p="sm" style={{ border: '1px solid rgba(255,255,255,0.05)', borderRadius: 8 }}>
+                      <Text c="white" size="sm" fw={600} tt="capitalize">{key}</Text>
+                      <Group grow mt="xs" spacing="xs">
+                        <NumberInput
+                          label="Sprite"
+                          value={blip.sprite ?? 0}
+                          onChange={(val) => {
+                            setAppearanceSettings({
+                              ...appearanceSettings,
+                              blips: {
+                                ...appearanceSettings.blips,
+                                [key]: { ...blip, sprite: val as number }
+                              }
+                            });
+                          }}
+                        />
+                        <NumberInput
+                          label="Color"
+                          value={blip.color ?? 0}
+                          onChange={(val) => {
+                            setAppearanceSettings({
+                              ...appearanceSettings,
+                              blips: {
+                                ...appearanceSettings.blips,
+                                [key]: { ...blip, color: val as number }
+                              }
+                            });
+                          }}
+                        />
+                        <NumberInput
+                          label="Scale"
+                          value={blip.scale ?? 0.7}
+                          step={0.1}
+                          precision={1}
+                          min={0}
+                          max={2}
+                          onChange={(val) => {
+                            setAppearanceSettings({
+                              ...appearanceSettings,
+                              blips: {
+                                ...appearanceSettings.blips,
+                                [key]: { ...blip, scale: val as number }
+                              }
+                            });
+                          }}
+                        />
+                      </Group>
+                      <TextInput
+                        mt="xs"
+                        label="Name"
+                        value={blip.name || ''}
+                        onChange={(e) => {
+                          setAppearanceSettings({
+                            ...appearanceSettings,
+                            blips: {
+                              ...appearanceSettings.blips,
+                              [key]: { ...blip, name: e.target.value }
+                            }
+                          });
+                        }}
+                      />
+                    </Box>
+                  );
+                })}
+              </Stack>
+
+              <Group position="right">
+                <Button
+                  onClick={() => {
+                    TriggerNuiCallback('saveAppearanceSettings', appearanceSettings);
+                  }}
+                >
+                  {locale.ADMIN_SAVE_SETTINGS || 'Save Settings'}
+                </Button>
+              </Group>
+            </Stack>
+          </Tabs.Panel>
+
           <Tabs.Panel value="restrictions" pt="xl">
             <Box style={{ position: 'relative' }}>
               {isLoadingTab && activeTab === 'restrictions' && (
@@ -651,12 +732,14 @@ export const AdminMenu: FC = () => {
                   <Loader color="blue" />
                 </Overlay>
               )}
-              <Suspense fallback={
-                <Box style={{ padding: '3rem', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
-                  <Loader color="blue" size="md" />
-                  <Text c="dimmed" mt="md" size="sm">Loading restrictions...</Text>
-                </Box>
-              }>
+              <Suspense
+                fallback={
+                  <Box style={{ padding: '3rem', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
+                    <Loader color="blue" size="md" />
+                    <Text c="dimmed" mt="md" size="sm">{locale.ADMIN_MSG_LOADING_RESTRICTIONS || 'Loading restrictions...'}</Text>
+                  </Box>
+                }
+              >
                 <RestrictionsTab
                   restrictions={restrictions}
                   setRestrictions={setRestrictions}
@@ -666,6 +749,8 @@ export const AdminMenu: FC = () => {
                   setExpandedRestriction={setExpandedRestriction}
                   isLoading={!dataLoadProgress.restrictions}
                   isReady={true}
+                  locale={locale}
+                  categoryOptionsByPart={categoryOptionsByPart}
                 />
               </Suspense>
             </Box>
@@ -678,12 +763,14 @@ export const AdminMenu: FC = () => {
                   <Loader color="blue" />
                 </Overlay>
               )}
-              <Suspense fallback={
-                <Box style={{ padding: '3rem', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
-                  <Loader color="blue" size="md" />
-                  <Text c="dimmed" mt="md" size="sm">Loading models...</Text>
-                </Box>
-              }>
+              <Suspense
+                fallback={
+                  <Box style={{ padding: '3rem', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
+                    <Loader color="blue" size="md" />
+                    <Text c="dimmed" mt="md" size="sm">{locale.ADMIN_MSG_LOADING_MODELS || 'Loading models...'}</Text>
+                  </Box>
+                }
+              >
                 <ModelsTab
                   models={models}
                   setModels={setModels}
@@ -693,19 +780,10 @@ export const AdminMenu: FC = () => {
                   setLockedModelsSaved={setLockedModelsSaved}
                   isLoading={!dataLoadProgress.models}
                   isReady={true}
+                  locale={locale}
                 />
               </Suspense>
             </Box>
-          </Tabs.Panel>
-
-          <Tabs.Panel value="shops" pt="xl">
-            <ShopsTab
-              shopSettings={shopSettings}
-              setShopSettings={setShopSettings}
-              shopConfigs={shopConfigs}
-              setShopConfigs={setShopConfigs}
-              onSave={() => {}}
-            />
           </Tabs.Panel>
 
           <Tabs.Panel value="tattoos" pt="xl">
@@ -715,12 +793,14 @@ export const AdminMenu: FC = () => {
                   <Loader color="blue" />
                 </Overlay>
               )}
-              <Suspense fallback={
-                <Box style={{ padding: '3rem', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
-                  <Loader color="blue" size="md" />
-                  <Text c="dimmed" mt="md" size="sm">Loading tattoos...</Text>
-                </Box>
-              }>
+              <Suspense
+                fallback={
+                  <Box style={{ padding: '3rem', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
+                    <Loader color="blue" size="md" />
+                    <Text c="dimmed" mt="md" size="sm">{locale.ADMIN_MSG_LOADING_TATTOOS || 'Loading tattoos...'}</Text>
+                  </Box>
+                }
+              >
                 <TattoosTab
                   tattoos={tattoos}
                   setTattoos={setTattoos}
@@ -728,6 +808,8 @@ export const AdminMenu: FC = () => {
                   setExpandedDlc={setExpandedDlc}
                   isLoading={!dataLoadProgress.tattoos}
                   isReady={true}
+                  locale={locale}
+                  tattooZoneOptions={tattooZoneOptions}
                 />
               </Suspense>
             </Box>
@@ -742,6 +824,8 @@ export const AdminMenu: FC = () => {
               setEditingZone={setEditingZone}
               setPolyzonePointsInput={setPolyzonePointsInput}
               setAddZoneModalOpen={setAddZoneModalOpen}
+              appearanceSettings={appearanceSettings}
+              locale={locale}
             />
           </Tabs.Panel>
 
@@ -977,6 +1061,7 @@ export const AdminMenu: FC = () => {
                 { value: 'barber', label: 'Barber' },
                 { value: 'tattoo', label: 'Tattoo' },
                 { value: 'surgeon', label: 'Surgeon' },
+                { value: 'outfits', label: 'Outfits' },
               ]}
             />
             <TextInput
@@ -1031,6 +1116,7 @@ export const AdminMenu: FC = () => {
                   style={{ flex: 1 }}
                   value={polyzonePointsInput}
                   onChange={(e) => setPolyzonePointsInput(e.target.value)}
+                  disabled={editingZone?.enablePed === true}
                 />
                 <Button
                   variant="light"
@@ -1041,11 +1127,33 @@ export const AdminMenu: FC = () => {
                       // Client will handle multiple point capture and send back via NUI message when Backspace pressed
                     });
                   }}
+                  disabled={editingZone?.enablePed === true}
                 >
                   <IconDownload stroke={2} />
                 </Button>
               </Group>
+              {editingZone?.enablePed && (
+                <Text c="dimmed" size="xs" mt={4}>Polyzone disabled when using ped</Text>
+              )}
             </div>
+            <Checkbox
+              label="Enable Ped at Location"
+              description="Spawn an NPC at this location (disables polyzone)"
+              checked={editingZone?.enablePed ?? false}
+              onChange={(e) => {
+                if (editingZone) {
+                  const enablePed = e.currentTarget.checked;
+                  setEditingZone({ ...editingZone, enablePed });
+                  if (enablePed) {
+                    setPolyzonePointsInput(''); // Clear polyzone when enabling ped
+                  }
+                }
+              }}
+              styles={{
+                label: { color: '#fff', fontSize: '0.9rem' },
+                description: { color: '#888', fontSize: '0.8rem', marginTop: 4 }
+              }}
+            />
             <Checkbox
               label="Show Blip"
               description="Display this zone on the map"
@@ -1060,6 +1168,69 @@ export const AdminMenu: FC = () => {
                 description: { color: '#888', fontSize: '0.8rem', marginTop: 4 }
               }}
             />
+            {editingZone?.showBlip && (
+              <Stack spacing="sm" pl="md">
+                <NumberInput
+                  label="Blip Sprite"
+                  description="Icon ID for the blip"
+                  value={editingZone?.blipSprite ?? 0}
+                  onChange={(val) => {
+                    if (editingZone) {
+                      setEditingZone({ ...editingZone, blipSprite: val as number });
+                    }
+                  }}
+                  styles={{
+                    label: { color: '#fff', fontSize: '0.85rem' },
+                    description: { color: '#888', fontSize: '0.75rem' }
+                  }}
+                />
+                <NumberInput
+                  label="Blip Color"
+                  description="Color ID for the blip"
+                  value={editingZone?.blipColor ?? 0}
+                  onChange={(val) => {
+                    if (editingZone) {
+                      setEditingZone({ ...editingZone, blipColor: val as number });
+                    }
+                  }}
+                  styles={{
+                    label: { color: '#fff', fontSize: '0.85rem' },
+                    description: { color: '#888', fontSize: '0.75rem' }
+                  }}
+                />
+                <NumberInput
+                  label="Blip Scale"
+                  description="Size of the blip (0.0 - 2.0)"
+                  value={editingZone?.blipScale ?? 0.7}
+                  step={0.1}
+                  precision={1}
+                  min={0}
+                  max={2}
+                  onChange={(val) => {
+                    if (editingZone) {
+                      setEditingZone({ ...editingZone, blipScale: val as number });
+                    }
+                  }}
+                  styles={{
+                    label: { color: '#fff', fontSize: '0.85rem' },
+                    description: { color: '#888', fontSize: '0.75rem' }
+                  }}
+                />
+                <TextInput
+                  label="Blip Name"
+                  placeholder="Custom blip name"
+                  value={editingZone?.blipName || ''}
+                  onChange={(e) => {
+                    if (editingZone) {
+                      setEditingZone({ ...editingZone, blipName: e.target.value });
+                    }
+                  }}
+                  styles={{
+                    label: { color: '#fff', fontSize: '0.85rem' }
+                  }}
+                />
+              </Stack>
+            )}
             <TextInput
               label="Job (Optional)"
               placeholder="police"

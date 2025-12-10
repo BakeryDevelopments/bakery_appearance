@@ -28,6 +28,8 @@ interface RestrictionsTabProps {
   restrictions: ClothingRestriction[];
   setRestrictions: Dispatch<SetStateAction<ClothingRestriction[]>>;
   groupedRestrictions: Record<string, Record<string, ClothingRestriction[]>>;
+  locale: { [key: string]: string };
+  categoryOptionsByPart: Record<PartType, { value: string; label: string }[]>;
   models: string[];
   expandedRestriction: string | null;
   setExpandedRestriction: (value: string | null) => void;
@@ -35,26 +37,12 @@ interface RestrictionsTabProps {
   isReady: boolean;
 }
 
-const categoryOptionsByPart: Record<PartType, { value: string; label: string }[]> = {
-  model: [{ value: 'model', label: 'Model' }],
-  drawable: [
-    { value: 'masks', label: 'Masks' },
-    { value: 'shirts', label: 'Undershirts' },
-    { value: 'jackets', label: 'Tops/Jackets' },
-    { value: 'vest', label: 'Vest' },
-    { value: 'legs', label: 'Legs' },
-    { value: 'shoes', label: 'Shoes' },
-  ],
-  prop: [
-    { value: 'hats', label: 'Hats' },
-    { value: 'glasses', label: 'Glasses' },
-  ],
-};
-
 export const RestrictionsTab: FC<RestrictionsTabProps> = ({
   restrictions,
   setRestrictions,
   groupedRestrictions,
+  locale,
+  categoryOptionsByPart,
   models,
   expandedRestriction,
   setExpandedRestriction,

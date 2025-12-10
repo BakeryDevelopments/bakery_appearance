@@ -46,25 +46,47 @@ Config.ReloadSkin = {
 
 }
 
+Config.EnablePedsForShops = true -- Enable peds at shop locations
+Config.UseTarget = true -- Use ox_target for ped interactions (if false, uses markers)
+
 Config.Blips = {
     clothing = {
-        Sprite = 73,
-        Color = 47,
-        Scale = 0.7
+        sprite = 73,
+        color = 47,
+        scale = 0.7,
+        name = 'Clothing Store'
     },
     barber = {
-        Sprite = 71,
-        Color = 4,
-        Scale = 0.7
+        sprite = 71,
+        color = 4,
+        scale = 0.7,
+        name = 'Barber Shop'
     },
     tattoo = {
-        Sprite = 75,
-        Color = 48,
-        Scale = 0.7
+        sprite = 75,
+        color = 48,
+        scale = 0.7,
+        name = 'Tattoo Parlor'
     },
     surgeon = {
-        Sprite = 102,
-        Color = 2,
-        Scale = 0.7
+        sprite = 102,
+        color = 2,
+        scale = 0.7,
+        name = 'Plastic Surgeon'
+    },
+    outfits = {
+        sprite = 366,
+        color = 3,
+        scale = 0.7,
+        name = 'Outfits'
     }
+}
+
+
+Config.Tabs = {
+    clothing = {'clothes', 'accessories', 'outfits'},
+    barber = {'hair', 'makeup'},
+    tattoo = {'tattoos'},
+    surgeon = {'face', 'body'},
+    outfits = {'outfits'}
 }

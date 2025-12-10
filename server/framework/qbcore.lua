@@ -1,5 +1,5 @@
 -- Guard: ensure qb-core is started before loading
-if GetResourceState('qb-core') ~= 'started' then
+if GetResourceState('qb-core') ~= 'started' or  GetResourceState('qbx-core') == 'started'then
     return
 end
 
@@ -74,6 +74,49 @@ function Framework.GetCitizenId(source)
     local Player = QBCore.Functions.GetPlayer(source)
     if not Player then return nil end
     return Player.PlayerData.citizenid
+end
+
+--- Remove money from player (prioritize cash, then bank)
+---@param source number Player server ID
+---@param amount number Amount to remove
+---@return boolean success Whether the operation was successful
+function Framework.RemoveMoney(source, amount)
+    local Player = QBCore.Functions.GetPlayer(source)
+    if not Player then return false end
+    
+    local cash = Player.PlayerData.money.cash or 0
+    local bank = Player.PlayerData.money.bank or 0
+    
+    if cash + bank < amount then
+        return false  -- Insufficient funds
+    end
+    
+    if cash >= amount then
+        Player.Functions.RemoveMoney('cash', amount)
+    else
+        local cashToTake = cash
+        local bankToTake = amount - cashToTake
+        if cashToTake > 0 then
+            Player.Functions.RemoveMoney('cash', cashToTake)
+        end
+        if bankToTake > 0 then
+            Player.Functions.RemoveMoney('bank', bankToTake)
+        end
+    end
+    
+    return true
+end
+
+--- Add money to player (to bank account)
+---@param source number Player server ID
+---@param amount number Amount to add
+---@return boolean success Whether the operation was successful
+function Framework.AddMoney(source, amount)
+    local Player = QBCore.Functions.GetPlayer(source)
+    if not Player then return false end
+    
+    Player.Functions.AddMoney('bank', amount)
+    return true
 end
 
 return Framework

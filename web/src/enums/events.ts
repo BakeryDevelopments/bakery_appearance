@@ -1,7 +1,7 @@
 export enum Send {
   saveOutfit = 'saveOutfit',
   renameOutfit = 'renameOutfit',
-  deleteOutfit = 'deleteOutfit',
+  deleteOutfit = 'deleteOutfitPlayer',
   useOutfit = 'useOutfit',
   importOutfit = 'importOutfit',
   itemOutfit = 'itemOutfit',

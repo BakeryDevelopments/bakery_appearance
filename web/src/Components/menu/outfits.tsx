@@ -51,8 +51,8 @@ const Outfits: React.FC = () => {
     const [isImporting, setIsImporting] = useState<boolean>(false);
     const [newOutfitLabel, setNewOutfitLabel] = useState<string>('');
     const [newOutfitJobRank, setNewOutfitJobRank] = useState<number>(0);
-    const [importOutfitId, setImportOutfitId] = useState<number>(0);
-    const [activeDropdownIndex, setActiveDropdownIndex] = useState<number>(-1);
+    const [importShareCode, setImportShareCode] = useState<string>('');
+    const [activeDropdownId, setActiveDropdownId] = useState<number | string>(-1);
     const [validationError, setValidationError] = useState<string | null>(null);
 
     const handleRename = (index: number) => {
@@ -99,7 +99,7 @@ const Outfits: React.FC = () => {
 
     const handleOutfitAction = (
         action: string,
-        index: number,
+        indexOrId: number | string,
         outfit?: TOutfitData,
         label?: string
     ) => {
@@ -120,13 +120,13 @@ const Outfits: React.FC = () => {
                 if (outfit) useOutfit(outfit);
                 break;
             case 'share':
-                shareOutfit(index);
+                shareOutfit(indexOrId as number | string);
                 break;
             case 'item':
                 if (outfit) itemOutfit(outfit, renameLabel !== '' ? renameLabel : (label ?? ''));
                 break;
             case 'delete':
-                deleteOutfit(index);
+                deleteOutfit(indexOrId);
                 break;
             default:
                 break;
@@ -142,7 +142,7 @@ const Outfits: React.FC = () => {
 
     const resetImportFields = () => {
         setIsImporting(false);
-        setImportOutfitId(0);
+        setImportShareCode('');
     };
 
     // Validate current appearance before saving as outfit
@@ -244,8 +244,8 @@ const Outfits: React.FC = () => {
                             isBoss={jobData.isBoss}
                             locale={locale}
                             theme={theme}
-                            activeDropdownIndex={activeDropdownIndex}
-                            setActiveDropdownIndex={setActiveDropdownIndex}
+                            activeDropdownId={activeDropdownId}
+                            setActiveDropdownId={setActiveDropdownId}
                             renameIndex={renameIndex}
                             setRenameIndex={setRenameIndex}
                             renameLabel={renameLabel}
@@ -254,6 +254,7 @@ const Outfits: React.FC = () => {
                             setDeleteIndex={setDeleteIndex}
                             handleOutfitAction={handleOutfitAction}
                             handleRename={handleRename}
+                            shareOutfit={shareOutfit}
                         />
                     ))}
                     <Divider my="lg" />
@@ -279,8 +280,8 @@ const Outfits: React.FC = () => {
                             isBoss={jobData.isBoss}
                             locale={locale}
                             theme={theme}
-                            activeDropdownIndex={activeDropdownIndex}
-                            setActiveDropdownIndex={setActiveDropdownIndex}
+                            activeDropdownId={activeDropdownId}
+                            setActiveDropdownId={setActiveDropdownId}
                             renameIndex={renameIndex}
                             setRenameIndex={setRenameIndex}
                             renameLabel={renameLabel}
@@ -289,6 +290,7 @@ const Outfits: React.FC = () => {
                             setDeleteIndex={setDeleteIndex}
                             handleOutfitAction={handleOutfitAction}
                             handleRename={handleRename}
+                            shareOutfit={shareOutfit}
                         />
                     ))}
                     <Divider my="lg" />
@@ -307,16 +309,16 @@ const Outfits: React.FC = () => {
                 setNewOutfitLabel={setNewOutfitLabel}
                 newOutfitJobRank={newOutfitJobRank}
                 setNewOutfitJobRank={setNewOutfitJobRank}
-                importOutfitId={importOutfitId}
-                setImportOutfitId={setImportOutfitId}
+                importShareCode={importShareCode}
+                setImportShareCode={setImportShareCode}
                 jobDataIsBoss={jobData.isBoss}
                 locale={locale}
                 theme={theme}
                 onSavePersonal={handleSavePersonalOutfit}
                 onSaveJob={handleSaveJobOutfit}
                 onImport={() => {
-                    if (importOutfitId > 0) {
-                        importOutfit(importOutfitId);
+                    if (importShareCode.length > 0) {
+                        importOutfit(importShareCode);
                         resetImportFields();
                     }
                 }}
@@ -344,8 +346,8 @@ interface OutfitItemProps {
     isBoss: boolean;
     locale: any;
     theme: any;
-    activeDropdownIndex: number;
-    setActiveDropdownIndex: (i: number) => void;
+    activeDropdownId: number | string;
+    setActiveDropdownId: (i: number | string) => void;
     renameIndex: number;
     setRenameIndex: (i: number) => void;
     renameLabel: string;
@@ -354,13 +356,14 @@ interface OutfitItemProps {
     setDeleteIndex: (i: number) => void;
     handleOutfitAction: (action: string, index: number, outfit?: TOutfitData, label?: string) => void;
     handleRename: (index: number) => void;
+    shareOutfit: (id: number | string) => void;
 }
 
 const OutfitItem: React.FC<OutfitItemProps> = ({
     label, outfit, id, index, isJob, jobname, isAdmin, isBoss, locale, theme,
-    activeDropdownIndex, setActiveDropdownIndex, renameIndex, setRenameIndex,
+    activeDropdownId, setActiveDropdownId, renameIndex, setRenameIndex,
     renameLabel, setRenameLabel, deleteIndex, setDeleteIndex,
-    handleOutfitAction, handleRename,
+    handleOutfitAction, handleRename, shareOutfit,
 }) => {
     return (
         <Box>
@@ -387,12 +390,12 @@ const OutfitItem: React.FC<OutfitItemProps> = ({
                       e.currentTarget.style.backgroundColor = 'transparent';
                       e.currentTarget.style.color = theme.primaryColor;
                     }}
-                    onClick={() => setActiveDropdownIndex(activeDropdownIndex === index ? -1 : index)}
+                    onClick={() => setActiveDropdownId(activeDropdownId === id ? -1 : id)}
                 >
                     {locale?.OPTIONS_TITLE ?? "Options"}
                 </Button>
             </Group>
-            {activeDropdownIndex === index && (
+            {activeDropdownId === id && (
                     <Paper
                     shadow="md"
                     radius="md"
@@ -441,7 +444,7 @@ const OutfitItem: React.FC<OutfitItemProps> = ({
                                     color: theme.primaryColor,
                                     cursor: 'pointer',
                                 }}
-                                onClick={() => handleOutfitAction('share', id as number)}
+                                onClick={() => shareOutfit(id)}
                             >
                                 {locale?.SHAREOUTFIT_TITLE || 'Share'}
                             </Button>
@@ -520,8 +523,8 @@ interface OutfitCreationProps {
     setNewOutfitLabel: (s: string) => void;
     newOutfitJobRank: number;
     setNewOutfitJobRank: (n: number) => void;
-    importOutfitId: number;
-    setImportOutfitId: (n: number) => void;
+    importShareCode: string;
+    setImportShareCode: (s: string) => void;
     jobDataIsBoss: boolean;
     locale: any;
     theme: any;
@@ -533,7 +536,7 @@ interface OutfitCreationProps {
 const OutfitCreation: React.FC<OutfitCreationProps> = ({
     isAdding, setIsAdding, isJobAdding, setIsJobAdding, isImporting, setIsImporting,
     newOutfitLabel, setNewOutfitLabel, newOutfitJobRank, setNewOutfitJobRank,
-    importOutfitId, setImportOutfitId, jobDataIsBoss, locale, theme,
+    importShareCode, setImportShareCode, jobDataIsBoss, locale, theme,
     onSavePersonal, onSaveJob, onImport,
 }) => {
     const resetNewOutfitFields = () => {
@@ -545,7 +548,7 @@ const OutfitCreation: React.FC<OutfitCreationProps> = ({
 
     const resetImportFields = () => {
         setIsImporting(false);
-        setImportOutfitId(0);
+        setImportShareCode('');
     };
 
     if (isAdding || isJobAdding) {
@@ -596,10 +599,11 @@ const OutfitCreation: React.FC<OutfitCreationProps> = ({
                 <Group spacing="xs">
                     <Input
                         size="sm"
-                        placeholder="Outfit Code"
-                        type="number"
-                        value={importOutfitId}
-                        onChange={(e) => setImportOutfitId(parseInt(e.currentTarget.value) || 0)}
+                        placeholder="Enter share code (8 characters)"
+                        type="text"
+                        value={importShareCode}
+                        onChange={(e) => setImportShareCode(e.currentTarget.value)}
+                        maxLength={8}
                     />
                     <Button size="xs" color="red" onClick={resetImportFields}>
                         <IconCancel size={14} />
@@ -608,7 +612,7 @@ const OutfitCreation: React.FC<OutfitCreationProps> = ({
                         size="xs"
                         color="green"
                         onClick={onImport}
-                        disabled={importOutfitId <= 0}
+                        disabled={importShareCode.length === 0}
                     >
                         <IconCheck size={14} />
                     </Button>

@@ -1,7 +1,7 @@
 -- ===== Zone Noclip + Raycast Mode =====
 local _zoneNoclipActive = false
 local _zoneRaycastPoint = nil
-local _zoneMoveSpeed = 1.0
+local _zoneMoveSpeed = 0.1
 local _zoneMultiPointMode = false
 local _zoneMultiPoints = {}
 local _zoneStartedAt = 0

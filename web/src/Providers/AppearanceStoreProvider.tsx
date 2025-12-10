@@ -58,10 +58,10 @@ interface AppearanceStoreContextType {
   setOutfits: (outfits: TOutfit[] | undefined) => void;
   saveOutfit: (label: string, job?: { name: string; rank: number } | null) => void;
   editOutfit: (outfit: TOutfit) => void;
-  deleteOutfit: (id: number) => void;
+  deleteOutfit: (id: number | string) => void;
   useOutfit: (outfit: TOutfitData) => void;
-  importOutfit: (id: number) => void;
-  shareOutfit: (id: number) => void;
+  importOutfit: (shareCode: string) => void;
+  shareOutfit: (id: number | string) => void;
   itemOutfit: (outfit: TOutfitData, label: string) => void;
 
   // Tattoos methods
@@ -173,7 +173,7 @@ export const AppearanceStoreProvider: FC<{ children: ReactNode }> = ({ children 
     });
   };
 
-  const deleteOutfit = (id: number) => {
+  const deleteOutfit = (id: number | string) => {
     const data = { id };
     TriggerNuiCallback<any>(Send.deleteOutfit, data, data).then((updatedData) => {
       if (!updatedData) return;
@@ -190,27 +190,49 @@ export const AppearanceStoreProvider: FC<{ children: ReactNode }> = ({ children 
     });
   };
 
-  const importOutfit = (id: number) => {
-    if (!outfits) return;
-    const outfit = outfits.find((outfit) => outfit.id === id);
-    if (outfit) return;
+  const importOutfit = (shareCode: string) => {
+    if (!shareCode || shareCode.length === 0) {
+      console.error('Share code is required for outfit import');
+      return;
+    }
 
-    const outfitName = `Imported Outfit ${outfits.length + 1}`;
-    const data = { id, outfitName };
+    const outfitName = `Imported Outfit ${(outfits?.length ?? 0) + 1}`;
+    const data = { shareCode, outfitName };
 
-    TriggerNuiCallback<any>(Send.importOutfit, data, data).then((updatedData) => {
+    TriggerNuiCallback<any>('importOutfitByCode', data, data).then((updatedData) => {
       if (!updatedData) return;
       setOutfits(updatedData.outfits ?? outfits);
       setAppearance(updatedData.appearance ?? appearance);
     });
   };
 
-  const shareOutfit = (id: number) => {
+  const shareOutfit = (id: number | string) => {
+    // Get the share code from the server
+    TriggerNuiCallback<any>('getOutfitShareCode', { id }, { id }).then((response) => {
+      if (response && response.shareCode) {
+        const shareCode = response.shareCode;
+        
+        // Use fallback method directly (more reliable in FiveM iframe)
+        fallbackCopyToClipboard(shareCode);
+      } else {
+        alert('Failed to get share code for this outfit.');
+      }
+    });
+  };
+
+  const fallbackCopyToClipboard = (text: string) => {
     const clipElem = document.createElement('textarea');
-    clipElem.value = id.toString();
+    clipElem.value = text;
+    clipElem.style.position = 'fixed';
+    clipElem.style.opacity = '0';
     document.body.appendChild(clipElem);
     clipElem.select();
-    document.execCommand('copy');
+    try {
+      document.execCommand('copy');
+      alert(`✓ Share code copied to clipboard!\n\nCode: ${text}\n\nOthers can use this code to import your outfit.`);
+    } catch (err) {
+      alert(`Failed to copy. Your share code is: ${text}`);
+    }
     document.body.removeChild(clipElem);
   };
 
