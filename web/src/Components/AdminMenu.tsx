@@ -111,8 +111,8 @@ export const AdminMenu: FC = () => {
   const [zones, setZones] = useState<Zone[]>([]);
   const [addZoneModalOpen, setAddZoneModalOpen] = useState(false);
   const [editingZone, setEditingZone] = useState<Zone | null>(null);
-  const [coordsInputValue, setCoordsInputValue] = useState<string>('');
-  const [polyzonePointsInputValue, setPolyzonePointsInputValue] = useState<string>('');
+  const [capturedCoords, setCapturedCoords] = useState<{ x: number; y: number; z: number } | null>(null);
+  const [capturedPolyzonePoints, setCapturedPolyzonePoints] = useState<{ x: number; y: number }[] | null>(null);
 
   // Outfits State
   const [outfits, setOutfits] = useState<JobOutfit[]>([]);
@@ -283,8 +283,9 @@ export const AdminMenu: FC = () => {
   HandleNuiMessage<{ points: { x: number; y: number }[] }>('polyzonePointsCaptured', (data) => {
     console.log('Admin Received polyzone points:', data);  
     if (!data || !data.points) return;
-    // Multi-point capture finished, restore UI and set input directly
-    setPolyzonePointsInputValue(JSON.stringify(data.points));
+    // Multi-point capture finished, restore UI
+    setCapturedPolyzonePoints(data.points);
+    setCapturedCoords(null);
     setCaptureActive(false);
     setIsVisible(true);
   });
@@ -292,9 +293,9 @@ export const AdminMenu: FC = () => {
   HandleNuiMessage<{ coords: { x: number; y: number; z: number } }>('singlePointCaptured', (data) => {
     console.log('Admin Received single point coords:', data);
     if (!data || !data.coords) return;
-    // Single-point capture finished, restore UI and set input directly
-    const { x, y, z } = data.coords;
-    setCoordsInputValue(`${x.toFixed(2)}, ${y.toFixed(2)}, ${z.toFixed(2)}, 0`);
+    // Single-point capture finished, restore UI
+    setCapturedCoords(data.coords);
+    setCapturedPolyzonePoints(null);
     setCaptureActive(false);
     setIsVisible(true);
   });
@@ -309,9 +310,17 @@ export const AdminMenu: FC = () => {
   };
 
   const handleStartCapture = (multiPoint: boolean) => {
+    // Clear previous captures
+    setCapturedCoords(null);
+    setCapturedPolyzonePoints(null);
     setIsVisible(false);
     setCaptureActive(true);
     TriggerNuiCallback('startZoneRaycast', { multiPoint });
+  };
+
+  const clearCaptureData = () => {
+    setCapturedCoords(null);
+    setCapturedPolyzonePoints(null);
   };
 
   const handleSaveZone = (zoneData: Zone, isUpdate: boolean) => {
@@ -1046,18 +1055,16 @@ export const AdminMenu: FC = () => {
           onClose={() => {
             setAddZoneModalOpen(false);
             setEditingZone(null);
-            setCoordsInputValue('');
-            setPolyzonePointsInputValue('');
+            clearCaptureData();
           }}
           onSaveZone={handleSaveZone}
           editingZone={editingZone}
           appearanceSettings={appearanceSettings}
           isCapturing={captureActive}
           onStartCapture={handleStartCapture}
-          coordsInputValue={coordsInputValue}
-          polyzonePointsInputValue={polyzonePointsInputValue}
-          onCoordsInputChange={setCoordsInputValue}
-          onPolyzonePointsInputChange={setPolyzonePointsInputValue}
+          capturedCoords={capturedCoords}
+          capturedPolyzonePoints={capturedPolyzonePoints}
+          onClearCaptureData={clearCaptureData}
         />
 
         <AddOutfitModal

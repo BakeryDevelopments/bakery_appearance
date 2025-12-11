@@ -33,10 +33,9 @@ interface AddZoneModalProps {
   appearanceSettings: AppearanceSettings;
   isCapturing: boolean;
   onStartCapture: (multiPoint: boolean) => void;
-  coordsInputValue: string;
-  polyzonePointsInputValue: string;
-  onCoordsInputChange: (value: string) => void;
-  onPolyzonePointsInputChange: (value: string) => void;
+  capturedCoords?: { x: number; y: number; z: number } | null;
+  capturedPolyzonePoints?: { x: number; y: number }[] | null;
+  onClearCaptureData?: () => void;
 }
 
 export const AddZoneModal: FC<AddZoneModalProps> = ({
@@ -47,13 +46,14 @@ export const AddZoneModal: FC<AddZoneModalProps> = ({
   appearanceSettings,
   isCapturing,
   onStartCapture,
-  coordsInputValue,
-  polyzonePointsInputValue,
-  onCoordsInputChange,
-  onPolyzonePointsInputChange,
+  capturedCoords,
+  capturedPolyzonePoints,
+  onClearCaptureData,
 }) => {
   const [zoneType, setZoneType] = useState<Zone['type']>('clothing');
   const [zoneName, setZoneName] = useState('');
+  const [coordsInput, setCoordsInput] =  useState<string>('');
+  const [polyzonePointsInput, setPolyzonePointsInput] = useState('');
   const [zoneShowBlip, setZoneShowBlip] = useState(true);
   const [zoneBlipSprite, setZoneBlipSprite] = useState<number>(0);
   const [zoneBlipColor, setZoneBlipColor] = useState<number>(0);
@@ -62,17 +62,44 @@ export const AddZoneModal: FC<AddZoneModalProps> = ({
   const [zoneEnablePed, setZoneEnablePed] = useState(false);
   const [zoneJob, setZoneJob] = useState('');
   const [zoneGang, setZoneGang] = useState('');
-  const [wasOpened, setWasOpened] = useState(false);
+  const [initialized, setInitialized] = useState(false);
+
+  useEffect(() => {
+    if (capturedPolyzonePoints && capturedPolyzonePoints.length > 0) {
+      setPolyzonePointsInput(JSON.stringify(capturedPolyzonePoints));
+    }
+  }, [capturedPolyzonePoints]);
+
+  useEffect(() => {
+    if (capturedCoords) {
+      const { x, y, z } = capturedCoords;
+      console.log('Captured Coords:', x, y, z);
+
+      const string = `${(x ?? 0).toFixed(2)}, ${(y ?? 0).toFixed(2)}, ${(z ?? 0).toFixed(2)}, 0`;
+      console.log('Setting Coords Input to:', string);
+      setCoordsInput(string);
+    }
+  }, [capturedCoords]);
+
+  useEffect(() => {
+  console.log('Coords Input updated:', coordsInput);
+}, [coordsInput]);
+
+  // Handle single point capture for coordinates
+  
 
   const handleClose = () => {
+    resetForm();
+    onClearCaptureData?.();
+    setInitialized(false);
     onClose();
   };
 
   const resetForm = () => {
     setZoneType('clothing');
     setZoneName('');
-    onCoordsInputChange('');
-    onPolyzonePointsInputChange('');
+    setCoordsInput('');
+    setPolyzonePointsInput('');
     setZoneShowBlip(true);
     setZoneBlipSprite(0);
     setZoneBlipColor(0);
@@ -87,12 +114,12 @@ export const AddZoneModal: FC<AddZoneModalProps> = ({
     const defaults = appearanceSettings?.blips?.[zone.type] || {};
     setZoneType(zone.type);
     setZoneName(zone.name || '');
-    onCoordsInputChange(
+    setCoordsInput(
       `${(zone.coords.x ?? 0).toFixed(2)}, ${(zone.coords.y ?? 0).toFixed(2)}, ${(
         zone.coords.z ?? 0
       ).toFixed(2)}, ${zone.coords.heading ?? 0}`
     );
-    onPolyzonePointsInputChange(zone.polyzone ? JSON.stringify(zone.polyzone) : '');
+    setPolyzonePointsInput(zone.polyzone ? JSON.stringify(zone.polyzone) : '');
     setZoneShowBlip(zone.showBlip ?? true);
     setZoneBlipSprite(zone.blipSprite ?? defaults.sprite ?? 0);
     setZoneBlipColor(zone.blipColor ?? defaults.color ?? 0);
@@ -104,35 +131,37 @@ export const AddZoneModal: FC<AddZoneModalProps> = ({
   };
 
   useEffect(() => {
-    if (opened && !wasOpened) {
-      // Modal just opened
-      setWasOpened(true);
-      
-      if (editingZone) {
-        loadZoneData(editingZone);
-      } else {
-        // Only reset local state, parent manages input values
-        setZoneType('clothing');
-        setZoneName('');
-        setZoneShowBlip(true);
-        const defaults = appearanceSettings?.blips?.['clothing'] || {};
-        setZoneBlipSprite(defaults.sprite ?? 0);
-        setZoneBlipColor(defaults.color ?? 0);
-        setZoneBlipScale(defaults.scale ?? 0.7);
-        setZoneBlipName(defaults.name ?? '');
-        setZoneEnablePed(false);
-        setZoneJob('');
-        setZoneGang('');
-      }
-    } else if (!opened && wasOpened) {
-      // Modal just closed
-      setWasOpened(false);
+    if (!opened) {
+      setInitialized(false);
+      return;
     }
-  }, [opened, editingZone, wasOpened, appearanceSettings]);
+
+    if (editingZone) {
+      loadZoneData(editingZone);
+      setInitialized(true);
+      return;
+    }
+
+    // If we already have captured data, don't wipe it
+    if ((capturedCoords && !initialized) || (capturedPolyzonePoints && !initialized)) {
+      setInitialized(true);
+      return;
+    }
+
+    if (!initialized) {
+      resetForm();
+      const defaults = appearanceSettings?.blips?.['clothing'] || {};
+      setZoneBlipSprite(defaults.sprite ?? 0);
+      setZoneBlipColor(defaults.color ?? 0);
+      setZoneBlipScale(defaults.scale ?? 0.7);
+      setZoneBlipName(defaults.name ?? '');
+      setInitialized(true);
+    }
+  }, [opened, editingZone, capturedCoords, capturedPolyzonePoints, initialized, appearanceSettings]);
 
   const handleSave = () => {
     // Parse coords
-    const parts = coordsInputValue.split(',').map((p) => parseFloat(p.trim()));
+    const parts = coordsInput.split(',').map((p) => parseFloat(p.trim()));
     if (parts.length < 3 || parts.slice(0, 3).some(isNaN)) {
       return;
     }
@@ -145,9 +174,9 @@ export const AddZoneModal: FC<AddZoneModalProps> = ({
     }
 
     let polyzone = undefined;
-    if (polyzonePointsInputValue.trim()) {
+    if (polyzonePointsInput.trim()) {
       try {
-        polyzone = JSON.parse(polyzonePointsInputValue);
+        polyzone = JSON.parse(polyzonePointsInput);
       } catch (e) {
         return;
       }
@@ -176,8 +205,8 @@ export const AddZoneModal: FC<AddZoneModalProps> = ({
   };
 
   const isButtonDisabled = () => {
-    if (!coordsInputValue) return true;
-    const parts = coordsInputValue.split(',').slice(0, 3);
+    if (!coordsInput) return true;
+    const parts = coordsInput.split(',').slice(0, 3);
     return parts.every((p) => {
       const n = parseFloat(p.trim());
       return n === 0;
@@ -226,9 +255,9 @@ export const AddZoneModal: FC<AddZoneModalProps> = ({
               placeholder="123.45, 234.56, 345.67, 90.0"
               description="Get coords in-game and paste here"
               style={{ flex: 1 }}
-              value={coordsInputValue}
+              value={coordsInput}
               onChange={(e) => {
-                onCoordsInputChange(e.target.value);
+                setCoordsInput(e.target.value);
               }}
             />
             <Button
@@ -249,8 +278,8 @@ export const AddZoneModal: FC<AddZoneModalProps> = ({
               placeholder='[{"x":1,"y":2},{"x":3,"y":4}]'
               description="Optional: Press E to add points, ESC to finish"
               style={{ flex: 1 }}
-              value={polyzonePointsInputValue}
-              onChange={(e) => onPolyzonePointsInputChange(e.target.value)}
+              value={polyzonePointsInput}
+              onChange={(e) => setPolyzonePointsInput(e.target.value)}
               disabled={zoneEnablePed}
             />
             <Button
@@ -274,7 +303,7 @@ export const AddZoneModal: FC<AddZoneModalProps> = ({
           onChange={(e) => {
             setZoneEnablePed(e.currentTarget.checked);
             if (e.currentTarget.checked) {
-              onPolyzonePointsInputChange('');
+              setPolyzonePointsInput('');
             }
           }}
           styles={{
