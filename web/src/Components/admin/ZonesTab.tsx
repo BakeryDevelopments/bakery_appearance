@@ -31,11 +31,7 @@ interface JobOutfit {
 interface ZonesTabProps {
   zones: Zone[];
   setZones: (zones: Zone[]) => void;
-  newZoneType: Zone['type'];
-  setNewZoneType: (type: Zone['type']) => void;
-  setEditingZone: (zone: Zone | null) => void;
-  setPolyzonePointsInput: (input: string) => void;
-  setAddZoneModalOpen: (open: boolean) => void;
+  onOpenZoneModal: (zone?: Zone) => void;
   appearanceSettings: { blips?: Record<string, { sprite?: number; color?: number; scale?: number; name?: string }> };
   locale: { [key: string]: string };
 }
@@ -43,11 +39,7 @@ interface ZonesTabProps {
 export const ZonesTab: FC<ZonesTabProps> = ({
   zones,
   setZones,
-  newZoneType,
-  setNewZoneType,
-  setEditingZone,
-  setPolyzonePointsInput,
-  setAddZoneModalOpen,
+  onOpenZoneModal,
   appearanceSettings,
   locale,
 }) => {
@@ -83,36 +75,10 @@ export const ZonesTab: FC<ZonesTabProps> = ({
         <Text c="white" fw={500}>
           {locale.ADMIN_TAB_ZONES || 'Appearance Zones'}
         </Text>
-        <Group>
-          <Select
-            value={newZoneType}
-            onChange={(v) => setNewZoneType((v as Zone['type']) || 'clothing')}
-            data={[
-              { value: 'clothing', label: typeLabels.clothing },
-              { value: 'barber', label: typeLabels.barber },
-              { value: 'tattoo', label: typeLabels.tattoo },
-              { value: 'surgeon', label: typeLabels.surgeon },
-              { value: 'outfits', label: typeLabels.outfits },
-            ]}
-            placeholder={locale.ADMIN_PLACEHOLDER_ZONE_TYPE || "Select zone type"}
-          />
-          <Button onClick={() => {
-            const defaults = getBlipDefaults(newZoneType);
-            setEditingZone({
-              type: newZoneType,
-              coords: { x: 0, y: 0, z: 0, heading: 0 },
-              showBlip: true,
-              blipSprite: defaults.sprite,
-              blipColor: defaults.color,
-              blipScale: defaults.scale,
-              blipName: defaults.name
-            });
-            setAddZoneModalOpen(true);
-          }}>
-            <IconPlus size={16} style={{ marginRight: 8 }} />
-            {locale.ADMIN_ADD_ZONE || 'Add Zone'}
-          </Button>
-        </Group>
+        <Button onClick={() => onOpenZoneModal()}>
+          <IconPlus size={16} style={{ marginRight: 8 }} />
+          {locale.ADMIN_ADD_ZONE || 'Add Zone'}
+        </Button>
       </Group>
 
       {zones.length === 0 ? (
@@ -121,8 +87,8 @@ export const ZonesTab: FC<ZonesTabProps> = ({
         </Box>
       ) : (
         <Stack spacing="xl">
-          {groupedZones.map((group) => (
-            <Box key={group.type}>
+          {groupedZones.map((group, groupIdx) => (
+            <Box key={`${group.type}-${groupIdx}`}>
               <Group mb="md">
                 <Badge size="lg" color={typeColors[group.type]} variant="filled">
                   {typeLabels[group.type]}
@@ -133,9 +99,12 @@ export const ZonesTab: FC<ZonesTabProps> = ({
               </Group>
 
               <Stack spacing="md" pl="md" style={{ borderLeft: `3px solid var(--mantine-color-${typeColors[group.type]}-6)` }}>
-                {group.zones.map((zone, idx) => (
+                {group.zones.map((zone, idx) => {
+                  // Use zone ID if available, otherwise use a combination of type and index for uniqueness
+                  const uniqueKey = zone.id ? `zone-${zone.id}` : `${group.type}-temp-${idx}-${zones.indexOf(zone)}`;
+                  return (
                   <Group
-                    key={zone.id || idx}
+                    key={uniqueKey}
                     position="apart"
                     style={{
                       padding: '1rem',
@@ -171,9 +140,7 @@ export const ZonesTab: FC<ZonesTabProps> = ({
                         color="blue"
                         variant="light"
                         onClick={() => {
-                          setEditingZone(zone);
-                          setPolyzonePointsInput(zone.polyzone ? JSON.stringify(zone.polyzone) : '');
-                          setAddZoneModalOpen(true);
+                          onOpenZoneModal(zone);
                         }}
                       >
                         <IconChevronDown size={16} />
@@ -191,7 +158,8 @@ export const ZonesTab: FC<ZonesTabProps> = ({
                       </ActionIcon>
                     </Group>
                   </Group>
-                ))}
+                );
+                })}
               </Stack>
             </Box>
           ))}

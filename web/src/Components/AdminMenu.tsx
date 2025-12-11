@@ -4,6 +4,7 @@ import { IconPalette, IconLock, IconUser, IconShoppingCart, IconMapPin, IconHang
 import { TriggerNuiCallback } from '../Utils/TriggerNuiCallback';
 import { HandleNuiMessage } from '../Hooks/HandleNuiMessage';
 import { AddOutfitModal } from './admin/AddOutfitModal';
+import { AddZoneModal } from './admin/AddZoneModal';
 
 import { useCustomization } from '../Providers/CustomizationProvider';
 import { useAppearanceStore } from '../Providers/AppearanceStoreProvider';
@@ -110,9 +111,8 @@ export const AdminMenu: FC = () => {
   const [zones, setZones] = useState<Zone[]>([]);
   const [addZoneModalOpen, setAddZoneModalOpen] = useState(false);
   const [editingZone, setEditingZone] = useState<Zone | null>(null);
-  const [polyzonePointsInput, setPolyzonePointsInput] = useState<string>('');
-  const [coordsInput, setCoordsInput] = useState<string>('');
-  const [newZoneType, setNewZoneType] = useState<Zone['type']>('clothing');
+  const [coordsInputValue, setCoordsInputValue] = useState<string>('');
+  const [polyzonePointsInputValue, setPolyzonePointsInputValue] = useState<string>('');
 
   // Outfits State
   const [outfits, setOutfits] = useState<JobOutfit[]>([]);
@@ -281,36 +281,45 @@ export const AdminMenu: FC = () => {
   });
 
   HandleNuiMessage<{ points: { x: number; y: number }[] }>('polyzonePointsCaptured', (data) => {
+    console.log('Admin Received polyzone points:', data);  
     if (!data || !data.points) return;
-    // Multi-point capture finished, restore UI and set points
+    // Multi-point capture finished, restore UI and set input directly
+    setPolyzonePointsInputValue(JSON.stringify(data.points));
     setCaptureActive(false);
     setIsVisible(true);
-    if (data.points && data.points.length > 0) {
-      setPolyzonePointsInput(JSON.stringify(data.points));
-    }
   });
 
   HandleNuiMessage<{ coords: { x: number; y: number; z: number } }>('singlePointCaptured', (data) => {
+    console.log('Admin Received single point coords:', data);
     if (!data || !data.coords) return;
-    // Single-point capture finished, restore UI and set coord
+    // Single-point capture finished, restore UI and set input directly
+    const { x, y, z } = data.coords;
+    setCoordsInputValue(`${x.toFixed(2)}, ${y.toFixed(2)}, ${z.toFixed(2)}, 0`);
     setCaptureActive(false);
     setIsVisible(true);
-    if (editingZone) {
-      const heading = (editingZone.coords?.heading ?? 0);
-      setEditingZone({ ...editingZone, coords: { x: data.coords.x, y: data.coords.y, z: data.coords.z, heading } });
-      setCoordsInput(`${data.coords.x.toFixed(2)}, ${data.coords.y.toFixed(2)}, ${data.coords.z.toFixed(2)}, ${heading}`);
-    }
   });
 
-  // Keep coords input in sync when editingZone changes (e.g., opening modal or selecting a zone)
-  useEffect(() => {
-    if (editingZone && editingZone.coords) {
-      const c = editingZone.coords;
-      setCoordsInput(`${(c.x ?? 0).toFixed(2)}, ${(c.y ?? 0).toFixed(2)}, ${(c.z ?? 0).toFixed(2)}, ${c.heading ?? 0}`);
+  const openZoneModal = (zone?: Zone) => {
+    if (zone) {
+      setEditingZone(zone);
     } else {
-      setCoordsInput('');
+      setEditingZone(null);
     }
-  }, [editingZone]);
+    setAddZoneModalOpen(true);
+  };
+
+  const handleStartCapture = (multiPoint: boolean) => {
+    setIsVisible(false);
+    setCaptureActive(true);
+    TriggerNuiCallback('startZoneRaycast', { multiPoint });
+  };
+
+  const handleSaveZone = (zoneData: Zone, isUpdate: boolean) => {
+    // Don't update local state here - wait for the server broadcast via setZones NUI message
+    // This ensures zones have proper IDs from the database
+    setAddZoneModalOpen(false);
+    setEditingZone(null);
+  };
 
   // Sync local theme state with cached theme from provider
   useEffect(() => {
@@ -819,11 +828,7 @@ export const AdminMenu: FC = () => {
             <ZonesTab
               zones={zones}
               setZones={setZones}
-              newZoneType={newZoneType}
-              setNewZoneType={setNewZoneType}
-              setEditingZone={setEditingZone}
-              setPolyzonePointsInput={setPolyzonePointsInput}
-              setAddZoneModalOpen={setAddZoneModalOpen}
+              onOpenZoneModal={openZoneModal}
               appearanceSettings={appearanceSettings}
               locale={locale}
             />
@@ -1036,267 +1041,24 @@ export const AdminMenu: FC = () => {
           </Stack>
         </Modal>
 
-        <Modal
+        <AddZoneModal
           opened={addZoneModalOpen}
           onClose={() => {
             setAddZoneModalOpen(false);
             setEditingZone(null);
-            setPolyzonePointsInput('');
+            setCoordsInputValue('');
+            setPolyzonePointsInputValue('');
           }}
-          title={editingZone ? "Edit Zone" : "Add Zone"}
-          centered
-          zIndex={10000}
-        >
-          <Stack spacing="md">
-            <Select
-              label="Zone Type"
-              value={editingZone?.type || 'clothing'}
-              onChange={(value) => {
-                if (editingZone) {
-                  setEditingZone({ ...editingZone, type: value as any });
-                }
-              }}
-              data={[
-                { value: 'clothing', label: 'Clothing' },
-                { value: 'barber', label: 'Barber' },
-                { value: 'tattoo', label: 'Tattoo' },
-                { value: 'surgeon', label: 'Surgeon' },
-                { value: 'outfits', label: 'Outfits' },
-              ]}
-            />
-            <TextInput
-              label="Zone Name (Optional)"
-              placeholder="Downtown Clothing Store"
-              value={editingZone?.name || ''}
-              onChange={(e) => {
-                if (editingZone) {
-                  setEditingZone({ ...editingZone, name: e.target.value });
-                }
-              }}
-            />
-            <div>
-              <Group spacing="xs" align="flex-end">
-                <TextInput
-                  label="Coordinates (x, y, z, heading)"
-                  placeholder="123.45, 234.56, 345.67, 90.0"
-                  description="Get coords in-game and paste here"
-                  style={{ flex: 1 }}
-                  value={coordsInput}
-                  onChange={(e) => {
-                    const raw = e.target.value;
-                    setCoordsInput(raw);
-                    const parts = raw.split(',').map(p => parseFloat(p.trim()));
-                    if (parts.length >= 3 && !parts.slice(0, 3).some(isNaN)) {
-                      const coords = { x: parts[0], y: parts[1], z: parts[2], heading: parts[3] || 0 };
-                      if (editingZone) {
-                        setEditingZone({ ...editingZone, coords });
-                      }
-                    }
-                  }}
-                />
-                <Button
-                  variant="light"
-                  onClick={() => {
-                    setIsVisible(false);
-                    setCaptureActive(true);
-                    TriggerNuiCallback('startZoneRaycast', { multiPoint: false });
-                  }}
-                >
-                  <IconDownload stroke={2} />
-                </Button>
-              </Group>
-            </div>
-
-            <div>
-              <Group spacing="xs" align="flex-end">
-                <TextInput
-                  label="Polyzone Points (JSON)"
-                  placeholder='[{"x":1,"y":2},{"x":3,"y":4}]'
-                  description="Optional: Press E to add points, ESC to finish"
-                  style={{ flex: 1 }}
-                  value={polyzonePointsInput}
-                  onChange={(e) => setPolyzonePointsInput(e.target.value)}
-                  disabled={editingZone?.enablePed === true}
-                />
-                <Button
-                  variant="light"
-                  onClick={() => {
-                    setIsVisible(false);
-                    setCaptureActive(true);
-                    TriggerNuiCallback('startZoneRaycast', { multiPoint: true }).then(() => {
-                      // Client will handle multiple point capture and send back via NUI message when Backspace pressed
-                    });
-                  }}
-                  disabled={editingZone?.enablePed === true}
-                >
-                  <IconDownload stroke={2} />
-                </Button>
-              </Group>
-              {editingZone?.enablePed && (
-                <Text c="dimmed" size="xs" mt={4}>Polyzone disabled when using ped</Text>
-              )}
-            </div>
-            <Checkbox
-              label="Enable Ped at Location"
-              description="Spawn an NPC at this location (disables polyzone)"
-              checked={editingZone?.enablePed ?? false}
-              onChange={(e) => {
-                if (editingZone) {
-                  const enablePed = e.currentTarget.checked;
-                  setEditingZone({ ...editingZone, enablePed });
-                  if (enablePed) {
-                    setPolyzonePointsInput(''); // Clear polyzone when enabling ped
-                  }
-                }
-              }}
-              styles={{
-                label: { color: '#fff', fontSize: '0.9rem' },
-                description: { color: '#888', fontSize: '0.8rem', marginTop: 4 }
-              }}
-            />
-            <Checkbox
-              label="Show Blip"
-              description="Display this zone on the map"
-              checked={editingZone?.showBlip ?? true}
-              onChange={(e) => {
-                if (editingZone) {
-                  setEditingZone({ ...editingZone, showBlip: e.currentTarget.checked });
-                }
-              }}
-              styles={{
-                label: { color: '#fff', fontSize: '0.9rem' },
-                description: { color: '#888', fontSize: '0.8rem', marginTop: 4 }
-              }}
-            />
-            {editingZone?.showBlip && (
-              <Stack spacing="sm" pl="md">
-                <NumberInput
-                  label="Blip Sprite"
-                  description="Icon ID for the blip"
-                  value={editingZone?.blipSprite ?? 0}
-                  onChange={(val) => {
-                    if (editingZone) {
-                      setEditingZone({ ...editingZone, blipSprite: val as number });
-                    }
-                  }}
-                  styles={{
-                    label: { color: '#fff', fontSize: '0.85rem' },
-                    description: { color: '#888', fontSize: '0.75rem' }
-                  }}
-                />
-                <NumberInput
-                  label="Blip Color"
-                  description="Color ID for the blip"
-                  value={editingZone?.blipColor ?? 0}
-                  onChange={(val) => {
-                    if (editingZone) {
-                      setEditingZone({ ...editingZone, blipColor: val as number });
-                    }
-                  }}
-                  styles={{
-                    label: { color: '#fff', fontSize: '0.85rem' },
-                    description: { color: '#888', fontSize: '0.75rem' }
-                  }}
-                />
-                <NumberInput
-                  label="Blip Scale"
-                  description="Size of the blip (0.0 - 2.0)"
-                  value={editingZone?.blipScale ?? 0.7}
-                  step={0.1}
-                  precision={1}
-                  min={0}
-                  max={2}
-                  onChange={(val) => {
-                    if (editingZone) {
-                      setEditingZone({ ...editingZone, blipScale: val as number });
-                    }
-                  }}
-                  styles={{
-                    label: { color: '#fff', fontSize: '0.85rem' },
-                    description: { color: '#888', fontSize: '0.75rem' }
-                  }}
-                />
-                <TextInput
-                  label="Blip Name"
-                  placeholder="Custom blip name"
-                  value={editingZone?.blipName || ''}
-                  onChange={(e) => {
-                    if (editingZone) {
-                      setEditingZone({ ...editingZone, blipName: e.target.value });
-                    }
-                  }}
-                  styles={{
-                    label: { color: '#fff', fontSize: '0.85rem' }
-                  }}
-                />
-              </Stack>
-            )}
-            <TextInput
-              label="Job (Optional)"
-              placeholder="police"
-              description="Restrict zone to specific job"
-              value={editingZone?.job || ''}
-              onChange={(e) => {
-                if (editingZone) {
-                  setEditingZone({ ...editingZone, job: e.target.value || undefined });
-                }
-              }}
-            />
-            <TextInput
-              label="Gang (Optional)"
-              placeholder="ballas"
-              description="Restrict zone to specific gang"
-              value={editingZone?.gang || ''}
-              onChange={(e) => {
-                if (editingZone) {
-                  setEditingZone({ ...editingZone, gang: e.target.value || undefined });
-                }
-              }}
-            />
-            <Group position="right" mt="md">
-              <Button 
-                variant="subtle" 
-                onClick={() => {
-                  setAddZoneModalOpen(false);
-                  setEditingZone(null);
-                  setPolyzonePointsInput('');
-                }}
-              >
-                Cancel
-              </Button>
-              <Button 
-                onClick={() => {
-                  if (!editingZone?.coords) return;
-                  
-                  let polyzone = undefined;
-                  if (polyzonePointsInput.trim()) {
-                    try {
-                      polyzone = JSON.parse(polyzonePointsInput);
-                    } catch (e) {
-                      return;
-                    }
-                  }
-                  
-                  const zoneData = { ...editingZone, polyzone };
-                  
-                  TriggerNuiCallback(editingZone.id ? 'updateZone' : 'addZone', zoneData).then(() => {
-                    if (editingZone.id) {
-                      setZones(zones.map(z => z.id === editingZone.id ? zoneData : z));
-                    } else {
-                      setZones([...zones, { ...zoneData, id: Date.now() }]);
-                    }
-                    setAddZoneModalOpen(false);
-                    setEditingZone(null);
-                    setPolyzonePointsInput('');
-                  });
-                }}
-                disabled={!editingZone?.coords || (editingZone.coords.x === 0 && editingZone.coords.y === 0 && editingZone.coords.z === 0)}
-              >
-                {editingZone?.id ? 'Update' : 'Add'}
-              </Button>
-            </Group>
-          </Stack>
-        </Modal>
+          onSaveZone={handleSaveZone}
+          editingZone={editingZone}
+          appearanceSettings={appearanceSettings}
+          isCapturing={captureActive}
+          onStartCapture={handleStartCapture}
+          coordsInputValue={coordsInputValue}
+          polyzonePointsInputValue={polyzonePointsInputValue}
+          onCoordsInputChange={setCoordsInputValue}
+          onPolyzonePointsInputChange={setPolyzonePointsInputValue}
+        />
 
         <AddOutfitModal
           opened={addOutfitModalOpen}
