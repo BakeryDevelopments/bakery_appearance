@@ -9,6 +9,10 @@ import { IconCancel } from '../icons/IconCancel';
 const Tattoos: FC = () => {
   const { tattoos: tattooOptions, appearance, locale, setPlayerTattoos } = useAppearanceStore();
   const { theme } = useCustomization();
+  
+  console.log('Tattoo menu loaded - appearance:', appearance);
+  console.log('Tattoo options available:', tattooOptions?.length);
+  console.log('Current tattoos in appearance:', appearance?.tattoos);
 
   const resolveCollection = (zoneIndex: number, dlcIndex: number) =>
     tattooOptions?.[zoneIndex]?.dlcs?.[dlcIndex]?.label;
@@ -28,12 +32,17 @@ const Tattoos: FC = () => {
     });
 
   const [rows, setRows] = useState<TTattoo[]>(normalizeList((appearance?.tattoos as TTattoo[]) || []));
-  const [dlcSearch, setDlcSearch] = useState<Record<number, string>>({});
   const [tattooSearch, setTattooSearch] = useState<Record<number, string>>({});
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
 
   useEffect(() => {
-    setRows(normalizeList((appearance?.tattoos as TTattoo[]) || []));
+    const normalized = normalizeList((appearance?.tattoos as TTattoo[]) || []);
+    console.log('Tattoo menu - appearance updated:', {
+      appearanceTattoos: appearance?.tattoos,
+      normalizedTattoos: normalized,
+      tattooOptions: tattooOptions?.length,
+    });
+    setRows(normalized);
   }, [appearance?.tattoos, tattooOptions]);
 
   const commit = (updater: (prev: TTattoo[]) => TTattoo[]) => {
@@ -99,31 +108,20 @@ const Tattoos: FC = () => {
     });
   };
 
-  const handleDlcChange = (rowIndex: number, value: string | null) => {
-    const nextDlc = value ? Number(value) : 0;
-    commit((prev) => {
-      const next = [...prev];
-      const row = { ...next[rowIndex] };
-      const dlc = tattooOptions?.[row.zoneIndex]?.dlcs?.[nextDlc];
-      row.dlcIndex = nextDlc;
-      if (dlc?.tattoos?.[0]) {
-        row.tattoo = { ...dlc.tattoos[0], dlc: dlc.label };
-      }
-      row.opacity = 0.1;
-      next[rowIndex] = row;
-      return next;
-    });
-  };
 
   const handleTattooChange = (rowIndex: number, value: string | null) => {
-    const nextIndex = value ? Number(value) : 0;
+    const parts = value?.split('|') || ['0', '0'];
+    const dlcIndex = Number(parts[0]);
+    const tattooIndex = Number(parts[1]);
+    
     commit((prev) => {
       const next = [...prev];
       const row = { ...next[rowIndex] };
-      const dlc = tattooOptions?.[row.zoneIndex]?.dlcs?.[row.dlcIndex];
-      const selected = dlc?.tattoos?.[nextIndex];
+      const dlc = tattooOptions?.[row.zoneIndex]?.dlcs?.[dlcIndex];
+      const selected = dlc?.tattoos?.[tattooIndex];
       if (selected) {
         row.tattoo = { ...selected, dlc: dlc?.label };
+        row.dlcIndex = dlcIndex;
       }
       row.opacity = 0.1;
       next[rowIndex] = row;
@@ -142,17 +140,35 @@ const Tattoos: FC = () => {
   };
 
   const filteredDlcs = (zoneIndex: number, key: number) => {
-    const search = (dlcSearch[key] || '').toLowerCase();
+    const search = (tattooSearch[key] || '').toLowerCase();
     const dlcs = tattooOptions?.[zoneIndex]?.dlcs || [];
     if (!search) return dlcs;
-    return dlcs.filter((dlc) => dlc.label.toLowerCase().includes(search));
+    // Filter DLCs that have tattoos matching the search
+    return dlcs.filter((dlc) =>
+      (dlc.tattoos || []).some((tattoo) => tattoo.label.toLowerCase().includes(search))
+    );
   };
 
-  const filteredTattoos = (zoneIndex: number, dlcIndex: number, key: number) => {
+  const filteredTattoos = (zoneIndex: number, key: number) => {
     const search = (tattooSearch[key] || '').toLowerCase();
-    const tattoos = tattooOptions?.[zoneIndex]?.dlcs?.[dlcIndex]?.tattoos || [];
-    if (!search) return tattoos;
-    return tattoos.filter((tattoo) => tattoo.label.toLowerCase().includes(search));
+    const dlcs = tattooOptions?.[zoneIndex]?.dlcs || [];
+    const results: Array<{ dlcIndex: number; dlcLabel: string; tattoos: Array<{ index: number; label: string; hash: string | number }> }> = [];
+    
+    dlcs.forEach((dlc, dlcIdx) => {
+      const tattoos = (dlc.tattoos || [])
+        .map((t, tIdx) => ({ index: tIdx, label: t.label, hash: t.hash }))
+        .filter((t) => !search || t.label.toLowerCase().includes(search));
+      
+      if (tattoos.length > 0) {
+        results.push({
+          dlcIndex: dlc.dlcIndex ?? dlcIdx,
+          dlcLabel: dlc.label,
+          tattoos,
+        });
+      }
+    });
+    
+    return results;
   };
 
   const zoneOptions = useMemo(
@@ -189,10 +205,23 @@ const Tattoos: FC = () => {
         rows.map((row, i) => {
           const rowKey = row.id ?? i;
           const zone = tattooOptions?.[row.zoneIndex];
-          const dlcs = filteredDlcs(row.zoneIndex, rowKey);
-          const dlc = zone?.dlcs?.[row.dlcIndex];
-          const tattoos = filteredTattoos(row.zoneIndex, row.dlcIndex, rowKey);
-          const selectedTattooIndex = Math.max(0, dlc?.tattoos?.findIndex((t) => t.hash === row.tattoo?.hash) ?? 0);
+          const groupedTattoos = filteredTattoos(row.zoneIndex, rowKey);
+          
+          console.log('Tattoo row debug:', {
+            rowIndex: i,
+            zoneIndex: row.zoneIndex,
+            zoneName: zone?.label,
+            groupedTattoosCount: groupedTattoos.length,
+            groupedTattoos,
+            allZones: tattooOptions?.length,
+          });
+          
+          const selectedDlcIdx = groupedTattoos.findIndex((g) => g.dlcIndex === row.dlcIndex);
+          const selectedGroup = groupedTattoos[selectedDlcIdx] || groupedTattoos[0];
+          const selectedTattooIdx = selectedGroup?.tattoos?.findIndex((t) => t.hash === row.tattoo?.hash) ?? 0;
+          const tattooSelectValue = selectedGroup
+            ? `${selectedGroup.dlcIndex}|${Math.max(0, selectedTattooIdx)}`
+            : '';
 
           return (
             <Box key={rowKey} style={{ width: '100%' }}>
@@ -231,47 +260,28 @@ const Tattoos: FC = () => {
 
                 <Box>
                   <Group position="apart" mb={4}>
-                    <Text size="xs" c="dimmed">DLC</Text>
-                    <Text size="xs" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {zone?.dlcs?.length || 0}</Text>
+                    <Text size="xs" c="dimmed">{locale?.TATTOO_TITLE || 'Tattoo'}</Text>
+                    <Text size="xs" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {groupedTattoos.reduce((sum, g) => sum + (g.tattoos?.length ?? 0), 0)}</Text>
                   </Group>
                   <TextInput
-                    placeholder="Search DLC"
-                    value={dlcSearch[rowKey] || ''}
-                    onChange={(e) => setDlcSearch({ ...dlcSearch, [rowKey]: e.currentTarget.value })}
+                    placeholder={locale?.SEARCHTATTOO_SUBTITLE || 'Search tattoo'}
+                    value={tattooSearch[rowKey] || ''}
+                    onChange={(e) => setTattooSearch({ ...tattooSearch, [rowKey]: e.currentTarget.value })}
                     mb={4}
                   />
                   <Select
-                    placeholder={locale?.DLCOPT_TITLE || 'Select DLC'}
-                    data={dlcs.map((item, idx) => ({ label: item.label, value: String(item.dlcIndex ?? idx) }))}
-                    value={String(row.dlcIndex)}
-                    onChange={(val) => handleDlcChange(i, val)}
+                    placeholder={locale?.TATTOOPTIONS_SUBTITLE || 'Tattoo Options'}
+                    data={groupedTattoos.flatMap((group) =>
+                      (group.tattoos || []).map((tattoo) => ({
+                        label: `[${group.dlcLabel}] ${tattoo.label}`,
+                        value: `${group.dlcIndex}|${tattoo.index}`,
+                      }))
+                    )}
+                    value={tattooSelectValue}
+                    onChange={(val) => handleTattooChange(i, val)}
                     searchable
                   />
                 </Box>
-
-                {dlc && (dlc.tattoos?.length ?? 0) > 0 ? (
-                  <Box>
-                    <Group position="apart" mb={4}>
-                      <Text size="xs" c="dimmed">{locale?.TATTOO_TITLE || 'Tattoo'}</Text>
-                      <Text size="xs" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {dlc.tattoos?.length || 0}</Text>
-                    </Group>
-                    <TextInput
-                      placeholder={locale?.SEARCHTATTOO_SUBTITLE || 'Search tattoo'}
-                      value={tattooSearch[rowKey] || ''}
-                      onChange={(e) => setTattooSearch({ ...tattooSearch, [rowKey]: e.currentTarget.value })}
-                      mb={4}
-                    />
-                    <Select
-                      placeholder={locale?.TATTOOPTIONS_SUBTITLE || 'Tattoo Options'}
-                      data={tattoos.map((tattoo, idx) => ({ label: tattoo.label, value: String(idx) }))}
-                      value={String(selectedTattooIndex)}
-                      onChange={(val) => handleTattooChange(i, val)}
-                      searchable
-                    />
-                  </Box>
-                ) : (
-                  <Text size="xs" c="dimmed">{locale?.NO_TATTOOS || 'No tattoos available in this DLC'}</Text>
-                )}
 
                 <Box>
                   <Text size="xs" c="dimmed" mb={4}>{locale?.TATTOO_OPACITY || 'Opacity'}</Text>

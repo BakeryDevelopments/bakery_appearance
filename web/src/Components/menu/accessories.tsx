@@ -39,9 +39,9 @@ export const Props: FC = () => {
                                                 <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {propTotal.hats.total}</Text>
                                             </Box>
                                             <NumberStepper
-                                                value={props?.rhand.value || 0}
+                                                value={props?.hats.value || 0}
                                                 min={-1}
-                                                max={propTotal.rhand.total - 1}
+                                                max={propTotal.hats.total - 1}
                                                 blacklist={blacklist?.props?.hats?.values || null}
                                                 onChange={(val: number) => {
                                                     if (props && props.hats) {
@@ -59,9 +59,9 @@ export const Props: FC = () => {
                                                 <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {propTotal.hats.textures}</Text>
                                             </Box>
                                             <NumberStepper
-                                                value={props?.rhand.texture || 0}
+                                                value={props?.hats.texture || 0}
                                                 min={0}
-                                                max={propTotal.rhand.textures - 1}
+                                                max={propTotal.hats.textures - 1}
                                                 blacklist={
                                                     typeof props?.hats.value === 'number'
                                                         ? blacklist?.props?.hats?.textures?.[props.hats.value] || null

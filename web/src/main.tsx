@@ -13,7 +13,31 @@ import './index.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <MantineProvider theme={{colorScheme:'dark'}}>
+    <MantineProvider theme={{
+      colorScheme: 'dark',
+      fontFamily: '"Inter", sans-serif',
+      fontSizes: {
+        xs: '14px',
+        sm: '15px',
+        md: '16px',
+        lg: '17px',
+        xl: '20px',
+      },
+      globalStyles: (theme) => ({
+        body: {
+          fontWeight: 500,
+          WebkitFontSmoothing: 'antialiased',
+          MozOsxFontSmoothing: 'grayscale',
+          textRendering: 'optimizeSpeed',
+          fontSize: '14px',
+        },
+        '*': {
+          fontWeight: 500,
+          WebkitFontSmoothing: 'antialiased',
+          MozOsxFontSmoothing: 'grayscale',
+        }
+      })
+    }}>
       <CustomizationProvider>
         <ConfigProvider>
           <AppearanceStoreProvider>

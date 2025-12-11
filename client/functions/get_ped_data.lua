@@ -98,9 +98,6 @@ function GetPedComponents(ped)
             index = i,
             textures = textureCount
         }
-
-        print('Component:', name, 'Drawable Count:', drawableCount, 'Texture Count:', textureCount)
-
         -- drawables
         components[name] = {
             id = name,

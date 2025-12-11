@@ -1,8 +1,10 @@
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  text-rendering: optimizeLegibility !important;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600 !important;
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
+  -webkit-text-size-adjust: 100% !important;
+  text-rendering: optimizeSpeed !important;
   color-scheme: normal !important;
   overflow: hidden !important;
   background: none !important;
@@ -10,6 +12,47 @@
   width: 100vw !important;
   margin: 0 !important;
   padding: 0 !important;
+}
+
+body {
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 600 !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  text-rendering: optimizeSpeed !important;
+}
+
+* {
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 600 !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* Target all text elements directly, but exclude buttons and SVGs */
+p, span:not(button *), div:not(button *):not(svg *), label {
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 600 !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* Reset button styling to not inherit heavy font weight */
+button, button * {
+  font-weight: 400 !important;
+}
+
+/* SVG elements should not be affected by font styling */
+svg, svg * {
+  font-family: inherit;
+  font-weight: inherit;
+}
+
+/* Also target inline styles */
+[style*="font-size"] {
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.3px !important;
 }
 
 /* Global slider accent color bound to theme */

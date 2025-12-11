@@ -41,6 +41,13 @@ function OpenAppearanceMenu(zone)
 
     local models = CacheAPI.getModels()
     local tattoos = CacheAPI.getTattoos()
+    
+    -- Load player's current tattoos from server
+    lib.callback('tj_appearance:getPlayerTattoos', false, function(playerTattoos)
+        if playerTattoos then
+            _CurrentTattoos = playerTattoos
+        end
+    end)
 
 
       -- Get locked models from cache

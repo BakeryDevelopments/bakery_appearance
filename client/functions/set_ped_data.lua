@@ -92,7 +92,7 @@ function SetProp(ped, Propdata)
     SetPedPropIndex(ped, Propdata.index, Propdata.value, Propdata.texture, false)
     local variations = GetNumberOfPedPropTextureVariations(ped, Propdata.index, Propdata.value)
     print(string.format('[DEBUG SetProp] variations returned: %s, returning: %s', variations, variations - 1))
-    return variations - 1  -- Subtract 1
+    return variations
 end
 
 exports('SetPedProp', SetProp);
@@ -211,7 +211,13 @@ local function ApplyTattoos(ped, tattoos)
             local hashString = isMale and (tattooData.hashMale or tattooData.hash) or (tattooData.hashFemale or tattooData.hash)
 
             if collection and hashString and hashString ~= '' then
-                AddPedDecorationFromHashes(ped, joaat(collection), joaat(hashString))
+                -- Apply tattoo multiple times for opacity effect (0.0 to 1.0)
+                local opacity = entry.opacity or 1.0
+                local timesToApply = math.max(1, math.floor(opacity * 10))
+                
+                for _ = 1, timesToApply do
+                    AddPedDecorationFromHashes(ped, joaat(collection), joaat(hashString))
+                end
             end
         end
     end

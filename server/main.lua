@@ -315,6 +315,17 @@ lib.callback.register('tj_appearance:getAppearance', function(source)
     return Database.GetAppearance(citizenid)
 end)
 
+lib.callback.register('tj_appearance:getPlayerTattoos', function(source)
+    local citizenid = Framework.GetCitizenId(source)
+    
+    if not citizenid then
+        return {}
+    end
+
+    local appearance = Database.GetAppearance(citizenid)
+    return appearance and appearance.tattoos or {}
+end)
+
 -- Export: Get player appearance by identifier (citizenid)
 -- This is useful for multicharacter systems or external resources
 -- @param identifier string - The citizenid of the player
