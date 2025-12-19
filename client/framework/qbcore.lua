@@ -26,7 +26,8 @@ function Framework.GetPlayerData()
             name = PlayerData.gang and PlayerData.gang.name or 'none',
             label = PlayerData.gang and PlayerData.gang.label or 'None',
             grade = PlayerData.gang and PlayerData.gang.grade.level or 0
-        }
+        },
+        gender =  PlayerData.charinfo.gender == 1 and 'Female' or 'Male'
     }
 end
 

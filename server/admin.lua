@@ -299,7 +299,23 @@ lib.callback.register('tj_appearance:admin:saveAppearanceSettings', function(sou
     local merged = {
         useTarget = settings.useTarget ~= nil and settings.useTarget or (Config.UseTarget ~= false),
         enablePedsForShops = settings.enablePedsForShops ~= nil and settings.enablePedsForShops or (Config.EnablePedsForShops ~= false),
-        blips = settings.blips or Config.Blips or {}
+        chargePerTattoo = settings.chargePerTattoo ~= nil and settings.chargePerTattoo or false,
+        blips = settings.blips or Config.Blips or {},
+        prices = settings.prices or { clothing = 0, barber = 0, tattoo = 0, surgeon = 0 },
+        initialClothes = settings.initialClothes or {
+            male = {
+                model = 'mp_m_freemode_01',
+                components = {},
+                props = {},
+                hair = { color = 0, highlight = 0, style = 0, texture = 0 }
+            },
+            female = {
+                model = 'mp_f_freemode_01',
+                components = {},
+                props = {},
+                hair = { color = 0, highlight = 0, style = 0, texture = 0 }
+            }
+        }
     }
 
     ServerCache.appearanceSettings = merged

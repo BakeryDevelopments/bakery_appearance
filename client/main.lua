@@ -25,7 +25,7 @@ function OpenAppearanceMenu(zone)
     _CurrentMenuType = menuType  -- Set global menu type for save callback
 
     -- Get player's current model to determine gender
-    local model = GetEntityModel(cache.ped)
+    local model = GetPedModalHash(cache.ped)
     local isMale = model == GetHashKey("mp_m_freemode_01")
     local gender = isMale and 'male' or 'female'
 
@@ -73,7 +73,7 @@ function OpenAppearanceMenu(zone)
                 action = 'data',
                 data = {
                     tabs = Config.Tabs[menuType],
-                    appearance = GetPlayerAppearance(),
+                    appearance = GetAppearance(cache.ped),
                     models = models,
                     blacklist = blacklist,
                     tattoos = tattoos,
@@ -92,7 +92,7 @@ function OpenAppearanceMenu(zone)
                 action = 'data',
                 data = {
                     tabs = Config.Tabs[menuType],
-                    appearance = GetPlayerAppearance(),
+                    appearance = GetAppearance(cache.ped),
                     models = models,
                     blacklist = blacklist,
                     tattoos = tattoos,
@@ -128,10 +128,10 @@ end)
 RegisterNuiCallback('save', function(data, cb)
 
   -- Store current appearance before saving (in case we need to revert)
-  local beforeAppearance = GetPlayerAppearance()
+  local beforeAppearance = GetAppearance(cache.ped)
   
   -- Get current appearance and save to database
-  local appearance = GetPlayerAppearance()
+  local appearance = GetAppearance(cache.ped)
   appearance.menuType = _CurrentMenuType or 'clothing'  -- Include menu type for pricing
   
   lib.callback('tj_appearance:saveAppearance', false, function(success)
@@ -268,7 +268,7 @@ end)
 
 RegisterNuiCallback('cancel', function(data, cb)
   -- Check if data is different from current appearance
-  local currentAppearance = GetPlayerAppearance()
+  local currentAppearance = GetAppearance(cache.ped)
   local ped = cache.ped
   
   -- Compare data with current appearance
@@ -330,40 +330,6 @@ RegisterNuiCallback('cancel', function(data, cb)
   HudToggle(false)  -- Show HUD when menu is closed
   cb('ok')
 end)
-
-
-
-
-function GetPlayerAppearance()
-  -- Expanded function to get player appearance
-  local headData, headTotal = GetHeadOverlay(cache.ped)
-  local drawables, drawTotal = GetPedComponents(cache.ped)
-
-  local props, propTotal = GetPedProps(cache.ped)
-  local modelHash = GetEntityModel(cache.ped)
-  local hairColour = GetHairColour(cache.ped)
-  --local tattoos = cache.ped == PlayerPedId() and GetPedTattoos and GetPedTattoos(cache.ped) or {}
-
-  -- Convert model hash to string by checking against available models
-  local modelString = CacheAPI.getModelHashName(modelHash)
-
-
-  local data = {
-    model = modelString,
-    hairColour = hairColour,
-    headBlend = GetPedHeritageData(cache.ped),
-    headStructure = GetHeadStructure(cache.ped),
-    headOverlay = headData,
-    headOverlayTotal = headTotal,
-    drawables = drawables,
-    drawTotal = drawTotal,
-    props = props,
-    propTotal = propTotal,
-    tattoos = _CurrentTattoos or {}
-  }
-
-  return data
-end
 
 -- Admin Menu
 RegisterNetEvent('tj_appearance:client:openAdminMenu', function()

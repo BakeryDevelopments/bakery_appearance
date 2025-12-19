@@ -43,7 +43,7 @@ return {
         [16] = "Chin_Bone_Length",
         [17] = "Chin_Bone_Width",
         [18] = "Chin_Hole",
-        [19] = "Neck_Thikness"
+        [19] = "Neck_Thickness"
     },
     Head = {
         [0] = "Blemishes",

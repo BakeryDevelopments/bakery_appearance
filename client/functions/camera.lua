@@ -11,7 +11,7 @@ local CAM_CONFIG = Config.Camera
 --  - applies a small Z offset when boneKey == 'head' to frame slightly higher
 local function GetSectionCoords(entry, boneKey)
 
-  local model = GetEntityModel(cache.ped)
+  local model = GetPedModalHash(cache.ped)
   local isMale = model == GetHashKey("mp_m_freemode_01")
   local zOffset = not isMale and Config.Camera.Head_Z_Offset or 0.00
 

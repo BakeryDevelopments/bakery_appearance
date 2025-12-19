@@ -26,7 +26,8 @@ function Framework.GetPlayerData()
             name = 'none',
             label = 'None',
             grade = 0
-        }
+        },
+        gender = PlayerData.sex == "female" and  'Female' or 'Male'
     }
 end
 

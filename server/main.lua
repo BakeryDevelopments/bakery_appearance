@@ -97,7 +97,7 @@ lib.callback.register('tj_appearance:saveOutfit', function(source, outfitData)
 
     -- Determine gender from current model or outfit data
     local ped = GetPlayerPed(source)
-    local model = GetEntityModel(ped)
+    local model = GetPedModalHash(ped)
     local isMale = model == GetHashKey("mp_m_freemode_01")
     local gender = isMale and 'male' or 'female'
 
@@ -149,7 +149,7 @@ lib.callback.register('tj_appearance:getOutfits', function(source)
 
     -- Determine gender
     local ped = GetPlayerPed(source)
-    local model = GetEntityModel(ped)
+    local model = GetPedModalHash(ped)
     local isMale = model == GetHashKey("mp_m_freemode_01")
     local gender = isMale and 'male' or 'female'
 
@@ -263,7 +263,7 @@ lib.callback.register('tj_appearance:renameOutfit', function(source, data)
 
     -- Determine gender
     local ped = GetPlayerPed(source)
-    local model = GetEntityModel(ped)
+    local model = GetPedModalHash(ped)
     local isMale = model == GetHashKey("mp_m_freemode_01")
     local gender = isMale and 'male' or 'female'
     
@@ -298,7 +298,7 @@ lib.callback.register('tj_appearance:deleteOutfit', function(source, outfitData)
 
     -- Determine gender
     local ped = GetPlayerPed(source)
-    local model = GetEntityModel(ped)
+    local model = GetPedModalHash(ped)
     local isMale = model == GetHashKey("mp_m_freemode_01")
     local gender = isMale and 'male' or 'female'
 

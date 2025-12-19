@@ -1,5 +1,7 @@
 local peddata = require('modules.ped')
 
+local initialcreation = false
+
 
 
 function Tofloat(num)
@@ -163,5 +165,21 @@ RegisterNuiCallback('teleportToZone', function(info, cb)
 
     SetEntityCoords(cache.ped, info.x, info.y, info.z + 1.0, false, false, false, true)
 end)
+
+
+function InitialCreation()
+    SetupClothing()
+    TriggerServerEvent('tj_appearance:server:SetRoutingBucket')
+    initialcreation = true
+    OpenAppearanceMenu({type = 'all'})
+
+end
+
+function GetPedModalHash(ped)
+    return GetEntityModel(ped)
+end
+
+
+exports('InitialCreation', InitialCreation)
 
 

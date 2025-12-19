@@ -186,7 +186,7 @@ end
 exports('SetPedFaceFeature', SetFaceFeatures)
 exports('SetPedFaceFeatures', SetFaceFeatures)
 
-local function ApplyTattoos(ped, tattoos)
+function ApplyTattoos(ped, tattoos)
     if not ped then return end
 
     ClearPedDecorations(ped)
@@ -295,7 +295,7 @@ RegisterNuiCallback('setModel', function(data, cb)
         Wait(200) -- Give time for model to fully load
         
         -- Get complete fresh appearance data for the new model
-        local appearance = GetPlayerAppearance()
+        local appearance = GetAppearance(cache.ped)
         
         -- Override the model with the original string instead of hash
         appearance.model = modelString
@@ -312,7 +312,7 @@ end)
 
 -- setting ped data
 
-local function SetPedAppearance(ped, data)
+function SetPedAppearance(ped, data)
 
             
     if data then

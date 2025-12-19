@@ -154,12 +154,43 @@ function GetPedSkin(ped)
         headBlend = GetPedHeritageData(ped),
         headStructure = GetHeadStructure(ped),
         hairColour = GetHairColour(ped),
-        model = GetEntityModel(ped),
+        model = GetPedModalHash(ped),
     }
 end
 
 function IsFreemodePed(ped)
-    local model = GetEntityModel(ped)
+    local model = GetPedModalHash(ped)
     if freemodepeds[model] then return true end
     return false
+end
+
+function GetAppearance(ped)
+  -- Expanded function to get player appearance
+  local headData, headTotal = GetHeadOverlay(ped)
+  local drawables, drawTotal = GetPedComponents(ped)
+
+  local props, propTotal = GetPedProps(ped)
+  local modelHash = GetPedModalHash(ped)
+  local hairColour = GetHairColour(ped)
+  --local tattoos = ped == PlayerPedId() and GetPedTattoos and GetPedTattoos(ped) or {}
+
+  -- Convert model hash to string by checking against available models
+  local modelString = CacheAPI.getModelHashName(modelHash)
+
+
+  local data = {
+    model = modelString,
+    hairColour = hairColour,
+    headBlend = GetPedHeritageData(ped),
+    headStructure = GetHeadStructure(ped),
+    headOverlay = headData,
+    headOverlayTotal = headTotal,
+    drawables = drawables,
+    drawTotal = drawTotal,
+    props = props,
+    propTotal = propTotal,
+    tattoos = _CurrentTattoos or {}
+  }
+
+  return data
 end
