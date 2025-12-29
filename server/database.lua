@@ -2,6 +2,46 @@
 
 local Database = {}
 
+
+MySQL.ready(function()
+    -- Create player_appearance table if it doesn't exist
+    MySQL.query([[
+        CREATE TABLE IF NOT EXISTS player_appearance (
+            citizenid VARCHAR(50) NOT NULL PRIMARY KEY,
+            appearance_data LONGTEXT NOT NULL,
+            updated_at DATETIME NOT NULL
+        )
+    ]])
+
+    -- Create player_outfits table if it doesn't exist
+    MySQL.query([[
+        CREATE TABLE IF NOT EXISTS player_outfits (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            citizenid VARCHAR(50) NOT NULL,
+            gender VARCHAR(10) NOT NULL,
+            outfit_name VARCHAR(100) NOT NULL,
+            outfit_data LONGTEXT NOT NULL,
+            share_code VARCHAR(16),
+            created_at DATETIME NOT NULL,
+            updated_at DATETIME NOT NULL
+        )
+    ]])
+
+    -- Create appearance_job_outfits table if it doesn't exist
+    MySQL.query([[
+        CREATE TABLE IF NOT EXISTS appearance_job_outfits (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            job VARCHAR(50),
+            gang VARCHAR(50),
+            gender VARCHAR(10) NOT NULL,
+            outfit_name VARCHAR(100) NOT NULL,
+            outfit_data LONGTEXT NOT NULL,
+            created_at DATETIME NOT NULL,
+            updated_at DATETIME NOT NULL
+        )
+    ]])
+end)
+
 --- Save player appearance to database
 ---@param citizenid string Player's citizen ID
 ---@param appearance table Appearance data (JSON serializable)

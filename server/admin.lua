@@ -1,5 +1,3 @@
-local QBCore = exports['qb-core']:GetCoreObject()
-
 -- Helper function for deep copying tables
 local function deepcopy(orig)
     local orig_type = type(orig)

@@ -1,3 +1,4 @@
+---@diagnostic disable: duplicate-set-field
 -- Guard: ensure es_extended is started before loading
 if GetResourceState('es_extended') ~= 'started' then
     return
@@ -48,3 +49,7 @@ end
 RegisterNetEvent('esx:playerLoaded', function (xPlayer, skin)
     CacheAPI.init()
 end)
+
+function Framework.CachePed()
+    ESX.SetPlayerData("ped", cache.ped)
+end

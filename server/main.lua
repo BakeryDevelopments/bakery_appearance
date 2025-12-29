@@ -42,6 +42,10 @@ lib.callback.register('tj_appearance:saveAppearance', function(source, appearanc
         return false
     end
 
+    appearance.drawTotal = nil
+    appearance.propTotal = nil
+    appearance.headOverlayTotal = nil
+
     -- Save appearance to database
     local success = Database.SaveAppearance(citizenid, appearance)
     

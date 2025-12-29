@@ -1,6 +1,6 @@
 local export = '__cfx_export_illenium-appearance_'
 
-local IllenimumExports = {
+local IlleniumExports  = {
     { 'startPlayerCustomization', InitialCreation },
     { 'getPedModel',              GetPedModalHash },
     { 'getPedComponents', function(ped)
@@ -221,7 +221,7 @@ local IllenimumExports = {
 }
 
 
-for _, exportInfo in pairs(IllenimumExports) do
+for _, exportInfo in pairs(IlleniumExports) do
     local exportName, exportFunction = export .. exportInfo[1], exportInfo[2]
 
     AddEventHandler(exportName, function(setCB)

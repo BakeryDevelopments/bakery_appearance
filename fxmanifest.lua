@@ -28,3 +28,8 @@ files {
   'shared/locale/*.json',
   'shared/data/*.json',
 }
+
+provide {
+  'esx_skin',
+  'skinchanger'
+}
