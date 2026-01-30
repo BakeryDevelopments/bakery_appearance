@@ -9,6 +9,16 @@ local freemodepeds = {
 function GetPedHeritageData(ped)
     -- Native 0x2746bd9d88c5c5d0 gets ped head blend data
     -- Returns: shapeFirst, shapeSecond, shapeThird, skinFirst, skinSecond, skinThird, shapeMix, skinMix, thirdMix, hasParent
+    
+    -- Check if mask is equipped and maskfix has original data
+    local maskDrawable = GetPedDrawableVariation(ped, 1)
+    if maskDrawable > 0 then
+        local originalData = exports['bakery_appearance']:GetMaskFixOriginalBlendData()
+        if originalData then
+            return originalData
+        end
+    end
+    
     local shapeFirst, shapeSecond, shapeThird, skinFirst, skinSecond, skinThird, shapeMix, skinMix, thirdMix, hasParent =
         Citizen.InvokeNative(0x2746bd9d88c5c5d0, ped, Citizen.PointerValueInt(), Citizen.PointerValueInt(),
             Citizen.PointerValueInt(), Citizen.PointerValueInt(), Citizen.PointerValueInt(), Citizen.PointerValueInt(),
@@ -34,6 +44,16 @@ end
 
 function GetHeadStructure(ped)
     if not IsFreemodePed(ped) then return end
+    
+    -- Check if mask is equipped and maskfix has original data
+    local maskDrawable = GetPedDrawableVariation(ped, 1)
+    if maskDrawable > 0 then
+        local originalFeatures = exports['bakery_appearance']:GetMaskFixOriginalFaceFeatures()
+        if originalFeatures then
+            return originalFeatures
+        end
+    end
+    
     local features = {}
     for i = 0, 19 do
         features[peddata.FaceFeatures[i]] = {

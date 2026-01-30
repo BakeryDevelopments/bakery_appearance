@@ -1,3 +1,5 @@
+---@diagnostic disable: undefined-global
+
 local handleNuiMessage = require('modules.nui')
 require("modules.huddata")
 
@@ -44,7 +46,7 @@ function OpenAppearanceMenu(zone)
     local tattoos = CacheAPI.getTattoos()
     
     -- Load player's current tattoos from server
-    lib.callback('tj_appearance:getPlayerTattoos', false, function(playerTattoos)
+    lib.callback('bakery_appearance:getPlayerTattoos', false, function(playerTattoos)
         if playerTattoos then
             _CurrentTattoos = playerTattoos
         end
@@ -68,7 +70,7 @@ function OpenAppearanceMenu(zone)
 
 
     if Config.Tabs[menuType] and TableContains(Config.Tabs[menuType], 'outfits') then
-        lib.callback('tj_appearance:getOutfits', false, function(outfits)
+        lib.callback('bakery_appearance:getOutfits', false, function(outfits)
             handleNuiMessage({
                 action = 'data',
                 data = {
@@ -121,7 +123,7 @@ function OpenAppearanceMenu(zone)
 end
 
 -- Listen for server event to open appearance menu
-RegisterNetEvent('tj_appearance:client:openAppearanceMenu', function()
+RegisterNetEvent('bakery_appearance:client:openAppearanceMenu', function()
   OpenAppearanceMenu({type = 'all'})
 end)
 
@@ -134,15 +136,15 @@ RegisterNuiCallback('save', function(data, cb)
   local appearance = GetAppearance(cache.ped)
   appearance.menuType = _CurrentMenuType or 'clothing'  -- Include menu type for pricing
   
-  lib.callback('tj_appearance:saveAppearance', false, function(success)
+  lib.callback('bakery_appearance:saveAppearance', false, function(success)
     if success then
-      DebugPrint('[tj_appearance] Appearance saved successfully')
+      DebugPrint('[bakery_appearance] Appearance saved successfully')
       handleNuiMessage({ action = 'setVisibleApp', data = false }, false)
       ToggleCam(false)
       cb('ok')
     else
       -- Save failed (likely due to insufficient funds), revert appearance
-      DebugPrint('[tj_appearance] Save failed, reverting appearance')
+      DebugPrint('[bakery_appearance] Save failed, reverting appearance')
       
       -- Revert to previous appearance
       if beforeAppearance and beforeAppearance.model then
@@ -191,19 +193,19 @@ end)
 RegisterNuiCallback('saveOutfit', function(outfitData, cb)
   -- outfitData contains: { label, outfit, job }
   -- job is optional and indicates if this is a job/gang outfit (admin only)
-  lib.callback('tj_appearance:saveOutfit', false, function(success)
+  lib.callback('bakery_appearance:saveOutfit', false, function(success)
     if success then
-      DebugPrint('[tj_appearance] Outfit saved successfully')
+      DebugPrint('[bakery_appearance] Outfit saved successfully')
       
       -- Fetch updated outfits list
-      lib.callback('tj_appearance:getOutfits', false, function(outfits)
+      lib.callback('bakery_appearance:getOutfits', false, function(outfits)
         cb({ 
           success = true,
           outfits = outfits 
         })
       end)
     else
-      DebugPrint('[tj_appearance] Failed to save outfit')
+      DebugPrint('[bakery_appearance] Failed to save outfit')
       cb({ success = false, error = 'Failed to save outfit' })
     end
   end, outfitData)
@@ -213,10 +215,10 @@ RegisterNuiCallback('renameOutfit', function(data, cb)
   local outfitId = data.id
   local newLabel = data.label
   
-  lib.callback('tj_appearance:renameOutfit', false, function(success)
+  lib.callback('bakery_appearance:renameOutfit', false, function(success)
     if success then
       -- Fetch updated outfits list
-      lib.callback('tj_appearance:getOutfits', false, function(outfits)
+      lib.callback('bakery_appearance:getOutfits', false, function(outfits)
         cb({ 
           outfits = outfits 
         })
@@ -230,16 +232,16 @@ end)
 RegisterNuiCallback('getOutfitShareCode', function(data, cb)
   local outfitId = data.id
   
-  lib.callback('tj_appearance:getOutfitShareCode', false, function(shareCode)
+  lib.callback('bakery_appearance:getOutfitShareCode', false, function(shareCode)
     cb({ shareCode = shareCode })
   end, outfitId)
 end)
 
 RegisterNuiCallback('importOutfitByCode', function(data, cb)
-  lib.callback('tj_appearance:importOutfitByCode', false, function(success)
+  lib.callback('bakery_appearance:importOutfitByCode', false, function(success)
     if success then
       -- Fetch updated outfits list
-      lib.callback('tj_appearance:getOutfits', false, function(outfits)
+      lib.callback('bakery_appearance:getOutfits', false, function(outfits)
         cb({ 
           success = true,
           outfits = outfits 
@@ -252,10 +254,10 @@ RegisterNuiCallback('importOutfitByCode', function(data, cb)
 end)
 
 RegisterNuiCallback('deleteOutfitPlayer', function(data, cb)
-  lib.callback('tj_appearance:deleteOutfit', false, function(success)
+  lib.callback('bakery_appearance:deleteOutfit', false, function(success)
     if success then
       -- Fetch updated outfits list
-      lib.callback('tj_appearance:getOutfits', false, function(outfits)
+      lib.callback('bakery_appearance:getOutfits', false, function(outfits)
         cb({ 
           outfits = outfits 
         })
@@ -332,7 +334,7 @@ RegisterNuiCallback('cancel', function(data, cb)
 end)
 
 -- Admin Menu
-RegisterNetEvent('tj_appearance:client:openAdminMenu', function()
+RegisterNetEvent('bakery_appearance:client:openAdminMenu', function()
   -- Load all data from cache instead of server callback
 
   handleNuiMessage({ action = 'setVisibleAdminMenu', data = true }, true)
@@ -357,73 +359,73 @@ RegisterNuiCallback('closeAdminMenu', function(data, cb)
 end)
 
 RegisterNuiCallback('saveTheme', function(theme, cb)
-  lib.callback('tj_appearance:admin:saveTheme', false, function(success)
+  lib.callback('bakery_appearance:admin:saveTheme', false, function(success)
     cb(success)
   end, theme)
 end)
 
 RegisterNuiCallback('saveSettings', function(settings, cb)
-  lib.callback('tj_appearance:admin:saveSettings', false, function(success)
+  lib.callback('bakery_appearance:admin:saveSettings', false, function(success)
     cb(success)
   end, settings)
 end)
 
 RegisterNuiCallback('saveAppearanceSettings', function(settings, cb)
-  lib.callback('tj_appearance:admin:saveAppearanceSettings', false, function(success)
+  lib.callback('bakery_appearance:admin:saveAppearanceSettings', false, function(success)
     cb(success)
   end, settings)
 end)
 
 RegisterNuiCallback('addRestriction', function(restriction, cb)
-  lib.callback('tj_appearance:admin:addRestriction', false, function(success)
+  lib.callback('bakery_appearance:admin:addRestriction', false, function(success)
     cb(success)
   end, restriction)
 end)
 
 RegisterNuiCallback('getPlayerInfo', function(identifier, cb)
-  lib.callback('tj_appearance:admin:getPlayerInfo', false, function(playerInfo)
+  lib.callback('bakery_appearance:admin:getPlayerInfo', false, function(playerInfo)
     cb(playerInfo)
   end, identifier)
 end)
 
 RegisterNuiCallback('deleteRestriction', function(id, cb)
-  lib.callback('tj_appearance:admin:deleteRestriction', false, function(success)
+  lib.callback('bakery_appearance:admin:deleteRestriction', false, function(success)
     cb(success)
   end, id)
 end)
 
 RegisterNuiCallback('addModel', function(modelName, cb)
-  lib.callback('tj_appearance:admin:addModel', false, function(success)
+  lib.callback('bakery_appearance:admin:addModel', false, function(success)
     cb(success)
   end, modelName)
 end)
 
 RegisterNuiCallback('deleteModel', function(modelName, cb)
-  lib.callback('tj_appearance:admin:deleteModel', false, function(success)
+  lib.callback('bakery_appearance:admin:deleteModel', false, function(success)
     cb(success)
   end, modelName)
 end)
 
 RegisterNuiCallback('addLockedModels', function(payload, cb)
-  lib.callback('tj_appearance:admin:addLockedModels', false, function(updated)
+  lib.callback('bakery_appearance:admin:addLockedModels', false, function(updated)
     cb(updated)
   end, payload)
 end)
 
 RegisterNuiCallback('deleteModels', function(modelNames, cb)
-  lib.callback('tj_appearance:admin:deleteModels', false, function(success)
+  lib.callback('bakery_appearance:admin:deleteModels', false, function(success)
     cb(success)
   end, modelNames)
 end)
 
 RegisterNuiCallback('saveShopSettings', function(data, cb)
-  lib.callback('tj_appearance:admin:saveShopSettings', false, function(success)
+  lib.callback('bakery_appearance:admin:saveShopSettings', false, function(success)
     cb(success)
   end, data)
 end)
 
 RegisterNuiCallback('addZone', function(zone, cb)
-  lib.callback('tj_appearance:admin:addZone', false, function(success)
+  lib.callback('bakery_appearance:admin:addZone', false, function(success)
     -- Server will broadcast the updated zones list via event
     -- No need to update cache here as the event handler will do it
     cb(success)
@@ -431,7 +433,7 @@ RegisterNuiCallback('addZone', function(zone, cb)
 end)
 
 RegisterNuiCallback('updateZone', function(zone, cb)
-  lib.callback('tj_appearance:admin:updateZone', false, function(success)
+  lib.callback('bakery_appearance:admin:updateZone', false, function(success)
     -- Server will broadcast the updated zones list via event
     -- No need to update cache here as the event handler will do it
     cb(success)
@@ -439,7 +441,7 @@ RegisterNuiCallback('updateZone', function(zone, cb)
 end)
 
 RegisterNuiCallback('deleteZone', function(id, cb)
-  lib.callback('tj_appearance:admin:deleteZone', false, function(success)
+  lib.callback('bakery_appearance:admin:deleteZone', false, function(success)
     -- Server will broadcast the updated zones list via event
     -- No need to update cache here as the event handler will do it
     cb(success)
@@ -447,28 +449,28 @@ RegisterNuiCallback('deleteZone', function(id, cb)
 end)
 
 RegisterNuiCallback('addOutfit', function(outfit, cb)
-  lib.callback('tj_appearance:admin:addOutfit', false, function(result)
+  lib.callback('bakery_appearance:admin:addOutfit', false, function(result)
     cb(result)
   end, outfit)
 end)
 
 RegisterNuiCallback('deleteOutfit', function(id, cb)
-  lib.callback('tj_appearance:admin:deleteOutfit', false, function(success)
+  lib.callback('bakery_appearance:admin:deleteOutfit', false, function(success)
     cb(success)
   end, id)
 end)
 
 RegisterNuiCallback('saveTattoos', function(tattoos, cb)
-  lib.callback('tj_appearance:admin:saveTattoos', false, function(success)
+  lib.callback('bakery_appearance:admin:saveTattoos', false, function(success)
     cb(success)
   end, tattoos)
 end)
 
-RegisterNetEvent('tj_appearance:client:updateTheme', function(theme)
+RegisterNetEvent('bakery_appearance:client:updateTheme', function(theme)
     handleNuiMessage({ action = 'setThemeConfig', data = theme }, true)
 end)
 
-RegisterNetEvent('tj_appearance:client:updateRestrictions', function(restrictions)
+RegisterNetEvent('bakery_appearance:client:updateRestrictions', function(restrictions)
     -- Update cache with nested structure
     CacheAPI.updateCache('restrictions', restrictions)
     
@@ -491,17 +493,17 @@ RegisterNetEvent('tj_appearance:client:updateRestrictions', function(restriction
     handleNuiMessage({ action = 'setRestrictions', data = flattened }, true)
 end)
 
-RegisterNetEvent('tj_appearance:client:updateZones', function(zones)
+RegisterNetEvent('bakery_appearance:client:updateZones', function(zones)
     CacheAPI.updateCache('zones', zones)
     handleNuiMessage({ action = 'setZones', data = zones }, true)
 end)
 
-RegisterNetEvent('tj_appearance:client:updateOutfits', function(outfits)
+RegisterNetEvent('bakery_appearance:client:updateOutfits', function(outfits)
     CacheAPI.updateCache('outfits', outfits)
     handleNuiMessage({ action = 'setOutfits', data = outfits }, true)
 end)
 
-RegisterNetEvent('tj_appearance:client:updateTattoos', function(tattoos)
+RegisterNetEvent('bakery_appearance:client:updateTattoos', function(tattoos)
     CacheAPI.updateCache('tattoos', tattoos)
     handleNuiMessage({ action = 'setTattoos', data = tattoos }, true)
 end)

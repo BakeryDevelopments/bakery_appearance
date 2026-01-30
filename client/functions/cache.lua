@@ -10,7 +10,32 @@ local Cache = {
     shopConfigs = {},
     blacklist = {},
     locale = {},
-    appearanceSettings = {},
+    appearanceSettings = {
+        useTarget = Config.UseTarget ~= false,
+        enablePedsForShops = Config.EnablePedsForShops ~= false,
+        chargePerTattoo = Config.ChargePerTattoo or false,
+        blips = Config.Blips or {},
+        prices = {
+            clothing = Config.ClothingPrice or 0,
+            barber = Config.BarberPrice or 0,
+            tattoo = Config.TattooPrice or 0,
+            surgeon = Config.SurgeonPrice or 0
+        },
+        initialClothes = {
+            male = {
+                model = 'mp_m_freemode_01',
+                components = {},
+                props = {},
+                hair = { color = 0, highlight = 0, style = 0, texture = 0 }
+            },
+            female = {
+                model = 'mp_f_freemode_01',
+                components = {},
+                props = {},
+                hair = { color = 0, highlight = 0, style = 0, texture = 0 }
+            }
+        }
+    },
     disable = {}
 }
 
@@ -36,7 +61,7 @@ end
 
 -- Load settings (locked models) from JSON
 local function loadSettings()
-    local themeFile = LoadResourceFile('tj_appearance', 'shared/data/theme.json')
+    local themeFile = LoadResourceFile('bakery_appearance', 'shared/data/theme.json')
     Cache.theme = themeFile and json.decode(themeFile) or {
         primaryColor = '#3b82f6',
         inactiveColor = '#8b5cf6',
@@ -44,7 +69,7 @@ local function loadSettings()
     }
 
     -- Load restrictions and convert to nested format if needed
-    local restrictionsFile = LoadResourceFile('tj_appearance', 'shared/data/restrictions.json')
+    local restrictionsFile = LoadResourceFile('bakery_appearance', 'shared/data/restrictions.json')
     local loadedRestrictions = restrictionsFile and json.decode(restrictionsFile) or {}
     
     -- Check if it's a flat array and convert to nested structure
@@ -66,7 +91,7 @@ local function loadSettings()
         Cache.blacklist.restrictions = loadedRestrictions
     end
 
-    local settingsFile = LoadResourceFile('tj_appearance', 'shared/data/locked_models.json')
+    local settingsFile = LoadResourceFile('bakery_appearance', 'shared/data/locked_models.json')
     Cache.blacklist.lockedModels = settingsFile and json.decode(settingsFile) or {}
 
     -- Load disable config from Config
@@ -77,26 +102,58 @@ local function loadSettings()
     return Cache
 end
 
--- Load appearance settings (useTarget, blip defaults, ped toggle)
+-- Load appearance settings (useTarget, blip defaults, ped toggle, prices, initial clothes)
 local function loadAppearanceSettings()
-    local settingsFile = LoadResourceFile('tj_appearance', 'shared/data/appearance_settings.json')
-    local defaults = {
-        useTarget = Config.UseTarget ~= false,
-        enablePedsForShops = Config.EnablePedsForShops ~= false,
-        blips = Config.Blips or {}
-    }
+    local settingsFile = LoadResourceFile('bakery_appearance', 'shared/data/appearance_settings.json')
+    
+    -- Import peddata for component/prop names
+    local peddata = require('modules.ped')
+
+    -- Initialize default components with proper names (0-11)
+    for i = 0, 11 do
+        local name = peddata.Components[i]
+        Cache.appearanceSettings.initialClothes.male.components[name] = {
+            id = name,
+            index = i,
+            value = 0,
+            texture = 0
+        }
+        Cache.appearanceSettings.initialClothes.female.components[name] = {
+            id = name,
+            index = i,
+            value = 0,
+            texture = 0
+        }
+    end
+
+    -- Initialize default props with proper names (0-7)
+    for i = 0, 7 do
+        local name = peddata.Props[i]
+        Cache.appearanceSettings.initialClothes.male.props[name] = {
+            id = name,
+            index = i,
+            value = -1,
+            texture = -1
+        }
+        Cache.appearanceSettings.initialClothes.female.props[name] = {
+            id = name,
+            index = i,
+            value = -1,
+            texture = -1
+        }
+    end
 
     if settingsFile then
         local decoded = json.decode(settingsFile) or {}
-        Cache.appearanceSettings = defaults
 
         if type(decoded) == 'table' then
-            Cache.appearanceSettings.useTarget = decoded.useTarget ~= nil and decoded.useTarget or defaults.useTarget
-            Cache.appearanceSettings.enablePedsForShops = decoded.enablePedsForShops ~= nil and decoded.enablePedsForShops or defaults.enablePedsForShops
-            Cache.appearanceSettings.blips = decoded.blips or defaults.blips
+            Cache.appearanceSettings.useTarget = decoded.useTarget ~= nil and decoded.useTarget or Cache.appearanceSettings.useTarget
+            Cache.appearanceSettings.enablePedsForShops = decoded.enablePedsForShops ~= nil and decoded.enablePedsForShops or Cache.appearanceSettings.enablePedsForShops
+            Cache.appearanceSettings.chargePerTattoo = decoded.chargePerTattoo ~= nil and decoded.chargePerTattoo or Cache.appearanceSettings.chargePerTattoo
+            Cache.appearanceSettings.blips = decoded.blips or Cache.appearanceSettings.blips
+            Cache.appearanceSettings.prices = decoded.prices or Cache.appearanceSettings.prices
+            Cache.appearanceSettings.initialClothes = decoded.initialClothes or Cache.appearanceSettings.initialClothes
         end
-    else
-        Cache.appearanceSettings = defaults
     end
 
     return Cache.appearanceSettings
@@ -104,7 +161,7 @@ end
 
 -- Load models from JSON
 local function loadModels()
-    local modelsFile = LoadResourceFile('tj_appearance', 'shared/data/models.json')
+    local modelsFile = LoadResourceFile('bakery_appearance', 'shared/data/models.json')
     local rawModels = modelsFile and json.decode(modelsFile) or {}
 
     table.sort(rawModels)
@@ -127,7 +184,7 @@ end
 
 -- Load zones from JSON
 local function loadZones()
-    local zonesFile = LoadResourceFile('tj_appearance', 'shared/data/zones.json')
+    local zonesFile = LoadResourceFile('bakery_appearance', 'shared/data/zones.json')
     Cache.zones = zonesFile and json.decode(zonesFile) or {}
 
     return Cache.zones
@@ -135,14 +192,14 @@ end
 
 -- Load outfits from JSON
 local function loadOutfits()
-    local outfitsFile = LoadResourceFile('tj_appearance', 'shared/data/outfits.json')
+    local outfitsFile = LoadResourceFile('bakery_appearance', 'shared/data/outfits.json')
     Cache.outfits = outfitsFile and json.decode(outfitsFile) or {}
     return Cache.outfits
 end
 
 -- Load tattoos from JSON
 local function loadTattoos()
-    local tattoosFile = LoadResourceFile('tj_appearance', 'shared/data/tattoos.json')
+    local tattoosFile = LoadResourceFile('bakery_appearance', 'shared/data/tattoos.json')
     local loadedTattoos = tattoosFile and json.decode(tattoosFile) or {}
     
     -- Convert simple DLC array (strings or objects) to nested zone structure for UI compatibility
@@ -225,7 +282,7 @@ end
 
 -- Load shop settings from JSON
 local function loadShopSettings()
-    local shopSettingsFile = LoadResourceFile('tj_appearance', 'shared/data/shop_settings.json')
+    local shopSettingsFile = LoadResourceFile('bakery_appearance', 'shared/data/shop_settings.json')
     Cache.shopSettings = shopSettingsFile and json.decode(shopSettingsFile) or {
         enablePedsForShops = true,
         enablePedsForClothingRooms = true,
@@ -237,7 +294,7 @@ end
 
 -- Load shop configs from JSON
 local function loadShopConfigs()
-    local shopConfigsFile = LoadResourceFile('tj_appearance', 'shared/data/shop_configs.json')
+    local shopConfigsFile = LoadResourceFile('bakery_appearance', 'shared/data/shop_configs.json')
     Cache.shopConfigs = shopConfigsFile and json.decode(shopConfigsFile) or {}
     return Cache.shopConfigs
 end
@@ -356,7 +413,7 @@ local function GetPlayerRestrictions()
 end
 
 local function loadLocale()
-    local localeFile = LoadResourceFile('tj_appearance', 'shared/locale/'..Config.Locale..'.json')
+    local localeFile = LoadResourceFile('bakery_appearance', 'shared/locale/'..Config.Locale..'.json')
     Cache.locale = localeFile and json.decode(localeFile) or {}
     return Cache.locale
 end
@@ -409,17 +466,17 @@ local function initializeCache()
 end
 
 
-RegisterNetEvent('tj_appearance:client:updateTheme', function(theme)
+RegisterNetEvent('bakery_appearance:client:updateTheme', function(theme)
     Cache.theme = theme
     handleNuiMessage({ action = 'setThemeConfig', data = theme }, true)
 end)
 
-RegisterNetEvent('tj_appearance:client:updateTattoos', function(tattoos)
+RegisterNetEvent('bakery_appearance:client:updateTattoos', function(tattoos)
     Cache.tattoos = tattoos or {}
     handleNuiMessage({ action = 'setTattoos', data = Cache.tattoos }, true)
 end)
 
-RegisterNetEvent('tj_appearance:client:updateAppearanceSettings', function(settings)
+RegisterNetEvent('bakery_appearance:client:updateAppearanceSettings', function(settings)
     Cache.appearanceSettings = settings or Cache.appearanceSettings or {}
     handleNuiMessage({ action = 'setAppearanceSettings', data = Cache.appearanceSettings }, true)
 end)

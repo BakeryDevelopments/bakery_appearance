@@ -48,7 +48,7 @@ local function createZonePed(zone)
         -- Use ox_target
         exports.ox_target:addLocalEntity(ped, {
             {
-                name = 'tj_appearance_zone_' .. zone.id,
+                name = 'bakery_appearance_zone_' .. zone.id,
                 icon = 'fa-solid fa-shirt',
                 label = getZoneLabel(zone.type),
                 onSelect = function()
@@ -82,7 +82,7 @@ local function createPolyZone(zone)
 
     -- Create polyzone using ox_lib
     local poly = lib.zones.poly({
-        name = 'tj_appearance_zone_' .. zone.id,
+        name = 'bakery_appearance_zone_' .. zone.id,
         points = points,
         thickness = 10.0,
         debug = Config.Debug,
@@ -155,7 +155,7 @@ end)
 local function initializeZones()
     local zones = CacheAPI.getZones()
 
-    DebugPrint(string.format('[tj_appearance] Initializing %d zones', #zones))
+    DebugPrint(string.format('[bakery_appearance] Initializing %d zones', #zones))
 
     for _, zone in ipairs(zones) do
         if zone.enablePed then
@@ -163,7 +163,7 @@ local function initializeZones()
             createZonePed(zone)
         elseif zone.polyzone and #zone.polyzone > 0 then
             -- Create polyzone interaction
-            DebugPrint(string.format('[tj_appearance] Creating polyzone for zone ID: %s', zone.id))
+            DebugPrint(string.format('[bakery_appearance] Creating polyzone for zone ID: %s', zone.id))
             createPolyZone(zone)
         elseif zone.coords then
             -- Create point marker interaction (fallback)
@@ -225,7 +225,7 @@ local function cleanupZones()
 end
 
 -- Update zones when config changes
-RegisterNetEvent('tj_appearance:client:updateZones', function(zones)
+RegisterNetEvent('bakery_appearance:client:updateZones', function(zones)
     cleanupZones()
     Wait(500)
     initializeZones()

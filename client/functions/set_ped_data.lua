@@ -374,6 +374,28 @@ function SetPedAppearance(ped, data)
     end
 end
 
+
+function SetupClothing(isMale)
+    local ped = cache.ped
+
+    if isMale == nil then
+        isMale = IsPedMale(ped)
+    end
+
+    local baseclothing = CacheAPI.getAppearanceSettings().initialClothes
+
+    if isMale then
+        SetModel(ped, `mp_m_freemode_01`)
+        SetPedAppearance(ped, baseclothing.male)
+    else
+        SetModel(ped, `mp_f_freemode_01`)
+        SetPedAppearance(ped, baseclothing.female)
+    end
+
+
+
+end
+
 exports('SetPedAppearance', SetPedAppearance)
 exports('setPedAppearance', SetPedAppearance)
 

@@ -1,9 +1,5 @@
 local peddata = require('modules.ped')
 
-local initialcreation = false
-
-
-
 function Tofloat(num)
     -- Safely convert input to float; handle nil and non-number values
     if num == nil then
@@ -152,11 +148,8 @@ function DebugPrint(data)
     end
 end
 
-
-
-
 RegisterNuiCallback('teleportToZone', function(info, cb)
-    local hasPermission = lib.callback.await('tj_appearance:admin:isAdmin', false)
+    local hasPermission = lib.callback.await('bakery_appearance:admin:isAdmin', false)
 
     if not hasPermission then
         cb({ success = false, message = 'You do not have permission to use this feature.' })
@@ -168,18 +161,23 @@ end)
 
 
 function InitialCreation()
-    SetupClothing()
-    TriggerServerEvent('tj_appearance:server:SetRoutingBucket')
-    initialcreation = true
-    OpenAppearanceMenu({type = 'all'})
+    local gender = Framework.GetPlayerData().gender
 
+    local isMale = gender == 'Male'
+
+    SetupClothing(isMale)
+
+    
+    while IsScreenFadedIn() do
+        Wait(100)
+    end
+
+    TriggerServerEvent('bakery_appearance:server:SetRoutingBucket')
+    OpenAppearanceMenu({ type = 'all' ,shouldcharge = false })
 end
 
 function GetPedModalHash(ped)
     return GetEntityModel(ped)
 end
 
-
 exports('InitialCreation', InitialCreation)
-
-
