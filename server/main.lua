@@ -11,12 +11,17 @@ function DebugPrint(data)
     end
 end
 
+-- Helper: normalize ped model lookup on the server
+local function GetPedModalHash(ped)
+    return GetEntityModel(ped)
+end
+
 -- Save player appearance callback
-lib.callback.register('tj_appearance:saveAppearance', function(source, appearance)
+lib.callback.register('bakery_appearance:saveAppearance', function(source, appearance)
     local citizenid = Framework.GetCitizenId(source)
     
     if not citizenid then
-        DebugPrint('[tj_appearance] ERROR: Could not get citizenid for player ' .. source)
+        DebugPrint('[bakery_appearance] ERROR: Could not get citizenid for player ' .. source)
         return false
     end
 
@@ -27,7 +32,7 @@ lib.callback.register('tj_appearance:saveAppearance', function(source, appearanc
     -- Get player data for money check
     local playerData = Framework.GetPlayer(source)
     if not playerData then
-        DebugPrint('[tj_appearance] ERROR: Could not get player data for source ' .. source)
+        DebugPrint('[bakery_appearance] ERROR: Could not get player data for source ' .. source)
         return false
     end
     
@@ -54,7 +59,7 @@ lib.callback.register('tj_appearance:saveAppearance', function(source, appearanc
         local moneyRemoved = Framework.RemoveMoney(source, price)
         
         if moneyRemoved then
-            DebugPrint(string.format('[tj_appearance] Saved appearance for citizenid: %s (charged $%d)', citizenid, price))
+            DebugPrint(string.format('[bakery_appearance] Saved appearance for citizenid: %s (charged $%d)', citizenid, price))
             TriggerClientEvent('ox_lib:notify', source, {
                 title = 'Success',
                 description = string.format('Appearance saved! Charged $%d', price),
@@ -62,7 +67,7 @@ lib.callback.register('tj_appearance:saveAppearance', function(source, appearanc
             })
         else
             -- Failed to remove money, revert the save
-            DebugPrint(string.format('[tj_appearance] Failed to charge money for citizenid: %s', citizenid))
+            DebugPrint(string.format('[bakery_appearance] Failed to charge money for citizenid: %s', citizenid))
             TriggerClientEvent('ox_lib:notify', source, {
                 title = 'Error',
                 description = 'Failed to process payment',
@@ -71,14 +76,14 @@ lib.callback.register('tj_appearance:saveAppearance', function(source, appearanc
             return false
         end
     elseif success then
-        DebugPrint('[tj_appearance] Saved appearance for citizenid: ' .. citizenid)
+        DebugPrint('[bakery_appearance] Saved appearance for citizenid: ' .. citizenid)
         TriggerClientEvent('ox_lib:notify', source, {
             title = 'Success',
             description = 'Appearance saved!',
             type = 'success'
         })
     else
-        DebugPrint('[tj_appearance] Failed to save appearance for citizenid: ' .. citizenid)
+        DebugPrint('[bakery_appearance] Failed to save appearance for citizenid: ' .. citizenid)
         TriggerClientEvent('ox_lib:notify', source, {
             title = 'Error',
             description = 'Failed to save appearance',
@@ -90,12 +95,12 @@ lib.callback.register('tj_appearance:saveAppearance', function(source, appearanc
 end)
 
 -- Save outfit callback (personal only - job/gang outfits are saved via admin menu)
-lib.callback.register('tj_appearance:saveOutfit', function(source, outfitData)
+lib.callback.register('bakery_appearance:saveOutfit', function(source, outfitData)
     local citizenid = Framework.GetCitizenId(source)
     local playerData = Framework.GetPlayer(source)
     
     if not playerData then
-        DebugPrint('[tj_appearance] ERROR: Could not get player data for source ' .. source)
+        DebugPrint('[bakery_appearance] ERROR: Could not get player data for source ' .. source)
         return false
     end
 
@@ -135,7 +140,7 @@ lib.callback.register('tj_appearance:saveOutfit', function(source, outfitData)
     local success, shareCode = Database.SaveOutfit(citizenid, nil, nil, gender, outfitName, outfitToSave)
     
     if success then
-        DebugPrint(string.format('[tj_appearance] Saved personal outfit "%s" for citizenid: %s (gender: %s) - Share Code: %s', 
+        DebugPrint(string.format('[bakery_appearance] Saved personal outfit "%s" for citizenid: %s (gender: %s) - Share Code: %s', 
             outfitName, citizenid, gender, shareCode or 'N/A'))
     end
 
@@ -143,7 +148,7 @@ lib.callback.register('tj_appearance:saveOutfit', function(source, outfitData)
 end)
 
 -- Get player outfits callback
-lib.callback.register('tj_appearance:getOutfits', function(source)
+lib.callback.register('bakery_appearance:getOutfits', function(source)
     local citizenid = Framework.GetCitizenId(source)
     local playerData = Framework.GetPlayer(source)
     
@@ -158,7 +163,7 @@ lib.callback.register('tj_appearance:getOutfits', function(source)
     local gender = isMale and 'male' or 'female'
 
     -- Debug: Print player job/gang info
-    DebugPrint(string.format('[tj_appearance] Fetching outfits for player %s - Job: %s, Gang: %s, Gender: %s', 
+    DebugPrint(string.format('[bakery_appearance] Fetching outfits for player %s - Job: %s, Gang: %s, Gender: %s', 
         citizenid, playerData.job.name or 'none', playerData.gang.name or 'none', gender))
 
     -- Get personal outfits from database
@@ -180,7 +185,7 @@ lib.callback.register('tj_appearance:getOutfits', function(source)
     end
     
     -- Debug: Print outfit counts
-    DebugPrint(string.format('[tj_appearance] Found %d personal outfits, %d job/gang outfits', 
+    DebugPrint(string.format('[bakery_appearance] Found %d personal outfits, %d job/gang outfits', 
         #personalOutfits, #jobOutfits))
 
     -- Transform database format to UI format
@@ -213,7 +218,7 @@ lib.callback.register('tj_appearance:getOutfits', function(source)
 end)
 
 -- Get outfit share code callback
-lib.callback.register('tj_appearance:getOutfitShareCode', function(source, outfitId)
+lib.callback.register('bakery_appearance:getOutfitShareCode', function(source, outfitId)
     local citizenid = Framework.GetCitizenId(source)
     
     if not citizenid or not outfitId then
@@ -233,7 +238,7 @@ lib.callback.register('tj_appearance:getOutfitShareCode', function(source, outfi
 end)
 
 -- Import outfit by share code callback
-lib.callback.register('tj_appearance:importOutfitByCode', function(source, data)
+lib.callback.register('bakery_appearance:importOutfitByCode', function(source, data)
     local citizenid = Framework.GetCitizenId(source)
     
     if not citizenid or not data or not data.shareCode or not data.outfitName then
@@ -245,7 +250,7 @@ lib.callback.register('tj_appearance:importOutfitByCode', function(source, data)
 end)
 
 -- Rename outfit callback
-lib.callback.register('tj_appearance:renameOutfit', function(source, data)
+lib.callback.register('bakery_appearance:renameOutfit', function(source, data)
     local citizenid = Framework.GetCitizenId(source)
     
     if not citizenid or not data or not data.id or not data.label then
@@ -278,7 +283,7 @@ lib.callback.register('tj_appearance:renameOutfit', function(source, data)
 end)
 
 -- Delete outfit callback
-lib.callback.register('tj_appearance:deleteOutfit', function(source, outfitData)
+lib.callback.register('bakery_appearance:deleteOutfit', function(source, outfitData)
     local citizenid = Framework.GetCitizenId(source)
     
     if not citizenid then
@@ -315,7 +320,7 @@ lib.callback.register('tj_appearance:deleteOutfit', function(source, outfitData)
 end)
 
 -- Get player appearance callback
-lib.callback.register('tj_appearance:getAppearance', function(source)
+lib.callback.register('bakery_appearance:getAppearance', function(source)
     local citizenid = Framework.GetCitizenId(source)
     
     if not citizenid then
@@ -325,7 +330,7 @@ lib.callback.register('tj_appearance:getAppearance', function(source)
     return Database.GetAppearance(citizenid)
 end)
 
-lib.callback.register('tj_appearance:getPlayerTattoos', function(source)
+lib.callback.register('bakery_appearance:getPlayerTattoos', function(source)
     local citizenid = Framework.GetCitizenId(source)
     
     if not citizenid then
@@ -342,7 +347,7 @@ end)
 -- @return table|nil - The appearance data or nil if not found
 function GetPlayerAppearance(identifier)
     if not identifier or identifier == '' then
-        DebugPrint('[tj_appearance] ERROR: GetPlayerAppearance - Invalid identifier provided')
+        DebugPrint('[bakery_appearance] ERROR: GetPlayerAppearance - Invalid identifier provided')
         return nil
     end
 
@@ -366,7 +371,7 @@ exports('GetPlayerAppearance', GetPlayerAppearance)
 -- Server-side admin command to open appearance menu for self or another player
 RegisterCommand('appearance', function(source, args, rawCommand)
     if not source or source == 0 then
-        DebugPrint("^1[tj_appearance] ERROR: Command can only be used in-game^7")
+        DebugPrint("^1[bakery_appearance] ERROR: Command can only be used in-game^7")
         return
     end
     
@@ -429,6 +434,6 @@ RegisterCommand('appearance', function(source, args, rawCommand)
     end
     
     -- Trigger client event to open appearance menu
-    TriggerClientEvent('tj_appearance:client:openAppearanceMenu', targetId)
+    TriggerClientEvent('bakery_appearance:client:openAppearanceMenu', targetId)
 end, false)
 

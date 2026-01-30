@@ -1,5 +1,5 @@
 -- ============================================================================
--- TJ Appearance - Database Schema
+-- bakery Appearance - Database Schema
 -- ============================================================================
 -- This schema only contains runtime/persistent data tables.
 -- Configuration (theme, zones, restrictions, etc.) is managed via JSON files

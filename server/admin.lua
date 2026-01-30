@@ -53,14 +53,14 @@ end
 
 local function LoadCache()
     -- Load models
-    local modelsFile = LoadResourceFile('tj_appearance', 'shared/data/models.json')
+    local modelsFile = LoadResourceFile('bakery_appearance', 'shared/data/models.json')
     if modelsFile then
         ServerCache.models = json.decode(modelsFile) or {}
     else
         ServerCache.models = {}
     end
 
-    local restrictionsFile = LoadResourceFile('tj_appearance', 'shared/data/restrictions.json')
+    local restrictionsFile = LoadResourceFile('bakery_appearance', 'shared/data/restrictions.json')
     if restrictionsFile then
         local loadedRestrictions = json.decode(restrictionsFile) or {}
         
@@ -88,7 +88,7 @@ local function LoadCache()
         ServerCache.restrictions = {}
     end
 
-    local tattoosFile = LoadResourceFile('tj_appearance', 'shared/data/tattoos.json')
+    local tattoosFile = LoadResourceFile('bakery_appearance', 'shared/data/tattoos.json')
     if tattoosFile then
         local loadedTattoos = json.decode(tattoosFile) or {}
 
@@ -168,7 +168,7 @@ local function LoadCache()
     end
 
     -- Load settings (theme + locked models)
-    local themeFile = LoadResourceFile('tj_appearance', 'shared/data/theme.json')
+    local themeFile = LoadResourceFile('bakery_appearance', 'shared/data/theme.json')
     if themeFile then
         ServerCache.theme = json.decode(themeFile) or {
             primaryColor = '#3b82f6',
@@ -260,35 +260,35 @@ function IsAdmin(source)
     return isAdmin
 end
 
-lib.callback.register('tj_appearance:admin:isAdmin', function(source)
+lib.callback.register('bakery_appearance:admin:isAdmin', function(source)
     return IsAdmin(source)
 end)
 
 -- Save theme configuration (includes shape)
-lib.callback.register('tj_appearance:admin:saveTheme', function(source, theme)
+lib.callback.register('bakery_appearance:admin:saveTheme', function(source, theme)
     if not IsAdmin(source) then return false end
 
     ServerCache.theme = theme
     SaveResourceFile(GetCurrentResourceName(), 'shared/data/theme.json', json.encode(theme), -1)
 
     -- Broadcast to all clients
-    TriggerClientEvent('tj_appearance:client:updateTheme', -1, theme)
+    TriggerClientEvent('bakery_appearance:client:updateTheme', -1, theme)
     return true
 end)
 
 -- Save settings
-lib.callback.register('tj_appearance:admin:saveSettings', function(source, settings)
+lib.callback.register('bakery_appearance:admin:saveSettings', function(source, settings)
     if not IsAdmin(source) then return false end
 
     ServerCache.settings.lockedModels = settings
     SaveResourceFile(GetCurrentResourceName(), 'shared/data/locked_models.json', json.encode(settings), -1)
-    TriggerClientEvent('tj_appearance:client:updateLockedModels', -1, settings)
+    TriggerClientEvent('bakery_appearance:client:updateLockedModels', -1, settings)
 
     return true
 end)
 
 -- Save appearance settings (useTarget, blip defaults, ped toggle)
-lib.callback.register('tj_appearance:admin:saveAppearanceSettings', function(source, settings)
+lib.callback.register('bakery_appearance:admin:saveAppearanceSettings', function(source, settings)
     if not IsAdmin(source) then return false end
 
     if type(settings) ~= 'table' then return false end
@@ -320,12 +320,12 @@ lib.callback.register('tj_appearance:admin:saveAppearanceSettings', function(sou
     SaveResourceFile(GetCurrentResourceName(), 'shared/data/appearance_settings.json', json.encode(merged), -1)
 
     -- Broadcast to all clients so menus/zones can reflect changes
-    TriggerClientEvent('tj_appearance:client:updateAppearanceSettings', -1, merged)
+    TriggerClientEvent('bakery_appearance:client:updateAppearanceSettings', -1, merged)
 
     return true
 end)
 
-lib.callback.register('tj_appearance:admin:saveTattoos', function(source, tattoos)
+lib.callback.register('bakery_appearance:admin:saveTattoos', function(source, tattoos)
     if not IsAdmin(source) then return false end
 
     -- Tattoos come from admin menu in simple DLC format
@@ -403,12 +403,12 @@ lib.callback.register('tj_appearance:admin:saveTattoos', function(source, tattoo
     table.sort(nested, function(a, b) return (a.zoneIndex or 0) < (b.zoneIndex or 0) end)
 
     ServerCache.tattoos = nested
-    TriggerClientEvent('tj_appearance:client:updateTattoos', -1, ServerCache.tattoos)
+    TriggerClientEvent('bakery_appearance:client:updateTattoos', -1, ServerCache.tattoos)
     return true
 end)
 
 -- Append locked models without removing existing ones
-lib.callback.register('tj_appearance:admin:addLockedModels', function(source, payload)
+lib.callback.register('bakery_appearance:admin:addLockedModels', function(source, payload)
     if not IsAdmin(source) then return false end
     local modelsToAdd = (payload and payload.models) or {}
     if type(modelsToAdd) ~= 'table' or #modelsToAdd == 0 then return false end
@@ -441,7 +441,7 @@ lib.callback.register('tj_appearance:admin:addLockedModels', function(source, pa
 end)
 
 -- Save shop settings and configs
-lib.callback.register('tj_appearance:admin:saveShopSettings', function(source, data)
+lib.callback.register('bakery_appearance:admin:saveShopSettings', function(source, data)
     if not IsAdmin(source) then return false end
 
     local settings = data.settings
@@ -459,7 +459,7 @@ lib.callback.register('tj_appearance:admin:saveShopSettings', function(source, d
 end)
 
 -- Add zone
-lib.callback.register('tj_appearance:admin:addZone', function(source, zone)
+lib.callback.register('bakery_appearance:admin:addZone', function(source, zone)
     if not IsAdmin(source) then return false end
 
     -- Generate an ID for the new zone
@@ -469,19 +469,19 @@ lib.callback.register('tj_appearance:admin:addZone', function(source, zone)
     table.insert(ServerCache.zones, newZone)
     SaveResourceFile(GetCurrentResourceName(), 'shared/data/zones.json', json.encode(ServerCache.zones), -1)
 
-    TriggerClientEvent('tj_appearance:client:updateZones', -1, ServerCache.zones)
+    TriggerClientEvent('bakery_appearance:client:updateZones', -1, ServerCache.zones)
     return true
 end)
 
 -- Update zone
-lib.callback.register('tj_appearance:admin:updateZone', function(source, zone)
+lib.callback.register('bakery_appearance:admin:updateZone', function(source, zone)
     if not IsAdmin(source) then return false end
 
     for i, z in ipairs(ServerCache.zones) do
         if z.id == zone.id then
             ServerCache.zones[i] = zone
             SaveResourceFile(GetCurrentResourceName(), 'shared/data/zones.json', json.encode(ServerCache.zones), -1)
-            TriggerClientEvent('tj_appearance:client:updateZones', -1, ServerCache.zones)
+            TriggerClientEvent('bakery_appearance:client:updateZones', -1, ServerCache.zones)
             return true
         end
     end
@@ -490,14 +490,14 @@ lib.callback.register('tj_appearance:admin:updateZone', function(source, zone)
 end)
 
 -- Delete zone
-lib.callback.register('tj_appearance:admin:deleteZone', function(source, id)
+lib.callback.register('bakery_appearance:admin:deleteZone', function(source, id)
     if not IsAdmin(source) then return false end
 
     for i, zone in ipairs(ServerCache.zones) do
         if zone.id == id then
             table.remove(ServerCache.zones, i)
             SaveResourceFile(GetCurrentResourceName(), 'shared/data/zones.json', json.encode(ServerCache.zones), -1)
-            TriggerClientEvent('tj_appearance:client:updateZones', -1, ServerCache.zones)
+            TriggerClientEvent('bakery_appearance:client:updateZones', -1, ServerCache.zones)
             return true
         end
     end
@@ -506,7 +506,7 @@ lib.callback.register('tj_appearance:admin:deleteZone', function(source, id)
 end)
 
 -- Add outfit
-lib.callback.register('tj_appearance:admin:addOutfit', function(source, outfit)
+lib.callback.register('bakery_appearance:admin:addOutfit', function(source, outfit)
     if not IsAdmin(source) then return false end
 
     local newOutfit = {
@@ -520,20 +520,20 @@ lib.callback.register('tj_appearance:admin:addOutfit', function(source, outfit)
 
     table.insert(ServerCache.outfits, newOutfit)
     SaveResourceFile(GetCurrentResourceName(), 'shared/data/outfits.json', json.encode(ServerCache.outfits), -1)
-    TriggerClientEvent('tj_appearance:client:updateOutfits', -1, ServerCache.outfits)
+    TriggerClientEvent('bakery_appearance:client:updateOutfits', -1, ServerCache.outfits)
 
     return { id = newOutfit.id }
 end)
 
 -- Delete outfit
-lib.callback.register('tj_appearance:admin:deleteOutfit', function(source, id)
+lib.callback.register('bakery_appearance:admin:deleteOutfit', function(source, id)
     if not IsAdmin(source) then return false end
 
     for i, outfit in ipairs(ServerCache.outfits) do
         if outfit.id == id then
             table.remove(ServerCache.outfits, i)
             SaveResourceFile(GetCurrentResourceName(), 'shared/data/outfits.json', json.encode(ServerCache.outfits), -1)
-            TriggerClientEvent('tj_appearance:client:updateOutfits', -1, ServerCache.outfits)
+            TriggerClientEvent('bakery_appearance:client:updateOutfits', -1, ServerCache.outfits)
             return true
         end
     end
@@ -542,7 +542,7 @@ lib.callback.register('tj_appearance:admin:deleteOutfit', function(source, id)
 end)
 
 -- Add model
-lib.callback.register('tj_appearance:admin:addModel', function(source, modelName)
+lib.callback.register('bakery_appearance:admin:addModel', function(source, modelName)
     if not IsAdmin(source) then return false end
 
     -- Prevent adding freemode models (they should always exist)
@@ -561,13 +561,13 @@ lib.callback.register('tj_appearance:admin:addModel', function(source, modelName
     table.insert(ServerCache.models, modelName)
     table.sort(ServerCache.models)
     SaveResourceFile(GetCurrentResourceName(), 'shared/data/models.json', json.encode(ServerCache.models), -1)
-    TriggerClientEvent('tj_appearance:client:updateModels', -1, ServerCache.models)
+    TriggerClientEvent('bakery_appearance:client:updateModels', -1, ServerCache.models)
 
     return true
 end)
 
 -- Delete model
-lib.callback.register('tj_appearance:admin:deleteModel', function(source, modelName)
+lib.callback.register('bakery_appearance:admin:deleteModel', function(source, modelName)
     if not IsAdmin(source) then return false end
 
     -- Prevent deletion of freemode models
@@ -580,7 +580,7 @@ lib.callback.register('tj_appearance:admin:deleteModel', function(source, modelN
         if model == modelName then
             table.remove(ServerCache.models, i)
             SaveResourceFile(GetCurrentResourceName(), 'shared/data/models.json', json.encode(ServerCache.models), -1)
-            TriggerClientEvent('tj_appearance:client:updateModels', -1, ServerCache.models)
+            TriggerClientEvent('bakery_appearance:client:updateModels', -1, ServerCache.models)
             return true
         end
     end
@@ -589,7 +589,7 @@ lib.callback.register('tj_appearance:admin:deleteModel', function(source, modelN
 end)
 
 -- Delete multiple models
-lib.callback.register('tj_appearance:admin:deleteModels', function(source, modelNames)
+lib.callback.register('bakery_appearance:admin:deleteModels', function(source, modelNames)
     if not IsAdmin(source) then return false end
 
     if type(modelNames) ~= 'table' then return false end
@@ -611,13 +611,13 @@ lib.callback.register('tj_appearance:admin:deleteModels', function(source, model
 
     if deletedCount > 0 then
         SaveResourceFile(GetCurrentResourceName(), 'shared/data/models.json', json.encode(ServerCache.models), -1)
-        TriggerClientEvent('tj_appearance:client:updateModels', -1, ServerCache.models)
+        TriggerClientEvent('bakery_appearance:client:updateModels', -1, ServerCache.models)
     end
 
     return true
 end)
 -- Get player info by identifier
-lib.callback.register('tj_appearance:admin:getPlayerInfo', function(source, identifier)
+lib.callback.register('bakery_appearance:admin:getPlayerInfo', function(source, identifier)
     if not IsAdmin(source) then return nil end
     
     -- Search all online players for matching identifier
@@ -649,7 +649,7 @@ lib.callback.register('tj_appearance:admin:getPlayerInfo', function(source, iden
 end)
 
 -- Add restriction
-lib.callback.register('tj_appearance:admin:addRestriction', function(source, restriction)
+lib.callback.register('bakery_appearance:admin:addRestriction', function(source, restriction)
     if not IsAdmin(source) then return false end
 
     -- Generate ID based on existing restrictions
@@ -694,14 +694,14 @@ lib.callback.register('tj_appearance:admin:addRestriction', function(source, res
     })
 
     -- Persist to JSON
-    SaveResourceFile('tj_appearance', 'shared/data/restrictions.json', json.encode(ServerCache.restrictions), -1)
-    TriggerClientEvent('tj_appearance:client:updateRestrictions', -1, ServerCache.restrictions)
+    SaveResourceFile('bakery_appearance', 'shared/data/restrictions.json', json.encode(ServerCache.restrictions), -1)
+    TriggerClientEvent('bakery_appearance:client:updateRestrictions', -1, ServerCache.restrictions)
 
     return true
 end)
 
 -- Delete restriction
-lib.callback.register('tj_appearance:admin:deleteRestriction', function(source, id)
+lib.callback.register('bakery_appearance:admin:deleteRestriction', function(source, id)
     if not IsAdmin(source) then return false end
 
     -- Find and remove from cache
@@ -726,8 +726,8 @@ lib.callback.register('tj_appearance:admin:deleteRestriction', function(source, 
 
     if found then
         -- Persist to JSON
-        SaveResourceFile('tj_appearance', 'shared/data/restrictions.json', json.encode(ServerCache.restrictions), -1)
-        TriggerClientEvent('tj_appearance:client:updateRestrictions', -1, ServerCache.restrictions)
+        SaveResourceFile('bakery_appearance', 'shared/data/restrictions.json', json.encode(ServerCache.restrictions), -1)
+        TriggerClientEvent('bakery_appearance:client:updateRestrictions', -1, ServerCache.restrictions)
     end
 
     return found
@@ -740,5 +740,5 @@ RegisterCommand('appearanceadmin', function(source)
         return
     end
 
-    TriggerClientEvent('tj_appearance:client:openAdminMenu', source)
+    TriggerClientEvent('bakery_appearance:client:openAdminMenu', source)
 end, false)
