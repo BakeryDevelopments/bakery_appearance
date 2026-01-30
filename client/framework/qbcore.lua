@@ -3,13 +3,14 @@ if GetResourceState('qb-core') ~= 'started' then
     return
 end
 
-local QBCore = exports['qb-core']:GetCoreObject()
+
 Framework = {}
+Framework.QBCore = exports['qb-core']:GetCoreObject()
 
 --- Get local player data from QBCore
 ---@return table|nil playerData Player data including job, gang, etc.
 function Framework.GetPlayerData()
-    local PlayerData = QBCore.Functions.GetPlayerData()
+    local PlayerData = Framework.QBCore.Functions.GetPlayerData()
     if not PlayerData then return nil end
     
     return {

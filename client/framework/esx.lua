@@ -4,14 +4,13 @@ if GetResourceState('es_extended') ~= 'started' then
     return
 end
 
-local ESX = exports['es_extended']:getSharedObject()
-
 Framework = {}
+Framework.ESX = exports['es_extended']:getSharedObject()
 
 --- Get local player data from ESX
 ---@return table|nil playerData Player data including job, etc.
 function Framework.GetPlayerData()
-    local PlayerData = ESX.GetPlayerData()
+    local PlayerData = Framework.ESX.GetPlayerData()
     if not PlayerData then return nil end
     
     return {
@@ -51,5 +50,5 @@ RegisterNetEvent('esx:playerLoaded', function (xPlayer, skin)
 end)
 
 function Framework.CachePed()
-    ESX.SetPlayerData("ped", cache.ped)
+    Framework.ESX.SetPlayerData("ped", cache.ped)
 end

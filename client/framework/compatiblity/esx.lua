@@ -5,16 +5,14 @@ end
 
 
 local firstSpawn = false
-local lastsex = -1
-
 local peddata = require('modules.ped')
 
-local function nonNilComponent(id, index, value, texture)
-    if value == nil and texture == nil then return nil end
-    return { id = id, index = index, value = value, texture = texture }
-end
+local MODELS = {
+    MALE = GetHashKey('mp_m_freemode_01'),
+    FEMALE = GetHashKey('mp_f_freemode_01')
+}
 
-local function nonNilProp(id, index, value, texture)
+local function buildEntry(id, index, value, texture)
     if value == nil and texture == nil then return nil end
     return { id = id, index = index, value = value, texture = texture }
 end
@@ -37,7 +35,7 @@ local SkinchangerToAppearance = function(skin)
         { peddata.Components[11], 11, skin.torso_1,  skin.torso_2 },  -- jackets
     }
     for _, spec in ipairs(compSpecs) do
-        local entry = nonNilComponent(table.unpack(spec))
+        local entry = buildEntry(table.unpack(spec))
         if entry then appearance.drawables[entry.id] = entry end
     end
 
@@ -46,29 +44,29 @@ local SkinchangerToAppearance = function(skin)
         { peddata.Props[0], 0, skin.helmet_1,    skin.helmet_2 },    -- hats
         { peddata.Props[1], 1, skin.glasses_1,   skin.glasses_2 },   -- glasses
         { peddata.Props[2], 2, skin.ears_1,      skin.ears_2 },      -- earrings
-
         { peddata.Props[6], 6, skin.watches_1,   skin.watches_2 },   -- watches
         { peddata.Props[7], 7, skin.bracelets_1, skin.bracelets_2 }, -- bracelets
-
     }
     for _, spec in ipairs(propSpecs) do
-        local entry = nonNilProp(table.unpack(spec))
+        local entry = buildEntry(table.unpack(spec))
         if entry then appearance.props[entry.id] = entry end
     end
 
     appearance.model = skin.model
 
-    appearance.headBlend = {
-        shapeFirst = skin.mom,
-        shapeSecond = skin.dad,
-        shapeThird = skin.grandparents,
-        skinFirst = skin.mom,
-        skinSecond = skin.dad,
-        skinThird = skin.grandparents,
-        shapeMix = skin.face_md_weight,
-        skinMix = skin.skin_md_weight,
-        thirdMix = skin.face_g_weight
-    }
+    if skin.mom or skin.dad or skin.grandparents then
+        appearance.headBlend = {
+            shapeFirst = skin.mom,
+            shapeSecond = skin.dad,
+            shapeThird = skin.grandparents,
+            skinFirst = skin.mom,
+            skinSecond = skin.dad,
+            skinThird = skin.grandparents,
+            shapeMix = skin.face_md_weight,
+            skinMix = skin.skin_md_weight,
+            thirdMix = skin.face_g_weight
+        }
+    end
 
     return appearance
 end
@@ -88,7 +86,7 @@ AddEventHandler("esx_skin:openSaveableMenu", function()
 end)
 
 RegisterNetEvent("skinchanger:getSkin", function(cb)
-    lib.callback('tj_appearance:getAppearance', false, function(appearance)
+    lib.callback('bakery_appearance:getAppearance', false, function(appearance)
         cb(appearance)
         Framework.CachePed()
     end)
@@ -96,48 +94,35 @@ end)
 
 
 RegisterNetEvent("skinchanger:loadSkin", function(skin, cb)
-    print('Requesting appearance data...')
-
-    lib.callback('tj_appearance:getAppearance', false, function(appearance)
+    lib.callback('bakery_appearance:getAppearance', false, function(appearance)
         if appearance then
             SetPedAppearance(cache.ped, appearance)
-            Framework.CachePed()
         elseif skin and next(skin) ~= nil then
             if skin.sex then
-                SetModel(cache.ped, skin.sex == 1 and 'mp_f_freemode_01' or 'mp_m_freemode_01')
+                SetModel(cache.ped, skin.sex == 1 and MODELS.FEMALE or MODELS.MALE)
             end
             local convertedAppearance = SkinchangerToAppearance(skin)
-
             SetPedAppearance(cache.ped, convertedAppearance)
-            Framework.CachePed()
-
             convertedAppearance.menuType = 'all'
-
-            lib.callback('tj_appearance:saveAppearance', false, function(saved)
-                if saved then
-                    DebugPrint('Appearance saved successfully after loading skinchanger skin.')
-                else
-                    DebugPrint('Failed to save appearance after loading skinchanger skin.')
-                end
+            
+            lib.callback('bakery_appearance:saveAppearance', false, function(saved)
+                DebugPrint(saved and 'Appearance saved successfully.' or 'Failed to save appearance.')
+                if cb then cb() end
             end, convertedAppearance)
-
-
+            return
         else
             print('No skin data provided to skinchanger:loadSkin')
-            local model = GetHashKey("mp_m_freemode_01")
-            SetModel(cache.ped, model)
-            Framework.CachePed()
+            SetModel(cache.ped, MODELS.MALE)
         end
+        Framework.CachePed()
+        if cb then cb() end
     end)
-
-    if cb then cb() else return end
 end)
 
 
 
 AddEventHandler("skinchanger:loadDefaultModel", function(ismale)
-    local model = ismale and GetHashKey("mp_m_freemode_01") or GetHashKey("mp_f_freemode_01")
-    SetModel(cache.ped, model)
+    SetModel(cache.ped, ismale and MODELS.MALE or MODELS.FEMALE)
 end)
 
 
@@ -148,7 +133,7 @@ local export = '__cfx_export_skinchanger_'
 
 local SkinchangerExports = {
     { 'GetSkin', function()
-        lib.callback('tj_appearance:getAppearance', false, function(appearance)
+        lib.callback('bakery_appearance:getAppearance', false, function(appearance)
             return appearance
         end)
     end },
