@@ -14,7 +14,7 @@ const ModelsTab = lazy(() => import('./admin/ModelsTab').then(mod => ({ default:
 const RestrictionsTab = lazy(() => import('./admin/RestrictionsTab').then(mod => ({ default: mod.RestrictionsTab })));
 const ZonesTab = lazy(() => import('./admin/ZonesTab').then(mod => ({ default: mod.ZonesTab })));
 const OutfitsTab = lazy(() => import('./admin/OutfitsTab').then(mod => ({ default: mod.OutfitsTab })));
-const InitialClothesTab = lazy(() => import('./admin/InitialClothesTab').then(mod => ({ default: mod.InitialClothesTab })));
+const SettingsTab = lazy(() => import('./admin/SettingsTab').then(mod => ({ default: mod.SettingsTab })));
 
 interface ThemeConfig {
   primaryColor: string; // Active tab color
@@ -700,156 +700,27 @@ export const AdminMenu: FC = () => {
           </Tabs.Panel>
 
           <Tabs.Panel value="settings" pt="xl">
-            <Stack spacing="md">
-              <Group grow>
-                <Checkbox
-                  label={locale.ADMIN_USE_TARGET || 'Use ox_target for peds'}
-                  checked={appearanceSettings.useTarget}
-                  onChange={(e) => setAppearanceSettings({ ...appearanceSettings, useTarget: e.currentTarget.checked })}
-                />
-                <Checkbox
-                  label={locale.ADMIN_ENABLE_PEDS || 'Enable peds for shops'}
-                  checked={appearanceSettings.enablePedsForShops}
-                  onChange={(e) => setAppearanceSettings({ ...appearanceSettings, enablePedsForShops: e.currentTarget.checked })}
-                />
-                <Checkbox
-                  label={locale.ADMIN_CHARGE_PER_TATTOO || 'Charge per tattoo'}
-                  checked={appearanceSettings.chargePerTattoo}
-                  onChange={(e) => setAppearanceSettings({ ...appearanceSettings, chargePerTattoo: e.currentTarget.checked })}
-                />
-              </Group>
-
-              <Divider label={locale.ADMIN_PRICES || 'Prices'} labelPosition="left" />
-              <Group grow spacing="xs">
-                {(['clothing','barber','tattoo','surgeon'] as const).map((key) => (
-                  <NumberInput
-                    key={key}
-                    label={key.charAt(0).toUpperCase() + key.slice(1)}
-                    value={appearanceSettings.prices?.[key] ?? 0}
-                    min={0}
-                    onChange={(val) => {
-                      setAppearanceSettings({
-                        ...appearanceSettings,
-                        prices: {
-                          ...appearanceSettings.prices,
-                          [key]: val as number
-                        }
-                      });
-                    }}
-                    size="xs"
-                  />
-                ))}
-              </Group>
-
-              <Divider label={locale.ADMIN_BLIP_DEFAULTS || 'Blip Defaults'} labelPosition="left" />
-              <Group spacing="xs" align="flex-start">
-                {['clothing','barber','tattoo','surgeon','outfits'].map((key) => {
-                  const blip = appearanceSettings.blips?.[key] || {};
-                  return (
-                    <Box key={key} p="xs" style={{ border: '1px solid rgba(255,255,255,0.05)', borderRadius: 6, flex: 1, minWidth: 160 }}>
-                      <Text c="white" size="xs" fw={600} tt="capitalize" mb="xs">{key}</Text>
-                      <Stack spacing={4}>
-                        <NumberInput
-                          label="Sprite"
-                          value={blip.sprite ?? 0}
-                          onChange={(val) => {
-                            setAppearanceSettings({
-                              ...appearanceSettings,
-                              blips: {
-                                ...appearanceSettings.blips,
-                                [key]: { ...blip, sprite: val as number }
-                              }
-                            });
-                          }}
-                          size="xs"
-                          hideControls
-                        />
-                        <NumberInput
-                          label="Color"
-                          value={blip.color ?? 0}
-                          onChange={(val) => {
-                            setAppearanceSettings({
-                              ...appearanceSettings,
-                              blips: {
-                                ...appearanceSettings.blips,
-                                [key]: { ...blip, color: val as number }
-                              }
-                            });
-                          }}
-                          size="xs"
-                          hideControls
-                        />
-                        <NumberInput
-                          label="Scale"
-                          value={blip.scale ?? 0.7}
-                          step={0.1}
-                          precision={1}
-                          min={0}
-                          max={2}
-                          onChange={(val) => {
-                            setAppearanceSettings({
-                              ...appearanceSettings,
-                              blips: {
-                                ...appearanceSettings.blips,
-                                [key]: { ...blip, scale: val as number }
-                              }
-                            });
-                          }}
-                          size="xs"
-                          hideControls
-                        />
-                        <TextInput
-                          label="Name"
-                          value={blip.name || ''}
-                          onChange={(e) => {
-                            setAppearanceSettings({
-                              ...appearanceSettings,
-                              blips: {
-                                ...appearanceSettings.blips,
-                                [key]: { ...blip, name: e.target.value }
-                              }
-                            });
-                          }}
-                          size="xs"
-                        />
-                      </Stack>
-                    </Box>
-                  );
-                })}
-              </Group>
-
-              <Divider label={locale.ADMIN_INITIAL_CLOTHES_TITLE || 'Initial Player Clothes'} labelPosition="left" />
-              <Suspense fallback={<Loader />}>
-                <InitialClothesTab
+            <Suspense
+                fallback={
+                  <Box style={{ padding: '3rem', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
+                    <Loader color="blue" size="md" />
+                    <Text c="dimmed" mt="md" size="sm">{locale.ADMIN_MSG_LOADING_SETTINGS || 'Loading settings...'}</Text>
+                  </Box>
+                }
+              >
+                <SettingsTab
+                  appearanceSettings={appearanceSettings}
+                  setAppearanceSettings={setAppearanceSettings}
                   initialClothes={initialClothes}
                   setInitialClothes={setInitialClothes}
                   locale={locale}
+                  isLoading={isLoadingTab && activeTab === 'settings'}
                 />
-              </Suspense>
-
-              <Group position="right">
-                <Button
-                  onClick={() => {
-                    TriggerNuiCallback('saveAppearanceSettings', {
-                      ...appearanceSettings,
-                      initialClothes
-                    });
-                  }}
-                >
-                  {locale.ADMIN_SAVE_SETTINGS || 'Save Settings'}
-                </Button>
-              </Group>
-            </Stack>
+            </Suspense>
           </Tabs.Panel>
 
           <Tabs.Panel value="restrictions" pt="xl">
-            <Box style={{ position: 'relative' }}>
-              {isLoadingTab && activeTab === 'restrictions' && (
-                <Overlay blur={2} center>
-                  <Loader color="blue" />
-                </Overlay>
-              )}
-              <Suspense
+            <Suspense
                 fallback={
                   <Box style={{ padding: '3rem', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
                     <Loader color="blue" size="md" />
@@ -869,18 +740,11 @@ export const AdminMenu: FC = () => {
                   locale={locale}
                   categoryOptionsByPart={categoryOptionsByPart}
                 />
-              </Suspense>
-            </Box>
+            </Suspense>
           </Tabs.Panel>
 
           <Tabs.Panel value="models" pt="xl">
-            <Box style={{ position: 'relative' }}>
-              {isLoadingTab && activeTab === 'models' && (
-                <Overlay blur={2} center>
-                  <Loader color="blue" />
-                </Overlay>
-              )}
-              <Suspense
+            <Suspense
                 fallback={
                   <Box style={{ padding: '3rem', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
                     <Loader color="blue" size="md" />
@@ -899,18 +763,11 @@ export const AdminMenu: FC = () => {
                   isReady={true}
                   locale={locale}
                 />
-              </Suspense>
-            </Box>
+            </Suspense>
           </Tabs.Panel>
 
           <Tabs.Panel value="tattoos" pt="xl">
-            <Box style={{ position: 'relative' }}>
-              {isLoadingTab && activeTab === 'tattoos' && (
-                <Overlay blur={2} center>
-                  <Loader color="blue" />
-                </Overlay>
-              )}
-              <Suspense
+            <Suspense
                 fallback={
                   <Box style={{ padding: '3rem', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
                     <Loader color="blue" size="md" />
@@ -928,8 +785,7 @@ export const AdminMenu: FC = () => {
                   locale={locale}
                   tattooZoneOptions={tattooZoneOptions}
                 />
-              </Suspense>
-            </Box>
+            </Suspense>
           </Tabs.Panel>
 
           <Tabs.Panel value="zones" pt="xl">

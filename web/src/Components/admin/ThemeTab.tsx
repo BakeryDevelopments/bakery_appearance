@@ -17,14 +17,6 @@ interface ThemeTabProps {
 }
 
 export const ThemeTab: FC<ThemeTabProps> = ({ theme, setTheme, onSave, isLoading, isReady }) => {
-  if (isLoading || !isReady) {
-    return (
-      <Box style={{ padding: '3rem', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
-        <Loader color="blue" size="md" />
-        <Text c="dimmed" mt="md" size="sm">Loading theme settings...</Text>
-      </Box>
-    );
-  }
 
   return (
     <Stack spacing="xl">
