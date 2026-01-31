@@ -43,7 +43,7 @@ interface ClothingRestriction {
 interface Zone {
   id?: number;
   type: 'clothing' | 'barber' | 'tattoo' | 'surgeon' | 'outfits';
-  coords: { x: number; y: number; z: number; heading?: number };
+  coords: { x: number; y: number; z: number; w?: number };
   polyzone?: { x: number; y: number }[];
   showBlip: boolean;
   blipSprite?: number;
@@ -59,6 +59,7 @@ interface Zone {
 interface AppearanceSettings {
   useTarget: boolean;
   enablePedsForShops: boolean;
+  enableRadialZone: boolean;
   chargePerTattoo: boolean;
   blips: Record<string, { sprite?: number; color?: number; scale?: number; name?: string }>;
   prices: {
@@ -119,7 +120,7 @@ export const AdminMenu: FC = () => {
   const [zones, setZones] = useState<Zone[]>([]);
   const [addZoneModalOpen, setAddZoneModalOpen] = useState(false);
   const [editingZone, setEditingZone] = useState<Zone | null>(null);
-  const [capturedCoords, setCapturedCoords] = useState<{ x: number; y: number; z: number } | null>(null);
+  const [capturedCoords, setCapturedCoords] = useState<{ x: number; y: number; z: number; w?: number } | null>(null);
   const [capturedPolyzonePoints, setCapturedPolyzonePoints] = useState<{ x: number; y: number }[] | null>(null);
 
   // Outfits State
@@ -135,6 +136,7 @@ export const AdminMenu: FC = () => {
   const [appearanceSettings, setAppearanceSettings] = useState<AppearanceSettings>({
     useTarget: true,
     enablePedsForShops: true,
+    enableRadialZone: false,
     chargePerTattoo: false,
     prices: {
       clothing: 0,
@@ -226,7 +228,7 @@ export const AdminMenu: FC = () => {
         setDataLoadProgress(prev => ({ ...prev, restrictions: true }));
       });
     } else {
-      console.warn('Received non-array restrictions data:', data);
+      //console.warn('Received non-array restrictions data:', data);
       setRestrictions([]);
       setDataLoadProgress(prev => ({ ...prev, restrictions: true }));
     }
@@ -333,21 +335,19 @@ export const AdminMenu: FC = () => {
   });
 
   HandleNuiMessage<{ points: { x: number; y: number }[] }>('polyzonePointsCaptured', (data) => {
-    console.log('Admin Received polyzone points:', data);  
     if (!data || !data.points) return;
     // Multi-point capture finished, restore UI
     setCapturedPolyzonePoints(data.points);
-    setCapturedCoords(null);
+    // setCapturedCoords(null);
     setCaptureActive(false);
     setIsVisible(true);
   });
 
-  HandleNuiMessage<{ coords: { x: number; y: number; z: number } }>('singlePointCaptured', (data) => {
-    console.log('Admin Received single point coords:', data);
+  HandleNuiMessage<{ coords: { x: number; y: number; z: number; w?: number } }>('singlePointCaptured', (data) => {
     if (!data || !data.coords) return;
     // Single-point capture finished, restore UI
     setCapturedCoords(data.coords);
-    setCapturedPolyzonePoints(null);
+    // setCapturedPolyzonePoints(null);
     setCaptureActive(false);
     setIsVisible(true);
   });
@@ -362,9 +362,7 @@ export const AdminMenu: FC = () => {
   };
 
   const handleStartCapture = (multiPoint: boolean) => {
-    // Clear previous captures
-    setCapturedCoords(null);
-    setCapturedPolyzonePoints(null);
+    // Only clear the capture type we're about to use, preserve the other
     setIsVisible(false);
     setCaptureActive(true);
     TriggerNuiCallback('startZoneRaycast', { multiPoint });

@@ -6,7 +6,7 @@ import { TriggerNuiCallback } from '../../Utils/TriggerNuiCallback';
 interface Zone {
   id?: number;
   type: 'clothing' | 'barber' | 'tattoo' | 'surgeon' | 'outfits';
-  coords: { x: number; y: number; z: number; heading?: number };
+  coords: { x: number; y: number; z: number; w?: number };
   polyzone?: { x: number; y: number }[];
   showBlip: boolean;
   blipSprite?: number;
@@ -22,6 +22,7 @@ interface Zone {
 interface AppearanceSettings {
   useTarget: boolean;
   enablePedsForShops: boolean;
+  enableRadialZone: boolean;
   blips: Record<string, { sprite?: number; color?: number; scale?: number; name?: string }>;
 }
 
@@ -33,7 +34,7 @@ interface AddZoneModalProps {
   appearanceSettings: AppearanceSettings;
   isCapturing: boolean;
   onStartCapture: (multiPoint: boolean) => void;
-  capturedCoords?: { x: number; y: number; z: number } | null;
+  capturedCoords?: { x: number; y: number; z: number; w?: number } | null;
   capturedPolyzonePoints?: { x: number; y: number }[] | null;
   onClearCaptureData?: () => void;
 }
@@ -65,25 +66,19 @@ export const AddZoneModal: FC<AddZoneModalProps> = ({
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    if (capturedPolyzonePoints && capturedPolyzonePoints.length > 0) {
+    if (capturedPolyzonePoints && capturedPolyzonePoints.length > 0 && !polyzonePointsInput) {
       setPolyzonePointsInput(JSON.stringify(capturedPolyzonePoints));
     }
-  }, [capturedPolyzonePoints]);
+  }, [capturedPolyzonePoints, polyzonePointsInput]);
 
   useEffect(() => {
-    if (capturedCoords) {
-      const { x, y, z } = capturedCoords;
-      console.log('Captured Coords:', x, y, z);
-
-      const string = `${(x ?? 0).toFixed(2)}, ${(y ?? 0).toFixed(2)}, ${(z ?? 0).toFixed(2)}, 0`;
-      console.log('Setting Coords Input to:', string);
+    if (capturedCoords && !coordsInput) {
+      const { x, y, z, w } = capturedCoords;
+      const string = `${(x ?? 0).toFixed(2)}, ${(y ?? 0).toFixed(2)}, ${(z ?? 0).toFixed(2)}, ${(w ?? 0).toFixed(3)}`;
       setCoordsInput(string);
     }
-  }, [capturedCoords]);
+  }, [capturedCoords, coordsInput]);
 
-  useEffect(() => {
-  console.log('Coords Input updated:', coordsInput);
-}, [coordsInput]);
 
   // Handle single point capture for coordinates
   
@@ -117,7 +112,7 @@ export const AddZoneModal: FC<AddZoneModalProps> = ({
     setCoordsInput(
       `${(zone.coords.x ?? 0).toFixed(2)}, ${(zone.coords.y ?? 0).toFixed(2)}, ${(
         zone.coords.z ?? 0
-      ).toFixed(2)}, ${zone.coords.heading ?? 0}`
+      ).toFixed(2)}, ${zone.coords.w ?? 0}`
     );
     setPolyzonePointsInput(zone.polyzone ? JSON.stringify(zone.polyzone) : '');
     setZoneShowBlip(zone.showBlip ?? true);
@@ -137,7 +132,9 @@ export const AddZoneModal: FC<AddZoneModalProps> = ({
     }
 
     if (editingZone) {
-      loadZoneData(editingZone);
+      if (!polyzonePointsInput && !coordsInput && !initialized) {
+        loadZoneData(editingZone);
+      }
       setInitialized(true);
       return;
     }
@@ -157,7 +154,7 @@ export const AddZoneModal: FC<AddZoneModalProps> = ({
       setZoneBlipName(defaults.name ?? '');
       setInitialized(true);
     }
-  }, [opened, editingZone, capturedCoords, capturedPolyzonePoints, initialized, appearanceSettings]);
+  }, [opened, editingZone, initialized, appearanceSettings]);
 
   // When zone type changes on a new zone, apply blip defaults for that type
   useEffect(() => {
@@ -176,7 +173,7 @@ export const AddZoneModal: FC<AddZoneModalProps> = ({
       return;
     }
 
-    const coords = { x: parts[0], y: parts[1], z: parts[2], heading: parts[3] || 0 };
+    const coords = { x: parts[0], y: parts[1], z: parts[2], w: parts[3] || 0 };
 
     // Check if coords are all zero
     if (coords.x === 0 && coords.y === 0 && coords.z === 0) {

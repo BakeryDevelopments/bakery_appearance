@@ -6,7 +6,7 @@ import { TriggerNuiCallback } from '../../Utils/TriggerNuiCallback';
 interface Zone {
   id?: number;
   type: 'clothing' | 'barber' | 'tattoo' | 'surgeon' | 'outfits';
-  coords: { x: number; y: number; z: number; heading?: number };
+  coords: { x: number; y: number; z: number; w?: number };
   polyzone?: { x: number; y: number }[];
   showBlip: boolean;
   blipSprite?: number;
@@ -128,9 +128,9 @@ export const ZonesTab: FC<ZonesTabProps> = ({
                         <Text c="dimmed" size="xs">
                           <span style={{ fontWeight: 500 }}>Coords:</span> {zone.coords.x.toFixed(2)}, {zone.coords.y.toFixed(2)}, {zone.coords.z.toFixed(2)}
                         </Text>
-                        {zone.coords.heading !== undefined && zone.coords.heading !== 0 && (
+                        {zone.coords.w !== undefined && zone.coords.w !== 0 && (
                           <Text c="dimmed" size="xs">
-                            <span style={{ fontWeight: 500 }}>Heading:</span> {zone.coords.heading.toFixed(1)}°
+                            <span style={{ fontWeight: 500 }}>Heading:</span> {zone.coords.w.toFixed(1)}°
                           </Text>
                         )}
                       </Group>
@@ -144,7 +144,7 @@ export const ZonesTab: FC<ZonesTabProps> = ({
                             x: zone.coords.x,
                             y: zone.coords.y,
                             z: zone.coords.z,
-                            heading: zone.coords.heading || 0
+                            heading: zone.coords.w || 0
                           });
                         }}
                       >
