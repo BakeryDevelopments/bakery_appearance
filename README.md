@@ -4,8 +4,11 @@ An advanced appearance and clothing customization menu for FiveM.
 
 ## Preview
 
-![Appearance Menu](docs/images/appearance-menu.png)
-![Outfit Manager](docs/images/outfit-manager.png)
+![FiveM_b3570_GTAProcess_hFS4yBXrwm](https://github.com/user-attachments/assets/4868955e-1afe-4072-bd8e-83e0d8e97226)
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/0ea55141-bdb2-47d6-8dd2-ef40fbe1fc88" />
+
+
+
 
 ## Website & Community
 
@@ -17,6 +20,13 @@ An advanced appearance and clothing customization menu for FiveM.
 **The Team Behind Bakery Appearance:**
 - TechJess#0 - Lead Developer
 - Contributors & Community
+
+**The OC's - Original Creators**
+- The Byte Labs Team - Discord: Byte Labs
+ - Master Mind - Discord: mastermind8816
+ - Complex - Discord: complexza
+ - DevX - Discord: devx
+ - DeeRock - Discord: deerockuk
 
 ---
 
