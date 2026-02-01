@@ -14,7 +14,7 @@ interface ClothingConfig {
 interface AppearanceSettings {
   useTarget: boolean;
   enablePedsForShops: boolean;
-  enableRadialZone: boolean;
+  useRadialMenu: boolean;
   chargePerTattoo: boolean;
   blips: Record<string, { sprite?: number; color?: number; scale?: number; name?: string }>;
   prices: {
@@ -163,8 +163,8 @@ export const SettingsTab: FC<SettingsTabProps> = ({
     setLocalSettings({ ...localSettings, enablePedsForShops: e.currentTarget.checked });
   }, [localSettings]);
 
-  const handleEnableRadialZoneChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setLocalSettings({ ...localSettings, enableRadialZone: e.currentTarget.checked });
+  const handleUseRadialMenuChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setLocalSettings({ ...localSettings, useRadialMenu: e.currentTarget.checked });
   }, [localSettings]);
 
   const handleChargePerTattooChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -208,9 +208,9 @@ export const SettingsTab: FC<SettingsTabProps> = ({
           onChange={handleEnablePedsChange}
         />
         <Checkbox
-          label={locale.ADMIN_ENABLE_RADIAL_ZONE || 'Enable radial menu for zones'}
-          checked={localSettings.enableRadialZone}
-          onChange={handleEnableRadialZoneChange}
+          label={locale.ADMIN_USE_RADIAL_MENU || 'Use radial menu for zones'}
+          checked={localSettings.useRadialMenu}
+          onChange={handleUseRadialMenuChange}
         />
         <Checkbox
           label={locale.ADMIN_CHARGE_PER_TATTOO || 'Charge per tattoo'}

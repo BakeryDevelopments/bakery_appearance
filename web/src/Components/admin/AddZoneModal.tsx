@@ -22,7 +22,7 @@ interface Zone {
 interface AppearanceSettings {
   useTarget: boolean;
   enablePedsForShops: boolean;
-  enableRadialZone: boolean;
+  useRadialMenu: boolean;
   blips: Record<string, { sprite?: number; color?: number; scale?: number; name?: string }>;
 }
 

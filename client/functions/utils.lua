@@ -23,20 +23,13 @@ end
 
 -- Format zone label with menu type and price
 function getZoneLabel(zoneType)
+    local settings = CacheAPI.getAppearanceSettings() or {}
     local menuType = zoneType or 'clothing'
-    local typeNames = {
-        clothing = 'Clothing Store',
-        barber = 'Barber Shop',
-        tattoo = 'Tattoo Parlor',
-        surgeon = 'Surgeon',
-        outfits = 'Outfits'
-    }
-
-    local typeName = typeNames[menuType] or 'Appearance'
-    local price = (Config.Prices and Config.Prices[menuType]) or 0
+    local typeName = (settings.blips and settings.blips[menuType] and settings.blips[menuType].name) or 'Appearance'
+    local price = (settings.prices and settings.prices[menuType]) or 0
 
     if price > 0 then
-        return string.format('Open %s ($%d)', typeName, price)
+        return string.format('Open %s - ($%d)', typeName, price)
     else
         return string.format('Open %s', typeName)
     end

@@ -220,14 +220,18 @@ local function StartZoneRaycastMode(multiPoint)
   _zoneStartedAt = GetGameTimer()
   _lastPointAddTime = 0
 
-  local cam = CreateCam("DEFAULT_SCRIPTED_CAMERA", true)
-  local pedPos = GetEntityCoords(cache.ped)
-  SetCamCoord(cam, pedPos.x, pedPos.y, pedPos.z + 1.0)
-  SetCamActive(cam, true)
-  RenderScriptCams(true, false, 0, true, true)
-  FreezeEntityPosition(cache.ped, true)
+  local cam = nil
+  if _zoneMultiPointMode then
+    cam = CreateCam("DEFAULT_SCRIPTED_CAMERA", true)
+    local pedPos = GetEntityCoords(cache.ped)
+    SetCamCoord(cam, pedPos.x, pedPos.y, pedPos.z + 1.0)
+    SetCamActive(cam, true)
+    RenderScriptCams(true, false, 0, true, true)
+    FreezeEntityPosition(cache.ped, true)
+  end
+
   SendNUIMessage({ action = 'zoneCaptureActive', data = { active = true } })
-  
+
   -- Show TextUI instructions
   local locale = CacheAPI.getLocale()
   if _zoneMultiPointMode then
@@ -235,25 +239,26 @@ local function StartZoneRaycastMode(multiPoint)
   else
     lib.showTextUI(locale.ZONE_SINGLEPOINT_INSTRUCTIONS)
   end
+
   CreateThread(function()
     while _zoneNoclipActive do
-      HandleFreecamMovement(cam)
-      
-      -- Tick raycast and get result
-      local hit = TickRaycast()
-      
-      if hit then
-        _zoneRaycastPoint = hit
-        DrawRayLine(hit)
-      end
-      
-      DisableControlAction(0, 24, true) -- Disable attack
-      DisableControlAction(0, 25, true) -- Disable aim
-
       if _zoneMultiPointMode then
+        HandleFreecamMovement(cam)
+
+        -- Tick raycast and get result
+        local hit = TickRaycast()
+
+        if hit then
+          _zoneRaycastPoint = hit
+          DrawRayLine(hit)
+        end
+
+        DisableControlAction(0, 24, true) -- Disable attack
+        DisableControlAction(0, 25, true) -- Disable aim
+
         -- Draw the polyzone visualization with current points
         DrawPolyZoneVisualization(_zoneMultiPoints)
-        
+
         -- Multi-point mode: E to add point, X to remove last, Backspace to finish
         if IsControlJustPressed(0, 38) then -- E key
           local currentTime = GetGameTimer()
@@ -279,13 +284,16 @@ local function StartZoneRaycastMode(multiPoint)
           break
         end
       else
-        -- Single-point mode: E to confirm, Backspace to cancel
+        -- Single-point mode: E to capture current player position/heading, Backspace to cancel
         if IsControlJustPressed(0, 38) then -- E key
-          if hit then
-            StopZoneRaycastMode()
-            SendNUIMessage({ action = 'singlePointCaptured', data = { coords = { x = hit.x, y = hit.y, z = hit.z } } })
-            break
-          end
+          local pedPos = GetEntityCoords(cache.ped)
+          local heading = GetEntityHeading(cache.ped)
+          StopZoneRaycastMode()
+          SendNUIMessage({
+            action = 'singlePointCaptured',
+            data = { coords = { x = pedPos.x, y = pedPos.y, z = pedPos.z, w = heading } }
+          })
+          break
         end
         if IsControlJustPressed(0, 177) then -- Backspace to cancel
           StopZoneRaycastMode()
@@ -294,11 +302,14 @@ local function StartZoneRaycastMode(multiPoint)
       end
       Wait(0)
     end
-    -- Disable freecam and restore normal camera
-    RenderScriptCams(false, false, 0, true, false)
-    DestroyCam(cam, false)
-    -- Restore player and UI focus
-    FreezeEntityPosition(cache.ped, false)
+
+    -- Disable freecam and restore normal camera (multi-point only)
+    if cam then
+      RenderScriptCams(false, false, 0, true, false)
+      DestroyCam(cam, false)
+      FreezeEntityPosition(cache.ped, false)
+    end
+
     -- Notify UI capture finished
     SendNUIMessage({ action = 'zoneCaptureActive', data = { active = false } })
   end)

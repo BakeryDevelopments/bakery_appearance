@@ -26,20 +26,6 @@ MySQL.ready(function()
             updated_at DATETIME NOT NULL
         )
     ]])
-
-    -- Create appearance_job_outfits table if it doesn't exist
-    MySQL.query([[
-        CREATE TABLE IF NOT EXISTS appearance_job_outfits (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            job VARCHAR(50),
-            gang VARCHAR(50),
-            gender VARCHAR(10) NOT NULL,
-            outfit_name VARCHAR(100) NOT NULL,
-            outfit_data LONGTEXT NOT NULL,
-            created_at DATETIME NOT NULL,
-            updated_at DATETIME NOT NULL
-        )
-    ]])
 end)
 
 --- Save player appearance to database
@@ -126,18 +112,9 @@ function Database.SaveOutfit(citizenid, job, gang, gender, outfitName, outfitDat
         ]], {citizenid, gender, outfitName, json.encode(outfitData), shareCode})
 
         return result ~= nil, shareCode
-    else
-        -- Save to job/gang outfits table (no share codes for job outfits)
-        local success = MySQL.query.await([[
-            INSERT INTO appearance_job_outfits (job, gang, gender, outfit_name, outfit_data, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, NOW(), NOW())
-            ON DUPLICATE KEY UPDATE
-                outfit_data = VALUES(outfit_data),
-                updated_at = NOW()
-        ]], {job or '', gang or '', gender, outfitName, json.encode(outfitData)})
-
-        return success ~= nil, nil
     end
+
+    return false, nil
 end
 
 --- Get player's personal outfits
@@ -188,61 +165,6 @@ function Database.RenamePersonalOutfit(citizenid, outfitId, newName, gender)
     ]], {newName, citizenid, outfitId, gender})
 
     return result and result.affectedRows > 0
-end
-
---- Get job/gang outfits
----@param job string|nil Job name
----@param gang string|nil Gang name
----@param gender string Gender filter (male/female)
----@return table outfits Array of outfit records
-function Database.GetJobGangOutfits(job, gang, gender)
-    local result = MySQL.query.await([[
-        SELECT id, outfit_name, outfit_data, job, gang, created_at, updated_at
-        FROM appearance_job_outfits
-        WHERE (job = ? OR gang = ?) AND gender = ?
-        ORDER BY created_at DESC
-    ]], {job or '', gang or '', gender})
-
-    if not result then
-        return {}
-    end
-    
-    -- Decode JSON outfit data
-    for i = 1, #result do
-        if result[i].outfit_data then
-            result[i].outfit_data = json.decode(result[i].outfit_data)
-        end
-    end
-
-    return result
-end
-
---- Get all outfits for a player (personal + job/gang)
----@param citizenid string Player's citizen ID
----@param job string|nil Player's current job
----@param gang string|nil Player's current gang
----@param gender string Gender filter (male/female)
----@return table outfits Combined array of personal and job/gang outfits
-function Database.GetAllOutfits(citizenid, job, gang, gender)
-    local personalOutfits = Database.GetPersonalOutfits(citizenid, gender)
-    local jobGangOutfits = Database.GetJobGangOutfits(job, gang, gender)
-
-    -- Merge arrays
-    local allOutfits = {}
-    
-    -- Add personal outfits with type flag
-    for i = 1, #personalOutfits do
-        personalOutfits[i].isPersonal = true
-        table.insert(allOutfits, personalOutfits[i])
-    end
-
-    -- Add job/gang outfits with type flag
-    for i = 1, #jobGangOutfits do
-        jobGangOutfits[i].isPersonal = false
-        table.insert(allOutfits, jobGangOutfits[i])
-    end
-
-    return allOutfits
 end
 
 --- Delete a personal outfit

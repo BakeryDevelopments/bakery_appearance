@@ -34,7 +34,8 @@ local function createZonePed(zone)
     lib.requestModel(modelHash, 10000)
 
     -- Create ped
-    local ped = CreatePed(4, modelHash, coords.x, coords.y, coords.z - 1.0, coords.heading or 0.0, false, true)
+
+    local ped = CreatePed(4, modelHash, coords.x, coords.y, coords.z - 1.0, coords.w or 0.0, false, true)
     SetEntityAsMissionEntity(ped, true, true)
     SetPedFleeAttributes(ped, 0, false)
     SetBlockingOfNonTemporaryEvents(ped, true)
@@ -80,6 +81,7 @@ local function createPolyZone(zone)
         table.insert(points, vec3(point.x, point.y, zone.coords and zone.coords.z or 0.0))
     end
 
+    local canuseradial = shouldUseRadialMenu()
     -- Create polyzone using ox_lib
     local poly = lib.zones.poly({
         name = 'bakery_appearance_zone_' .. zone.id,
@@ -89,13 +91,23 @@ local function createPolyZone(zone)
         onEnter = function()
             if not hasAccess(zone) then return end
 
-            lib.showTextUI('[E] ' .. getZoneLabel(zone.type))
+            local prompt = canuseradial and getZoneLabel(zone.type) or '[E] ' .. getZoneLabel(zone.type)
+
+            if canuseradial then
+                addtoradial(zone)
+            end
+
+            lib.showTextUI(prompt)
         end,
         onExit = function()
             lib.hideTextUI()
+
+            if canuseradial then
+                removefromradial(zone)
+            end
         end,
         inside = function()
-            if IsControlJustPressed(0, 38) then -- E key
+            if not canuseradial and IsControlJustPressed(0, 38) then -- E key (only if not using radial menu)
                 if hasAccess(zone) then
                     lib.hideTextUI()
                     OpenAppearanceMenu(zone)
@@ -134,9 +146,12 @@ CreateThread(function()
                     )
 
                     if distance < 2.0 then
-                        lib.showTextUI('[E] ' .. getZoneLabel(marker.zone.type))
+                        local settings = CacheAPI.getAppearanceSettings()
+                        local prompt = settings.useRadialMenu and getZoneLabel(marker.zone.type) or
+                        '[E] ' .. getZoneLabel(marker.zone.type)
+                        lib.showTextUI(prompt)
 
-                        if IsControlJustPressed(0, 38) then -- E key
+                        if not settings.useRadialMenu and IsControlJustPressed(0, 38) then -- E key (only if not using radial menu)
                             lib.hideTextUI()
                             openAppearanceMenu(marker.zone)
                         end

@@ -59,7 +59,7 @@ interface Zone {
 interface AppearanceSettings {
   useTarget: boolean;
   enablePedsForShops: boolean;
-  enableRadialZone: boolean;
+  useRadialMenu: boolean;
   chargePerTattoo: boolean;
   blips: Record<string, { sprite?: number; color?: number; scale?: number; name?: string }>;
   prices: {
@@ -136,7 +136,7 @@ export const AdminMenu: FC = () => {
   const [appearanceSettings, setAppearanceSettings] = useState<AppearanceSettings>({
     useTarget: true,
     enablePedsForShops: true,
-    enableRadialZone: false,
+    useRadialMenu: false,
     chargePerTattoo: false,
     prices: {
       clothing: 0,

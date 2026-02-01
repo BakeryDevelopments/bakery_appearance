@@ -25,7 +25,17 @@ ServerCache = {
     shopSettings = {},
     shopConfigs = {},
     restrictions = {},
-    appearanceSettings = {},
+    appearanceSettings = {
+        useTarget = false,
+        enablePedsForShops = false,
+        blips = {},
+        prices = {
+            clothing = 0,
+            barber = 0,
+            tattoo = 0,
+            surgeon = 0
+        }
+    },
 } 
 
 local TattooZones = {
@@ -190,23 +200,18 @@ end
 -- Load appearance settings (useTarget, blip defaults, ped toggles)
 local function LoadAppearanceSettingsCache()
     local settingsFile = LoadResourceFile(GetCurrentResourceName(), 'shared/data/appearance_settings.json')
-    local defaults = {
-        useTarget = Config.UseTarget ~= false,
-        enablePedsForShops = Config.EnablePedsForShops ~= false,
-        blips = Config.Blips or {}
-    }
 
     if settingsFile then
         local decoded = json.decode(settingsFile) or {}
-        ServerCache.appearanceSettings = defaults
 
         if type(decoded) == 'table' then
-            ServerCache.appearanceSettings.useTarget = decoded.useTarget ~= nil and decoded.useTarget or defaults.useTarget
-            ServerCache.appearanceSettings.enablePedsForShops = decoded.enablePedsForShops ~= nil and decoded.enablePedsForShops or defaults.enablePedsForShops
-            ServerCache.appearanceSettings.blips = decoded.blips or defaults.blips
+            ServerCache.appearanceSettings.useTarget = decoded.useTarget ~= nil and decoded.useTarget or false
+            ServerCache.appearanceSettings.enablePedsForShops = decoded.enablePedsForShops ~= nil and decoded.enablePedsForShops or false
+            ServerCache.appearanceSettings.useRadialMenu = decoded.useRadialMenu ~= nil and decoded.useRadialMenu or false
+            ServerCache.appearanceSettings.blips = decoded.blips or {}
+            ServerCache.appearanceSettings.prices = decoded.prices or {}
+
         end
-    else
-        ServerCache.appearanceSettings = defaults
     end
 end
 
@@ -295,10 +300,11 @@ lib.callback.register('bakery_appearance:admin:saveAppearanceSettings', function
 
     -- Merge with defaults to avoid nils
     local merged = {
-        useTarget = settings.useTarget ~= nil and settings.useTarget or (Config.UseTarget ~= false),
-        enablePedsForShops = settings.enablePedsForShops ~= nil and settings.enablePedsForShops or (Config.EnablePedsForShops ~= false),
+        useTarget = settings.useTarget ~= nil and settings.useTarget or false,
+        enablePedsForShops = settings.enablePedsForShops ~= nil and settings.enablePedsForShops or false,
+        useRadialMenu = (settings.useRadialMenu) ~= nil and (settings.useRadialMenu) or false,
         chargePerTattoo = settings.chargePerTattoo ~= nil and settings.chargePerTattoo or false,
-        blips = settings.blips or Config.Blips or {},
+        blips = settings.blips or {},
         prices = settings.prices or { clothing = 0, barber = 0, tattoo = 0, surgeon = 0 },
         initialClothes = settings.initialClothes or {
             male = {

@@ -11,15 +11,15 @@ local Cache = {
     blacklist = {},
     locale = {},
     appearanceSettings = {
-        useTarget = Config.UseTarget ~= false,
-        enablePedsForShops = Config.EnablePedsForShops ~= false,
-        chargePerTattoo = Config.ChargePerTattoo or false,
-        blips = Config.Blips or {},
+        useTarget = false,
+        enablePedsForShops = false,
+        chargePerTattoo = false,
+        blips = {},
         prices = {
-            clothing = Config.ClothingPrice or 0,
-            barber = Config.BarberPrice or 0,
-            tattoo = Config.TattooPrice or 0,
-            surgeon = Config.SurgeonPrice or 0
+            clothing =  0,
+            barber =  0,
+            tattoo =  0,
+            surgeon =  0
         },
         initialClothes = {
             male = {
@@ -149,6 +149,7 @@ local function loadAppearanceSettings()
         if type(decoded) == 'table' then
             Cache.appearanceSettings.useTarget = decoded.useTarget ~= nil and decoded.useTarget or Cache.appearanceSettings.useTarget
             Cache.appearanceSettings.enablePedsForShops = decoded.enablePedsForShops ~= nil and decoded.enablePedsForShops or Cache.appearanceSettings.enablePedsForShops
+            Cache.appearanceSettings.useRadialMenu = decoded.useRadialMenu ~= nil and decoded.useRadialMenu or Cache.appearanceSettings.useRadialMenu
             Cache.appearanceSettings.chargePerTattoo = decoded.chargePerTattoo ~= nil and decoded.chargePerTattoo or Cache.appearanceSettings.chargePerTattoo
             Cache.appearanceSettings.blips = decoded.blips or Cache.appearanceSettings.blips
             Cache.appearanceSettings.prices = decoded.prices or Cache.appearanceSettings.prices

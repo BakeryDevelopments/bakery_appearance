@@ -127,6 +127,11 @@ RegisterNetEvent('bakery_appearance:client:openAppearanceMenu', function()
   OpenAppearanceMenu({type = 'all'})
 end)
 
+-- Listen for server event to open appearance menu
+RegisterNetEvent('bakery_appearance:client:openAppearanceMenuByType', function(zoneType)
+  OpenAppearanceMenu({type = zoneType, shouldcharge = true})
+end)
+
 RegisterNuiCallback('save', function(data, cb)
 
   -- Store current appearance before saving (in case we need to revert)
