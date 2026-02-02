@@ -153,7 +153,7 @@ CreateThread(function()
 
                         if not settings.useRadialMenu and IsControlJustPressed(0, 38) then -- E key (only if not using radial menu)
                             lib.hideTextUI()
-                            openAppearanceMenu(marker.zone)
+                            OpenAppearanceMenu(marker.zone)
                         end
                     elseif distance >= 2.0 and distance < 3.0 then
                         lib.hideTextUI()

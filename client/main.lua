@@ -546,3 +546,81 @@ RegisterNuiCallback('getAppearanceData', function(_, cb)
     props = props,
   })
 end)
+
+-- Reload skin command with cooldown
+local lastReloadTime = 0
+
+RegisterCommand(Config.ReloadSkin.command, function()
+  local currentTime = GetGameTimer()
+  local timeSinceLastReload = (currentTime - lastReloadTime) / 1000 -- Convert to seconds
+  
+  -- Check cooldown
+  if timeSinceLastReload < Config.ReloadSkin.cooldown then
+    local timeRemaining = math.ceil(Config.ReloadSkin.cooldown - timeSinceLastReload)
+    lib.notify({
+      title = 'Cooldown Active',
+      description = string.format('Please wait %d seconds before reloading your skin again', timeRemaining),
+      type = 'error'
+    })
+    return
+  end
+  
+  -- Check disable conditions
+  local ped = cache.ped
+  
+  if Config.ReloadSkin.Disable.dead and IsEntityDead(ped) then
+    lib.notify({
+      title = 'Cannot Reload',
+      description = 'You cannot reload your skin while dead',
+      type = 'error'
+    })
+    return
+  end
+  
+  if Config.ReloadSkin.Disable.car and IsPedInAnyVehicle(ped, false) then
+    lib.notify({
+      title = 'Cannot Reload',
+      description = 'You cannot reload your skin while in a vehicle',
+      type = 'error'
+    })
+    return
+  end
+  
+  if Config.ReloadSkin.Disable.cuffed and IsPedCuffed(ped) then
+    lib.notify({
+      title = 'Cannot Reload',
+      description = 'You cannot reload your skin while cuffed',
+      type = 'error'
+    })
+    return
+  end
+  
+  -- Fetch and apply saved appearance
+  lib.callback('bakery_appearance:getAppearance', false, function(appearance)
+    if appearance then
+      -- Apply the appearance
+      SetPedAppearance(ped, appearance)
+      
+      -- Apply tattoos if they exist
+      if appearance.tattoos then
+        _CurrentTattoos = appearance.tattoos
+        ApplyTattoos(ped, appearance.tattoos)
+      end
+      
+      -- Update last reload time
+      lastReloadTime = GetGameTimer()
+      
+      lib.notify({
+        title = 'Success',
+        description = 'Your appearance has been reloaded',
+        type = 'success'
+      })
+    else
+      lib.notify({
+        title = 'Error',
+        description = 'Failed to load your saved appearance',
+        type = 'error'
+      })
+    end
+  end)
+end, false)
