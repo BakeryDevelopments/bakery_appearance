@@ -58,7 +58,6 @@ interface Zone {
 
 interface AppearanceSettings {
   useTarget: boolean;
-  enablePedsForShops: boolean;
   useRadialMenu: boolean;
   chargePerTattoo: boolean;
   blips: Record<string, { sprite?: number; color?: number; scale?: number; name?: string }>;
@@ -122,6 +121,7 @@ export const AdminMenu: FC = () => {
   const [editingZone, setEditingZone] = useState<Zone | null>(null);
   const [capturedCoords, setCapturedCoords] = useState<{ x: number; y: number; z: number; w?: number } | null>(null);
   const [capturedPolyzonePoints, setCapturedPolyzonePoints] = useState<{ x: number; y: number }[] | null>(null);
+  const [zoneFormData, setZoneFormData] = useState<{type: string; name: string; job: string; gang: string; price: number; useCustomPrice: boolean} | null>(null);
 
   // Outfits State
   const [outfits, setOutfits] = useState<JobOutfit[]>([]);
@@ -135,7 +135,6 @@ export const AdminMenu: FC = () => {
   // Appearance settings (runtime defaults for zones)
   const [appearanceSettings, setAppearanceSettings] = useState<AppearanceSettings>({
     useTarget: true,
-    enablePedsForShops: true,
     useRadialMenu: false,
     chargePerTattoo: false,
     prices: {
@@ -378,6 +377,7 @@ export const AdminMenu: FC = () => {
     // This ensures zones have proper IDs from the database
     setAddZoneModalOpen(false);
     setEditingZone(null);
+    clearCaptureData(); // Clear capture data after successful save
   };
 
   // Sync local theme state with cached theme from provider
@@ -1009,7 +1009,7 @@ export const AdminMenu: FC = () => {
           onClose={() => {
             setAddZoneModalOpen(false);
             setEditingZone(null);
-            clearCaptureData();
+            // Don't clear capture data immediately - let the modal handle it
           }}
           onSaveZone={handleSaveZone}
           editingZone={editingZone}
@@ -1019,6 +1019,8 @@ export const AdminMenu: FC = () => {
           capturedCoords={capturedCoords}
           capturedPolyzonePoints={capturedPolyzonePoints}
           onClearCaptureData={clearCaptureData}
+          formData={zoneFormData}
+          onFormDataChange={setZoneFormData}
         />
 
         <AddOutfitModal

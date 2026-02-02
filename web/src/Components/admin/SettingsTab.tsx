@@ -13,7 +13,6 @@ interface ClothingConfig {
 
 interface AppearanceSettings {
   useTarget: boolean;
-  enablePedsForShops: boolean;
   useRadialMenu: boolean;
   chargePerTattoo: boolean;
   blips: Record<string, { sprite?: number; color?: number; scale?: number; name?: string }>;
@@ -159,10 +158,6 @@ export const SettingsTab: FC<SettingsTabProps> = ({
     setLocalSettings({ ...localSettings, useTarget: e.currentTarget.checked });
   }, [localSettings]);
 
-  const handleEnablePedsChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setLocalSettings({ ...localSettings, enablePedsForShops: e.currentTarget.checked });
-  }, [localSettings]);
-
   const handleUseRadialMenuChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setLocalSettings({ ...localSettings, useRadialMenu: e.currentTarget.checked });
   }, [localSettings]);
@@ -201,11 +196,6 @@ export const SettingsTab: FC<SettingsTabProps> = ({
           label={locale.ADMIN_USE_TARGET || 'Use ox_target for peds'}
           checked={localSettings.useTarget}
           onChange={handleUseTargetChange}
-        />
-        <Checkbox
-          label={locale.ADMIN_ENABLE_PEDS || 'Enable peds for shops'}
-          checked={localSettings.enablePedsForShops}
-          onChange={handleEnablePedsChange}
         />
         <Checkbox
           label={locale.ADMIN_USE_RADIAL_MENU || 'Use radial menu for zones'}

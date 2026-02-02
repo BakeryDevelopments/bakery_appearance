@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react';
+import { FC, useState, useEffect, useRef } from 'react';
 import { Modal, Stack, Group, Button, TextInput, Select, Checkbox, NumberInput, Text, Box } from '@mantine/core';
 import { IconDownload } from '@tabler/icons-react';
 import { TriggerNuiCallback } from '../../Utils/TriggerNuiCallback';
@@ -17,11 +17,11 @@ interface Zone {
   job?: string;
   gang?: string;
   name?: string;
+  price?: number;
 }
 
 interface AppearanceSettings {
   useTarget: boolean;
-  enablePedsForShops: boolean;
   useRadialMenu: boolean;
   blips: Record<string, { sprite?: number; color?: number; scale?: number; name?: string }>;
 }
@@ -37,6 +37,8 @@ interface AddZoneModalProps {
   capturedCoords?: { x: number; y: number; z: number; w?: number } | null;
   capturedPolyzonePoints?: { x: number; y: number }[] | null;
   onClearCaptureData?: () => void;
+  formData?: {type: string; name: string; job: string; gang: string; price: number; useCustomPrice: boolean} | null;
+  onFormDataChange?: (data: {type: string; name: string; job: string; gang: string; price: number; useCustomPrice: boolean} | null) => void;
 }
 
 export const AddZoneModal: FC<AddZoneModalProps> = ({
@@ -50,6 +52,8 @@ export const AddZoneModal: FC<AddZoneModalProps> = ({
   capturedCoords,
   capturedPolyzonePoints,
   onClearCaptureData,
+  formData,
+  onFormDataChange,
 }) => {
   const [zoneType, setZoneType] = useState<Zone['type']>('clothing');
   const [zoneName, setZoneName] = useState('');
@@ -63,7 +67,9 @@ export const AddZoneModal: FC<AddZoneModalProps> = ({
   const [zoneEnablePed, setZoneEnablePed] = useState(false);
   const [zoneJob, setZoneJob] = useState('');
   const [zoneGang, setZoneGang] = useState('');
-  const [initialized, setInitialized] = useState(false);
+  const [zonePrice, setZonePrice] = useState<number | undefined>(undefined);
+  const [useCustomPrice, setUseCustomPrice] = useState(false);
+  const initializedRef = useRef(false);
 
   useEffect(() => {
     if (capturedPolyzonePoints && capturedPolyzonePoints.length > 0 && !polyzonePointsInput) {
@@ -86,7 +92,7 @@ export const AddZoneModal: FC<AddZoneModalProps> = ({
   const handleClose = () => {
     resetForm();
     onClearCaptureData?.();
-    setInitialized(false);
+    onFormDataChange?.(null);
     onClose();
   };
 
@@ -103,6 +109,8 @@ export const AddZoneModal: FC<AddZoneModalProps> = ({
     setZoneEnablePed(false);
     setZoneJob('');
     setZoneGang('');
+    setZonePrice(undefined);
+    setUseCustomPrice(false);
   };
 
   const loadZoneData = (zone: Zone) => {
@@ -123,48 +131,60 @@ export const AddZoneModal: FC<AddZoneModalProps> = ({
     setZoneEnablePed(zone.enablePed ?? false);
     setZoneJob(zone.job || '');
     setZoneGang(zone.gang || '');
+    setZonePrice(zone.price);
+    setUseCustomPrice(zone.price !== undefined);
   };
 
+  // Track if this is the first time opening the modal
   useEffect(() => {
     if (!opened) {
-      setInitialized(false);
       return;
     }
 
     if (editingZone) {
-      if (!polyzonePointsInput && !coordsInput && !initialized) {
+      if (!initializedRef.current) {
         loadZoneData(editingZone);
+        initializedRef.current = true;
       }
-      setInitialized(true);
       return;
     }
 
-    // If we already have captured data, don't wipe it
-    if ((capturedCoords && !initialized) || (capturedPolyzonePoints && !initialized)) {
-      setInitialized(true);
-      return;
+    // For new zones, restore from persisted formData or initialize defaults
+    if (!initializedRef.current) {
+      if (formData) {
+        setZoneType(formData.type as Zone['type']);
+        setZoneName(formData.name);
+        setZoneJob(formData.job);
+        setZoneGang(formData.gang);
+        setZonePrice(formData.price);
+        setUseCustomPrice(formData.useCustomPrice);
+      } else {
+        const defaults = appearanceSettings?.blips?.['clothing'] || {};
+        setZoneBlipSprite(defaults.sprite ?? 0);
+        setZoneBlipColor(defaults.color ?? 0);
+        setZoneBlipScale(defaults.scale ?? 0.7);
+        setZoneBlipName(defaults.name ?? '');
+      }
+      initializedRef.current = true;
     }
-
-    if (!initialized) {
-      resetForm();
-      const defaults = appearanceSettings?.blips?.['clothing'] || {};
-      setZoneBlipSprite(defaults.sprite ?? 0);
-      setZoneBlipColor(defaults.color ?? 0);
-      setZoneBlipScale(defaults.scale ?? 0.7);
-      setZoneBlipName(defaults.name ?? '');
-      setInitialized(true);
-    }
-  }, [opened, editingZone, initialized, appearanceSettings]);
+  }, [opened, editingZone, formData]);
 
   // When zone type changes on a new zone, apply blip defaults for that type
   useEffect(() => {
-    if (!opened || editingZone) return;
+    if (!opened || editingZone || !initializedRef.current) return;
     const defaults = appearanceSettings?.blips?.[zoneType] || {};
     setZoneBlipSprite(defaults.sprite ?? 0);
     setZoneBlipColor(defaults.color ?? 0);
     setZoneBlipScale(defaults.scale ?? 0.7);
     setZoneBlipName(defaults.name ?? '');
-  }, [zoneType, opened, editingZone, appearanceSettings]);
+  }, [zoneType, opened, editingZone]);
+
+  // Persist form data to parent when type, name, job, gang, price, or useCustomPrice changes
+  useEffect(() => {
+    if (opened && !editingZone && onFormDataChange) {
+      onFormDataChange({ type: zoneType, name: zoneName, job: zoneJob, gang: zoneGang, price: zonePrice ?? 0, useCustomPrice });
+    }
+  }, [zoneType, zoneName, zoneJob, zoneGang, zonePrice, useCustomPrice, opened, editingZone, onFormDataChange]);
 
   const handleSave = () => {
     // Parse coords
@@ -203,10 +223,13 @@ export const AddZoneModal: FC<AddZoneModalProps> = ({
       job: zoneJob || undefined,
       gang: zoneGang || undefined,
       name: zoneName || undefined,
+      price: useCustomPrice ? zonePrice : undefined,
     };
 
     TriggerNuiCallback(editingZone ? 'updateZone' : 'addZone', zoneData).then(() => {
       onSaveZone(zoneData, !!editingZone);
+      initializedRef.current = false;
+      onFormDataChange?.(null);
       handleClose();
     });
   };
@@ -219,10 +242,6 @@ export const AddZoneModal: FC<AddZoneModalProps> = ({
       return n === 0;
     });
   };
-
-  if (!opened) {
-    return null;
-  }
 
   return (
     <Modal
@@ -403,6 +422,30 @@ export const AddZoneModal: FC<AddZoneModalProps> = ({
             setZoneGang(e.target.value);
           }}
         />
+        <Checkbox
+          label="Use Custom Price"
+          description="Override default pricing for this zone"
+          checked={useCustomPrice}
+          onChange={(e) => {
+            setUseCustomPrice(e.currentTarget.checked);
+          }}
+          styles={{
+            label: { color: '#fff', fontSize: '0.9rem' },
+            description: { color: '#888', fontSize: '0.8rem', marginTop: 4 },
+          }}
+        />
+        {useCustomPrice && (
+          <NumberInput
+            label="Custom Price"
+            placeholder="Enter custom price"
+            description="Set custom price (e.g., 0 for free)"
+            value={zonePrice}
+            min={0}
+            onChange={(val) => {
+              setZonePrice(val as number | undefined);
+            }}
+          />
+        )}
         <Group position="right" mt="md">
           <Button variant="subtle" onClick={handleClose}>
             Cancel

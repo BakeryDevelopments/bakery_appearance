@@ -14,7 +14,6 @@ interface ShopConfig {
 }
 
 interface ShopSettings {
-  enablePedsForShops: boolean;
   enablePedsForClothingRooms: boolean;
   enablePedsForPlayerOutfitRooms: boolean;
 }
