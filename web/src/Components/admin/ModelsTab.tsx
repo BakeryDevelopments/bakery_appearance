@@ -1,7 +1,7 @@
 import { FC, useState, Dispatch, SetStateAction } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import { Box, Stack, Group, Text, Button, Checkbox, ActionIcon, Modal, TextInput, Badge, Loader } from '@mantine/core';
-import { IconPlus, IconTrash, IconUser } from '@tabler/icons-react';
+import { IconPlus, IconTrash, IconUser } from '../icons/Icons';
 import { TriggerNuiCallback } from '../../Utils/TriggerNuiCallback';
 
 interface ModelsTabProps {

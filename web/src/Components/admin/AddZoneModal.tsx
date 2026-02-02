@@ -1,6 +1,6 @@
 import { FC, useState, useEffect, useRef } from 'react';
 import { Modal, Stack, Group, Button, TextInput, Select, Checkbox, NumberInput, Text, Box } from '@mantine/core';
-import { IconDownload } from '@tabler/icons-react';
+import { IconDownload } from '../icons/Icons';
 import { TriggerNuiCallback } from '../../Utils/TriggerNuiCallback';
 
 interface Zone {

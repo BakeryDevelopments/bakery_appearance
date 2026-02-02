@@ -1,6 +1,6 @@
 import { FC, useCallback, memo, useMemo } from 'react';
 import { Stack, Group, Text, Box, NumberInput, Accordion, TextInput } from '@mantine/core';
-import { IconMars, IconVenus } from '@tabler/icons-react';
+import { IconMars, IconVenus } from '../icons/Icons';
 
 interface ClothingConfig {
   model: string;

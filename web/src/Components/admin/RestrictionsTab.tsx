@@ -1,7 +1,7 @@
 import { FC, useState, Dispatch, SetStateAction } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import { Box, Stack, Group, Text, Button, Accordion, Badge, ActionIcon, Modal, TextInput, Select, Checkbox, Loader } from '@mantine/core';
-import { IconPlus, IconTrash } from '@tabler/icons-react';
+import { IconPlus, IconTrash } from '../icons/Icons';
 import { TriggerNuiCallback } from '../../Utils/TriggerNuiCallback';
 
 interface ClothingRestriction {

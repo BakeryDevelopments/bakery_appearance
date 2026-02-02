@@ -1,6 +1,6 @@
 import { FC, useState, useEffect } from 'react';
 import { Box, Button } from '@mantine/core';
-import { IconLock } from '../icons/IconLock';
+import { IconLock } from '../icons/Icons';
 import { useAppearanceStore } from '../../Providers/AppearanceStoreProvider';
 
 

@@ -1,11 +1,21 @@
-import { FC, useState, useEffect, useMemo, lazy, Suspense } from 'react';
+import { FC, useState, useEffect, useMemo, Suspense } from 'react';
 import { Box, Button, Modal, Stack, Text } from '@mantine/core';
 import { CameraShape } from './micro/CameraShape';
-import { IconCancel } from './icons/IconCancel';
-import { IconSave } from './icons/IconSave';
-import { IconLock } from './icons/IconLock';
-import { IconToggle } from './icons/IconToggle';
-import { IconHat, IconMask, IconGlasses, IconShirt, IconJacket, IconVest, IconPants, IconShoes } from './icons/ToggleIcons';
+import {
+  IconCancel,
+  IconSave,
+  IconLock,
+  IconToggle,
+  IconHat,
+  IconMask,
+  IconGlasses,
+  IconShirt,
+  IconJacket,
+  IconVest,
+  IconPants,
+  IconShoes,
+  iconsMap,
+} from './icons/Icons';
 import { useAppearanceStore } from '../Providers/AppearanceStoreProvider';
 import { useCustomization } from '../Providers/CustomizationProvider';
 import { TriggerNuiCallback } from '../Utils/TriggerNuiCallback';
@@ -119,8 +129,6 @@ export const AppearanceNav: FC<AppearanceNavProps> = ({ animateIn }) => {
   const [limit, setLimit] = useState<number>(0);
   const [showToggles, setShowToggles] = useState<boolean>(false);
   const [modal, setModal] = useState<'close' | 'save' | null>(null);
-  const [iconComponents, setIconComponents] = useState<{ [key: string]: FC<any> }>({});
-
   // Animation for nav tabs - triggered by animateIn or tabs loading
   useEffect(() => {
     if (animateIn && tabs.length > 0) {
@@ -160,28 +168,6 @@ export const AppearanceNav: FC<AppearanceNavProps> = ({ animateIn }) => {
       return () => clearTimeout(timeout);
     }
   }, [animateIn, tabs.length]);
-
-  // Dynamically load tab icons
-  useEffect(() => {
-    const loadIcons = async () => {
-      const components: { [key: string]: FC<any> } = {};
-
-      for (const tab of tabs) {
-        try {
-          const iconModule = await import(`./icons/${tab.icon}.tsx`);
-          components[tab.icon] = iconModule.default || iconModule[tab.icon];
-        } catch (error) {
-          console.warn(`Failed to load icon: ${tab.icon}`, error);
-        }
-      }
-
-      setIconComponents(components);
-    };
-
-    if (tabs.length > 0) {
-      loadIcons();
-    }
-  }, [tabs]);
 
   const pieAngle = useMemo(() => {
     const tabCount = tabs.length < 8 ? 8 : tabs.length > 8 ? 8 : tabs.length;
@@ -242,14 +228,15 @@ export const AppearanceNav: FC<AppearanceNavProps> = ({ animateIn }) => {
       >
         {tabs.map((tab, index) => {
           const selected = selectedTab?.id === tab.id;
-            const [x, y] = pointIcon(
-              0,  // center x
-              0,  // center y
-              40,  // radius in rem
-              pieAngle * (tabs.length - index) - pieAngle / 2,
-              limit
-            );
-          const IconComponent = iconComponents[tab.icon];
+          const iconName = tab.icon || `Icon${tab.id.charAt(0).toUpperCase() + tab.id.slice(1)}`;
+          const IconComponent = iconsMap[iconName] || null;
+          const [x, y] = pointIcon(
+            0,  // center x
+            0,  // center y
+            40,  // radius in rem
+            pieAngle * (tabs.length - index) - pieAngle / 2,
+            limit
+          );
 
           return (
             <Button
@@ -306,7 +293,7 @@ export const AppearanceNav: FC<AppearanceNavProps> = ({ animateIn }) => {
                 >
                   {IconComponent && (
                     <Suspense fallback={null}>
-                      <IconComponent />
+                      <IconComponent size={48} />
                     </Suspense>
                   )}
                 </Box>
@@ -373,7 +360,7 @@ export const AppearanceNav: FC<AppearanceNavProps> = ({ animateIn }) => {
                   },
                 }}
               >
-                <IconCancel />
+                <IconCancel size={24} />
               </Box>
             </Box>
           </Button>
@@ -421,7 +408,7 @@ export const AppearanceNav: FC<AppearanceNavProps> = ({ animateIn }) => {
                 },
               }}
             >
-              {allValid ? <IconSave /> : <IconLock />}
+              {allValid ? <IconSave size={42} /> : <IconLock size={42} />}
             </Box>
           </Box>
         </Button>
@@ -478,7 +465,7 @@ export const AppearanceNav: FC<AppearanceNavProps> = ({ animateIn }) => {
                 },
               }}
             >
-              <IconToggle />
+              <IconToggle size={24} />
             </Box>
           </Box>
         </Button>

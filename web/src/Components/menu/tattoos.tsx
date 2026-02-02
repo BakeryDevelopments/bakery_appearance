@@ -3,8 +3,7 @@ import { Box, Button, Divider, Group, Select, Slider, Stack, Text, TextInput } f
 import { useAppearanceStore } from '../../Providers/AppearanceStoreProvider';
 import { useCustomization } from '../../Providers/CustomizationProvider';
 import type { TTattoo, TZoneTattoo } from '../../types/appearance';
-import { IconPlus } from '../icons/IconPlus';
-import { IconCancel } from '../icons/IconCancel';
+import { IconPlus, IconCancel } from '../icons/Icons';
 
 const Tattoos: FC = () => {
   const { tattoos: tattooOptions, appearance, locale, setPlayerTattoos } = useAppearanceStore();
@@ -314,7 +313,7 @@ const Tattoos: FC = () => {
           e.currentTarget.style.color = 'white';
         }}
       >
-        <IconPlus />
+        <IconPlus size={20} />
         <Text size="md" fw="bold">
           {locale?.ADDTATTOO_TITLE || 'Add Tattoo'}
         </Text>

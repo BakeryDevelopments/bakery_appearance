@@ -1,11 +1,9 @@
-import { FC, useState, useEffect, lazy, Suspense, ComponentType, useRef } from 'react';
+import { FC, useState, useEffect, Suspense, ComponentType, useRef } from 'react';
 import { Box, Text, Divider } from '@mantine/core';
 import { useAppearanceStore } from '../Providers/AppearanceStoreProvider';
 import { useCustomization } from '../Providers/CustomizationProvider';
 import classes from './menu.module.css';
-
-// Icon imports will be dynamic
-const iconCache: Record<string, ComponentType> = {};
+import { iconsMap, IconProps } from './icons/Icons';
 
 interface AppearanceMenuProps {
   animateIn?: boolean;
@@ -17,7 +15,7 @@ export const AppearanceMenu: FC<AppearanceMenuProps> = ({ animateIn, isVisible }
   const { theme } = useCustomization();
   const [showContent, setShowContent] = useState(false);
   const hasAnimatedRef = useRef(false);
-  const [IconComponent, setIconComponent] = useState<ComponentType | null>(null);
+  const [IconComponent, setIconComponent] = useState<FC<IconProps> | null>(null);
   const [MenuComponent, setMenuComponent] = useState<ComponentType | null>(null);
 
 
@@ -52,29 +50,15 @@ export const AppearanceMenu: FC<AppearanceMenuProps> = ({ animateIn, isVisible }
     }
   }, [isVisible]);
 
-  // Load icon dynamically when tab changes
+  // Resolve icon from centralized map when tab changes
   useEffect(() => {
     if (selectedTab?.icon) {
-      const loadIcon = async () => {
-        try {
-          // Check cache first
-          if (iconCache[selectedTab.icon!]) {
-            setIconComponent(() => iconCache[selectedTab.icon!]);
-            return;
-          }
-
-          // Dynamic import
-          const module = await import(`./icons/${selectedTab.icon}.tsx`);
-          const Icon = module.default || module[Object.keys(module)[0]];
-          iconCache[selectedTab.icon!] = Icon;
-          setIconComponent(() => Icon);
-        } catch (error) {
-          console.error(`Failed to load icon: ${selectedTab.icon}`, error);
-          setIconComponent(null);
-        }
-      };
-
-      loadIcon();
+      const Icon = iconsMap[selectedTab.icon];
+      if (Icon && typeof Icon === 'function') {
+        setIconComponent(() => Icon);
+      } else {
+        setIconComponent(null);
+      }
     } else {
       setIconComponent(null);
     }
@@ -163,7 +147,7 @@ export const AppearanceMenu: FC<AppearanceMenuProps> = ({ animateIn, isVisible }
               className={classes.flyInIcon}
               style={{ position: 'absolute' }}
             >
-              <IconComponent />
+              <IconComponent size={40} />
             </Box>
           )}
         </Box>

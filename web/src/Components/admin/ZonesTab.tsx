@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import { Stack, Group, Text, Button, Select, Box, Badge, ActionIcon, Accordion } from '@mantine/core';
-import { IconPlus, IconEdit, IconTrash, IconMapPin } from '@tabler/icons-react';
+import { IconPlus, IconEdit, IconTrash, IconMapPin } from '../icons/Icons';
 import { TriggerNuiCallback } from '../../Utils/TriggerNuiCallback';
 
 interface Zone {

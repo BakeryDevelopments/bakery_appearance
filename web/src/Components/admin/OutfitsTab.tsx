@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Stack, Group, Text, Button, Box, Badge, ActionIcon } from '@mantine/core';
-import { IconPlus, IconTrash } from '@tabler/icons-react';
+import { IconPlus, IconTrash } from '../icons/Icons';
 import { TriggerNuiCallback } from '../../Utils/TriggerNuiCallback';
 
 interface JobOutfit {

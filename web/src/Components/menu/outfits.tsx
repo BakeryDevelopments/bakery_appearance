@@ -3,11 +3,7 @@ import { Box, Button, Divider, Group, Input, NumberInput, Stack, Text, Paper, Gr
 import { useAppearanceStore } from '../../Providers/AppearanceStoreProvider';
 import { useCustomization } from '../../Providers/CustomizationProvider';
 import type { TOutfitData } from '../../types/appearance';
-import { IconCancel } from '../icons/IconCancel';
-import { IconCheck } from '../icons/IconCheck';
-import { IconPlus } from '../icons/IconPlus';
-import { IconImport } from '../icons/IconImport';
-import { IconLock } from '../icons/IconLock';
+import { IconCancel, IconCheck, IconPlus, IconImport, IconLock } from '../icons/Icons';
 import { Menu } from '@mantine/core';
 import { validateOutfit } from '../../Utils/BlacklistValidator';
 

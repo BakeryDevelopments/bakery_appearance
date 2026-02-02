@@ -1,7 +1,7 @@
 import { FC, Dispatch, SetStateAction, useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import { Box, Stack, Group, Text, Button, Accordion, Badge, ActionIcon, TextInput, Select, NumberInput, Loader } from '@mantine/core';
-import { IconPlus, IconTrash, IconDownload, IconMars, IconVenus, IconSearch } from '@tabler/icons-react';
+import { IconPlus, IconTrash, IconDownload, IconMars, IconVenus, IconSearch } from '../icons/Icons';
 import { TriggerNuiCallback } from '../../Utils/TriggerNuiCallback';
 
 interface TattooEntry {

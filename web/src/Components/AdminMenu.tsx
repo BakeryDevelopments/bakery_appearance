@@ -1,6 +1,6 @@
 import { FC, useEffect, useState, useMemo, lazy, Suspense, useCallback } from 'react';
 import { Tabs, Button, Stack, Group, Text, TextInput, Select, ActionIcon, Modal, Checkbox, Accordion, Badge, Box, NumberInput, Divider, Loader, Overlay } from '@mantine/core';
-import { IconPalette, IconLock, IconUser, IconShoppingCart, IconMapPin, IconHanger, IconDownload, IconFeather, IconMars, IconVenus, IconAdjustments } from '@tabler/icons-react';
+import { IconPalette, IconLock, IconUser, IconShoppingCart, IconMapPin, IconHanger, IconDownload, IconFeather, IconMars, IconVenus, IconAdjustments } from './icons/Icons';
 import { TriggerNuiCallback } from '../Utils/TriggerNuiCallback';
 import { HandleNuiMessage } from '../Hooks/HandleNuiMessage';
 import { AddOutfitModal } from './admin/AddOutfitModal';

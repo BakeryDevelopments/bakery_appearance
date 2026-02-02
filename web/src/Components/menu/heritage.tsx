@@ -4,7 +4,7 @@ import { useAppearanceStore } from '../../Providers/AppearanceStoreProvider';
 import type { THeadBlend } from '../../types/appearance';
 import { NumberStepper } from '../micro/NumberStepper';
 import { useCustomization } from '../../Providers/CustomizationProvider';
-import { IconLock } from '../icons/IconLock';
+import { IconLock } from '../icons/Icons';
 
 export const Heritage: FC = () => {
     const {
