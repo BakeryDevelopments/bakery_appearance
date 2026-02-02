@@ -27,7 +27,6 @@ ServerCache = {
     restrictions = {},
     appearanceSettings = {
         useTarget = false,
-        enablePedsForShops = false,
         blips = {},
         prices = {
             clothing = 0,
@@ -218,7 +217,6 @@ end
 local function LoadShopSettingsCache()
     local jsonData = LoadResourceFile(GetCurrentResourceName(), 'shared/data/shop_settings.json')
     ServerCache.shopSettings = jsonData and json.decode(jsonData) or {
-        enablePedsForShops = true,
         enablePedsForClothingRooms = true,
         enablePedsForPlayerOutfitRooms = true
     }
@@ -300,7 +298,6 @@ lib.callback.register('bakery_appearance:admin:saveAppearanceSettings', function
     -- Merge with defaults to avoid nils
     local merged = {
         useTarget = settings.useTarget ~= nil and settings.useTarget or false,
-        enablePedsForShops = settings.enablePedsForShops ~= nil and settings.enablePedsForShops or false,
         useRadialMenu = (settings.useRadialMenu) ~= nil and (settings.useRadialMenu) or false,
         chargePerTattoo = settings.chargePerTattoo ~= nil and settings.chargePerTattoo or false,
         blips = settings.blips or {},
