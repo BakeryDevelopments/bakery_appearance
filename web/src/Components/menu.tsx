@@ -138,13 +138,13 @@ export const AppearanceMenu: FC<AppearanceMenuProps> = ({ animateIn, isVisible }
           <Text
             key={`label-${id}`}
             className={classes.flyInRight}
-            style={{ position: 'absolute' }}
+            style={{ position: 'absolute', color: "white", fontWeight:"bold" }}
           >
             {label} &#8205;
           </Text>
         </Box>
 
-        <Text style={{ color: theme.primaryColor }}>
+        <Text style={{ color: theme.primaryColor, fontWeight:"bold" }}>
           {locale?.MENU_TITLE || 'Menu'}
         </Text>
 

@@ -170,7 +170,7 @@ const Tattoos: FC = () => {
   if (!tattooOptions || tattooOptions.length === 0) {
     return (
       <Stack spacing="md" className="appearance-scroll" style={{ padding: '0.25rem 0.75rem' }}>
-        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">
+        <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">
           {locale?.NO_TATTOOS || 'No tattoos available'}
         </Text>
       </Stack>
@@ -208,9 +208,9 @@ const Tattoos: FC = () => {
           return (
             <Box key={rowKey} style={{ width: '100%' }}>
               <Box style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                <Text fw={600} tt="uppercase" size="sm" c="white">{`${locale?.TATTOO_TITLE || 'Tattoo'} ${i + 1}`}</Text>
+                <Text fw="bold" tt="uppercase" size="md" c="white">{`${locale?.TATTOO_TITLE || 'Tattoo'} ${i + 1}`}</Text>
                 <Group spacing="xs">
-                  <Text size="xs" c="dimmed">
+                  <Text size="xs" c="gray.4">
                     {locale?.TOTAL_SUBTITLE || 'Total'}: {tattooOptions.length}
                   </Text>
                   {deleteIndex === i ? (
@@ -242,8 +242,8 @@ const Tattoos: FC = () => {
 
                 <Box>
                   <Group position="apart" mb={4}>
-                    <Text size="xs" c="dimmed">{locale?.TATTOO_TITLE || 'Tattoo'}</Text>
-                    <Text size="xs" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {groupedTattoos.reduce((sum, g) => sum + (g.tattoos?.length ?? 0), 0)}</Text>
+                    <Text size="xs" c="gray.4">{locale?.TATTOO_TITLE || 'Tattoo'}</Text>
+                    <Text size="xs" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {groupedTattoos.reduce((sum, g) => sum + (g.tattoos?.length ?? 0), 0)}</Text>
                   </Group>
                   <TextInput
                     placeholder={locale?.SEARCHTATTOO_SUBTITLE || 'Search tattoo'}
@@ -266,7 +266,7 @@ const Tattoos: FC = () => {
                 </Box>
 
                 <Box>
-                  <Text size="xs" c="dimmed" mb={4}>{locale?.TATTOO_OPACITY || 'Opacity'}</Text>
+                  <Text size="xs" c="gray.4" mb={4}>{locale?.TATTOO_OPACITY || 'Opacity'}</Text>
                   <Slider
                     min={0.1}
                     max={1}
@@ -283,7 +283,7 @@ const Tattoos: FC = () => {
           );
         })
       ) : (
-        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">
+        <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">
           {locale?.NO_TATTOOS || 'No tattoos applied'}
         </Text>
       )}
@@ -315,7 +315,7 @@ const Tattoos: FC = () => {
         }}
       >
         <IconPlus />
-        <Text size="sm" fw={600}>
+        <Text size="md" fw="bold">
           {locale?.ADDTATTOO_TITLE || 'Add Tattoo'}
         </Text>
       </Button>

@@ -26,7 +26,7 @@ export const ThemeTab: FC<ThemeTabProps> = ({ theme, setTheme, onSave, isLoading
         </Text>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
           <div>
-            <Text c="dimmed" size="xs" mb="xs">
+            <Text c="gray.4" size="xs" mb="xs">
               Active Tab
             </Text>
             <ColorPicker
@@ -44,7 +44,7 @@ export const ThemeTab: FC<ThemeTabProps> = ({ theme, setTheme, onSave, isLoading
             />
           </div>
           <div>
-            <Text c="dimmed" size="xs" mb="xs">
+            <Text c="gray.4" size="xs" mb="xs">
               Inactive Tab
             </Text>
             <ColorPicker
@@ -80,7 +80,7 @@ export const ThemeTab: FC<ThemeTabProps> = ({ theme, setTheme, onSave, isLoading
         />
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginTop: '1rem' }}>
           <div>
-            <Text c="dimmed" size="xs" mb="xs" ta="center">
+            <Text c="gray.4" size="xs" mb="xs" ta="center">
               Active Preview
             </Text>
             <div style={{ display: 'flex', justifyContent: 'center', padding: '1rem', backgroundColor: 'rgba(0,0,0,0.3)', borderRadius: 8 }}>
@@ -95,7 +95,7 @@ export const ThemeTab: FC<ThemeTabProps> = ({ theme, setTheme, onSave, isLoading
             </div>
           </div>
           <div>
-            <Text c="dimmed" size="xs" mb="xs" ta="center">
+            <Text c="gray.4" size="xs" mb="xs" ta="center">
               Inactive Preview
             </Text>
             <div style={{ display: 'flex', justifyContent: 'center', padding: '1rem', backgroundColor: 'rgba(0,0,0,0.3)', borderRadius: 8 }}>

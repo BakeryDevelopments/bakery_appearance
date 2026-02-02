@@ -1,6 +1,6 @@
-import { FC } from 'react';
-import { Stack, Group, Text, Button, Select, Box, Badge, ActionIcon } from '@mantine/core';
-import { IconPlus, IconChevronDown, IconTrash, IconMapPin } from '@tabler/icons-react';
+import { FC, useState } from 'react';
+import { Stack, Group, Text, Button, Select, Box, Badge, ActionIcon, Accordion } from '@mantine/core';
+import { IconPlus, IconEdit, IconTrash, IconMapPin } from '@tabler/icons-react';
 import { TriggerNuiCallback } from '../../Utils/TriggerNuiCallback';
 
 interface Zone {
@@ -43,6 +43,8 @@ export const ZonesTab: FC<ZonesTabProps> = ({
   appearanceSettings,
   locale,
 }) => {
+  const [expandedZoneType, setExpandedZoneType] = useState<string | null>(null);
+
   const getBlipDefaults = (type: Zone['type']) => {
     return (appearanceSettings?.blips && appearanceSettings.blips[type]) || {};
   };
@@ -86,98 +88,119 @@ export const ZonesTab: FC<ZonesTabProps> = ({
           {locale.ADMIN_MSG_NO_ZONES || 'No zones configured'}
         </Box>
       ) : (
-        <Stack spacing="xl">
-          {groupedZones.map((group, groupIdx) => (
-            <Box key={`${group.type}-${groupIdx}`}>
-              <Group mb="md">
-                <Badge size="lg" color={typeColors[group.type]} variant="filled">
-                  {typeLabels[group.type]}
-                </Badge>
-                <Text c="dimmed" size="sm">
-                  {group.zones.length} zone{group.zones.length !== 1 ? 's' : ''}
-                </Text>
-              </Group>
-
-              <Stack spacing="md" pl="md" style={{ borderLeft: `3px solid var(--mantine-color-${typeColors[group.type]}-6)` }}>
-                {group.zones.map((zone, idx) => {
-                  // Use zone ID if available, otherwise use a combination of type and index for uniqueness
-                  const uniqueKey = zone.id ? `zone-${zone.id}` : `${group.type}-temp-${idx}-${zones.indexOf(zone)}`;
-                  return (
-                  <Group
-                    key={uniqueKey}
-                    position="apart"
-                    style={{
-                      padding: '1rem',
-                      backgroundColor: 'rgba(255,255,255,0.02)',
-                      borderRadius: 6,
-                      border: '1px solid rgba(255,255,255,0.05)',
-                    }}
-                  >
-                    <div style={{ flex: 1 }}>
-                      <Group spacing="sm" mb={6}>
-                        {zone.job && <Badge size="xs" color="green">{locale.ADMIN_BADGE_JOB || 'Job'}: {zone.job}</Badge>}
-                        {zone.gang && <Badge size="xs" color="purple">{locale.ADMIN_BADGE_GANG || 'Gang'}: {zone.gang}</Badge>}
-                        {!zone.showBlip && <Badge size="xs" color="gray">{locale.ADMIN_BADGE_BLIP_HIDDEN || 'Blip Hidden'}</Badge>}
-                        {zone.enablePed && <Badge size="xs" color="orange">{locale.ADMIN_BADGE_PED || 'Ped Enabled'}</Badge>}
-                        {zone.polyzone && <Badge size="xs" color="indigo">{zone.polyzone.length} {locale.ADMIN_MSG_POLYZONE_POINTS || 'points'}</Badge>}
-                      </Group>
-                      <Text c="white" size="sm" fw={500} mb={4}>
-                        {zone.name || (locale.ADMIN_MSG_UNNAMED_ZONE || 'Unnamed Zone')}
-                      </Text>
-                      <Group spacing="xs">
-                        <Text c="dimmed" size="xs">
-                          <span style={{ fontWeight: 500 }}>Coords:</span> {zone.coords.x.toFixed(2)}, {zone.coords.y.toFixed(2)}, {zone.coords.z.toFixed(2)}
-                        </Text>
-                        {zone.coords.w !== undefined && zone.coords.w !== 0 && (
-                          <Text c="dimmed" size="xs">
-                            <span style={{ fontWeight: 500 }}>Heading:</span> {zone.coords.w.toFixed(1)}°
-                          </Text>
-                        )}
-                      </Group>
-                    </div>
-                    <Group spacing="xs" ml="md">
-                      <ActionIcon 
-                        color="cyan"
-                        variant="light"
-                        onClick={() => {
-                          TriggerNuiCallback('teleportToZone', {
-                            x: zone.coords.x,
-                            y: zone.coords.y,
-                            z: zone.coords.z,
-                            heading: zone.coords.w || 0
-                          });
-                        }}
-                      >
-                        <IconMapPin size={16} />
-                      </ActionIcon>
-                      <ActionIcon 
-                        color="blue"
-                        variant="light"
-                        onClick={() => {
-                          onOpenZoneModal(zone);
-                        }}
-                      >
-                        <IconChevronDown size={16} />
-                      </ActionIcon>
-                      <ActionIcon 
-                        color="red"
-                        variant="light"
-                        onClick={() => {
-                          TriggerNuiCallback('deleteZone', zone.id).then(() => {
-                            setZones(zones.filter(z => z.id !== zone.id));
-                          });
-                        }}
-                      >
-                        <IconTrash size={16} />
-                      </ActionIcon>
-                    </Group>
+        <Accordion
+          chevronPosition="right"
+          variant="separated"
+          value={expandedZoneType}
+          onChange={setExpandedZoneType}
+          styles={{
+            item: {
+              backgroundColor: 'rgba(255,255,255,0.03)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              marginBottom: '0.5rem',
+            },
+            control: {
+              '&:hover': {
+                backgroundColor: 'rgba(255,255,255,0.05)',
+              },
+            },
+          }}
+        >
+          {groupedZones.map((group) => (
+            <Accordion.Item key={group.type} value={group.type}>
+              <Accordion.Control>
+                <Group position="apart" style={{ width: '100%', paddingRight: '1rem' }}>
+                  <Group spacing="sm">
+                    <Badge size="lg" color={typeColors[group.type]} variant="filled">
+                      {typeLabels[group.type]}
+                    </Badge>
+                    <Badge size="sm" color="gray" variant="outline">
+                      {group.zones.length} zone{group.zones.length !== 1 ? 's' : ''}
+                    </Badge>
                   </Group>
-                );
-                })}
-              </Stack>
-            </Box>
+                </Group>
+              </Accordion.Control>
+              <Accordion.Panel>
+                <Stack spacing="md">
+                  {group.zones.map((zone, idx) => {
+                    const uniqueKey = zone.id ? `zone-${zone.id}` : `${group.type}-temp-${idx}-${zones.indexOf(zone)}`;
+                    return (
+                      <Group
+                        key={uniqueKey}
+                        position="apart"
+                        style={{
+                          padding: '1rem',
+                          backgroundColor: 'rgba(0,0,0,0.2)',
+                          borderRadius: 6,
+                          border: '1px solid rgba(255,255,255,0.05)',
+                        }}
+                      >
+                        <div style={{ flex: 1 }}>
+                          <Group spacing="sm" mb={6}>
+                            {zone.job && <Badge size="xs" color="green">{locale.ADMIN_BADGE_JOB || 'Job'}: {zone.job}</Badge>}
+                            {zone.gang && <Badge size="xs" color="purple">{locale.ADMIN_BADGE_GANG || 'Gang'}: {zone.gang}</Badge>}
+                            {!zone.showBlip && <Badge size="xs" color="gray">{locale.ADMIN_BADGE_BLIP_HIDDEN || 'Blip Hidden'}</Badge>}
+                            {zone.enablePed && <Badge size="xs" color="orange">{locale.ADMIN_BADGE_PED || 'Ped Enabled'}</Badge>}
+                            {zone.polyzone && <Badge size="xs" color="indigo">{zone.polyzone.length} {locale.ADMIN_MSG_POLYZONE_POINTS || 'points'}</Badge>}
+                          </Group>
+                          <Text c="white" size="sm" fw={500} mb={4}>
+                            {zone.name || (locale.ADMIN_MSG_UNNAMED_ZONE || 'Unnamed Zone')}
+                          </Text>
+                          <Group spacing="xs">
+                            <Text c="gray.4" size="xs">
+                              <span style={{ fontWeight: 500 }}>Coords:</span> {zone.coords.x.toFixed(2)}, {zone.coords.y.toFixed(2)}, {zone.coords.z.toFixed(2)}
+                            </Text>
+                            {zone.coords.w !== undefined && zone.coords.w !== 0 && (
+                              <Text c="gray.4" size="xs">
+                                <span style={{ fontWeight: 500 }}>Heading:</span> {zone.coords.w.toFixed(1)}°
+                              </Text>
+                            )}
+                          </Group>
+                        </div>
+                        <Group spacing="xs" ml="md">
+                          <ActionIcon 
+                            color="cyan"
+                            variant="light"
+                            onClick={() => {
+                              TriggerNuiCallback('teleportToZone', {
+                                x: zone.coords.x,
+                                y: zone.coords.y,
+                                z: zone.coords.z,
+                                heading: zone.coords.w || 0
+                              });
+                            }}
+                          >
+                            <IconMapPin size={16} />
+                          </ActionIcon>
+                          <ActionIcon 
+                            color="blue"
+                            variant="light"
+                            onClick={() => {
+                              onOpenZoneModal(zone);
+                            }}
+                          >
+                            <IconEdit size={16} />
+                          </ActionIcon>
+                          <ActionIcon 
+                            color="red"
+                            variant="light"
+                            onClick={() => {
+                              TriggerNuiCallback('deleteZone', zone.id).then(() => {
+                                setZones(zones.filter(z => z.id !== zone.id));
+                              });
+                            }}
+                          >
+                            <IconTrash size={16} />
+                          </ActionIcon>
+                        </Group>
+                      </Group>
+                    );
+                  })}
+                </Stack>
+              </Accordion.Panel>
+            </Accordion.Item>
           ))}
-        </Stack>
+        </Accordion>
       )}
     </Stack>
   );

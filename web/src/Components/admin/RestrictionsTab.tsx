@@ -116,7 +116,7 @@ export const RestrictionsTab: FC<RestrictionsTabProps> = ({
     return (
       <Box style={{ padding: '3rem', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
         <Loader color="blue" size="md" />
-        <Text c="dimmed" mt="md" size="sm">Loading restrictions...</Text>
+        <Text c="gray.4" mt="md" size="sm">Loading restrictions...</Text>
       </Box>
     );
   }
@@ -210,7 +210,7 @@ export const RestrictionsTab: FC<RestrictionsTabProps> = ({
                               <Box key={identifier} style={{ backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: 6, padding: '1rem' }}>
                                 <Group position="apart" mb="sm">
                                   <Group spacing="xs">
-                                    <Text size="sm" fw={500} c="dimmed">
+                                    <Text size="sm" fw={500} c="gray.4">
                                       {identifier === 'all' ? '🌐 All Players' : `👤 ${identifier}`}
                                     </Text>
                                   </Group>

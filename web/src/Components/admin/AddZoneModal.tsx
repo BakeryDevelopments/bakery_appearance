@@ -299,7 +299,7 @@ export const AddZoneModal: FC<AddZoneModalProps> = ({
               <IconDownload stroke={2} />
             </Button>
           </Group>
-          {zoneEnablePed && <Text c="dimmed" size="xs" mt={4}>
+          {zoneEnablePed && <Text c="gray.4" size="xs" mt={4}>
             Polyzone disabled when using ped
           </Text>}
         </div>

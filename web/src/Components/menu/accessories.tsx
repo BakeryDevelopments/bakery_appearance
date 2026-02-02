@@ -30,13 +30,13 @@ export const Props: FC = () => {
                     {!DisabledProps.hats && propTotal?.hats?.total > 0 ? (
                         <>
                             <Box>
-                                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.HATS_TITLE || 'Hats'}</Text>
+                                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.HATS_TITLE || 'Hats'}</Text>
                                 <Grid gutter="sm">
                                     <Grid.Col span={6}>
                                         <Box>
                                             <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                                <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
-                                                <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {propTotal.hats.total}</Text>
+                                                <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
+                                                <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {propTotal.hats.total}</Text>
                                             </Box>
                                             <NumberStepper
                                                 value={props?.hats.value || 0}
@@ -55,8 +55,8 @@ export const Props: FC = () => {
                                     <Grid.Col span={6}>
                                         <Box>
                                             <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                                <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
-                                                <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {propTotal.hats.textures}</Text>
+                                                <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
+                                                <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {propTotal.hats.textures}</Text>
                                             </Box>
                                             <NumberStepper
                                                 value={props?.hats.texture || 0}
@@ -85,13 +85,13 @@ export const Props: FC = () => {
                         <>
                             <Divider />
                             <Box>
-                                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.GLASSES_TITLE || 'glasses'}</Text>
+                                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.GLASSES_TITLE || 'glasses'}</Text>
                                 <Grid gutter="sm">
                                     <Grid.Col span={6}>
                                         <Box>
                                             <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                                <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
-                                                <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {propTotal.glasses.total}</Text>
+                                                <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
+                                                <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {propTotal.glasses.total}</Text>
                                             </Box>
                                             <NumberStepper
                                                 value={props?.glasses.value || 0}
@@ -110,8 +110,8 @@ export const Props: FC = () => {
                                     <Grid.Col span={6}>
                                         <Box>
                                             <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                                <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
-                                                <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {propTotal.glasses.textures}</Text>
+                                                <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
+                                                <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {propTotal.glasses.textures}</Text>
                                             </Box>
                                             <NumberStepper
                                                 value={props?.glasses.texture || 0}
@@ -140,13 +140,13 @@ export const Props: FC = () => {
                         <>
                             <Divider />
                             <Box>
-                                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.EARRINGS_TITLE || 'earrings'}</Text>
+                                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.EARRINGS_TITLE || 'earrings'}</Text>
                                 <Grid gutter="sm">
                                     <Grid.Col span={6}>
                                         <Box>
                                             <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                                <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
-                                                <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {propTotal.earrings.total}</Text>
+                                                <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
+                                                <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {propTotal.earrings.total}</Text>
                                             </Box>
                                             <NumberStepper
                                                 value={props?.earrings.value || 0}
@@ -165,8 +165,8 @@ export const Props: FC = () => {
                                     <Grid.Col span={6}>
                                         <Box>
                                             <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                                <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
-                                                <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {propTotal.earrings.textures}</Text>
+                                                <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
+                                                <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {propTotal.earrings.textures}</Text>
                                             </Box>
                                             <NumberStepper
                                                 value={props?.earrings.texture || 0}
@@ -195,13 +195,13 @@ export const Props: FC = () => {
                         <>
                             <Divider />
                             <Box>
-                                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.WATCHES_TITLE || 'watches'}</Text>
+                                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.WATCHES_TITLE || 'watches'}</Text>
                                 <Grid gutter="sm">
                                     <Grid.Col span={6}>
                                         <Box>
                                             <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                                <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
-                                                <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {propTotal.watches.total}</Text>
+                                                <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
+                                                <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {propTotal.watches.total}</Text>
                                             </Box>
                                             <NumberStepper
                                                 value={props?.watches.value || 0}
@@ -220,8 +220,8 @@ export const Props: FC = () => {
                                     <Grid.Col span={6}>
                                         <Box>
                                             <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                                <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
-                                                <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {propTotal.watches.textures}</Text>
+                                                <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
+                                                <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {propTotal.watches.textures}</Text>
                                             </Box>
                                             <NumberStepper
                                                 value={props?.watches.texture || 0}
@@ -250,13 +250,13 @@ export const Props: FC = () => {
                         <>
                             <Divider />
                             <Box>
-                                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.BRACELETS_TITLE || 'bracelets'}</Text>
+                                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.BRACELETS_TITLE || 'bracelets'}</Text>
                                 <Grid gutter="sm">
                                     <Grid.Col span={6}>
                                         <Box>
                                             <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                                <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
-                                                <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {propTotal.bracelets.total}</Text>
+                                                <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
+                                                <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {propTotal.bracelets.total}</Text>
                                             </Box>
                                             <NumberStepper
                                                 value={props?.bracelets.value || 0}
@@ -275,8 +275,8 @@ export const Props: FC = () => {
                                     <Grid.Col span={6}>
                                         <Box>
                                             <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                                <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
-                                                <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {propTotal.bracelets.textures}</Text>
+                                                <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
+                                                <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {propTotal.bracelets.textures}</Text>
                                             </Box>
                                             <NumberStepper
                                                 value={props?.bracelets.texture || 0}
@@ -304,7 +304,7 @@ export const Props: FC = () => {
                 </>
 
             ) :
-                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">
+                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">
                     {locale?.NO_ACCESSORIES || "You can't modify your accessories"}
                 </Text>}
 

@@ -51,11 +51,11 @@ export const MakeupMenu: FC = () => {
                         <>
 
                             <Box>
-                                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.BLUSH_TITLE || 'Blush'}</Text>
+                                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.BLUSH_TITLE || 'Blush'}</Text>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Design'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {headOverlayTotal.Blush}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Design'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {headOverlayTotal.Blush}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={headOverlay.Blush.overlayValue || 0}
@@ -79,7 +79,7 @@ export const MakeupMenu: FC = () => {
 
                                     <Box>
                                         <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '6px' }}>
-                                            <Text size="sm" c="dimmed">{locale?.COLOUR_SUBTITLE || 'Colour'}</Text>
+                                            <Text size="sm" c="gray.4">{locale?.COLOUR_SUBTITLE || 'Colour'}</Text>
                                         </Box>
                                         <ColourDropdown
                                             colourType="makeup"
@@ -106,7 +106,7 @@ export const MakeupMenu: FC = () => {
                                 <Grid.Col span={6}>
                                     <Box>
                                         <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '6px' }}>
-                                            <Text size="sm" c="dimmed">{locale?.HIGHLIGHT_SUBTITLE || 'Hightlight'}</Text>
+                                            <Text size="sm" c="gray.4">{locale?.HIGHLIGHT_SUBTITLE || 'Hightlight'}</Text>
                                         </Box>
                                         <ColourDropdown
                                             colourType="makeup"
@@ -133,7 +133,7 @@ export const MakeupMenu: FC = () => {
 
                             <Box>
                                 <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.625rem' }}>
-                                    <Text size="sm" c="dimmed" ta="right">
+                                    <Text size="sm" c="gray.4" ta="right">
                                         {locale?.OPACITY_SUBTITLE || 'Opacity'}
                                     </Text>
                                 </Box>
@@ -169,11 +169,11 @@ export const MakeupMenu: FC = () => {
                         <>
                             <Divider />
                             <Box>
-                                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.EYES_TITLE || 'Contact Lenses'}</Text>
+                                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.EYES_TITLE || 'Contact Lenses'}</Text>
 
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.COLOUR_SUBTITLE || 'Colour'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.COLOUR_SUBTITLE || 'Colour'}</Text>
                                     </Box>
                                     <ColourDropdown
                                         colourType="eye"
@@ -203,11 +203,11 @@ export const MakeupMenu: FC = () => {
                         <>
                             <Divider />
                             <Box>
-                                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.LIPSTICK_TITLE || 'Lipstick'}</Text>
+                                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.LIPSTICK_TITLE || 'Lipstick'}</Text>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Design'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {headOverlayTotal.Lipstick}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Design'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {headOverlayTotal.Lipstick}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={headOverlay.Lipstick.overlayValue || 0}
@@ -231,7 +231,7 @@ export const MakeupMenu: FC = () => {
 
                                     <Box>
                                         <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '6px' }}>
-                                            <Text size="sm" c="dimmed">{locale?.COLOUR_SUBTITLE || 'Colour'}</Text>
+                                            <Text size="sm" c="gray.4">{locale?.COLOUR_SUBTITLE || 'Colour'}</Text>
                                         </Box>
                                         <ColourDropdown
                                             colourType="makeup"
@@ -258,7 +258,7 @@ export const MakeupMenu: FC = () => {
                                 <Grid.Col span={6}>
                                     <Box>
                                         <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '6px' }}>
-                                            <Text size="sm" c="dimmed">{locale?.HIGHLIGHT_SUBTITLE || 'Hightlight'}</Text>
+                                            <Text size="sm" c="gray.4">{locale?.HIGHLIGHT_SUBTITLE || 'Hightlight'}</Text>
                                         </Box>
                                         <ColourDropdown
                                             colourType="makeup"
@@ -285,7 +285,7 @@ export const MakeupMenu: FC = () => {
 
                             <Box>
                                 <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.625rem' }}>
-                                    <Text size="sm" c="dimmed" ta="right">
+                                    <Text size="sm" c="gray.4" ta="right">
                                         {locale?.OPACITY_SUBTITLE || 'Opacity'}
                                     </Text>
                                 </Box>
@@ -319,11 +319,11 @@ export const MakeupMenu: FC = () => {
                         <>
                             <Divider />
                             <Box>
-                                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.MAKEUP_TITLE || 'Makeup'}</Text>
+                                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.MAKEUP_TITLE || 'Makeup'}</Text>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Design'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {headOverlayTotal.Makeup}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Design'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {headOverlayTotal.Makeup}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={headOverlay.Makeup.overlayValue || 0}
@@ -347,7 +347,7 @@ export const MakeupMenu: FC = () => {
 
                                     <Box>
                                         <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '6px' }}>
-                                            <Text size="sm" c="dimmed">{locale?.COLOUR_SUBTITLE || 'Colour'}</Text>
+                                            <Text size="sm" c="gray.4">{locale?.COLOUR_SUBTITLE || 'Colour'}</Text>
                                         </Box>
                                         <ColourDropdown
                                             colourType="makeup"
@@ -374,7 +374,7 @@ export const MakeupMenu: FC = () => {
                                 <Grid.Col span={6}>
                                     <Box>
                                         <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '6px' }}>
-                                            <Text size="sm" c="dimmed">{locale?.HIGHLIGHT_SUBTITLE || 'Hightlight'}</Text>
+                                            <Text size="sm" c="gray.4">{locale?.HIGHLIGHT_SUBTITLE || 'Hightlight'}</Text>
                                         </Box>
                                         <ColourDropdown
                                             colourType="makeup"
@@ -401,7 +401,7 @@ export const MakeupMenu: FC = () => {
 
                             <Box>
                                 <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.625rem' }}>
-                                    <Text size="sm" c="dimmed" ta="right">
+                                    <Text size="sm" c="gray.4" ta="right">
                                         {locale?.OPACITY_SUBTITLE || 'Opacity'}
                                     </Text>
                                 </Box>
@@ -432,7 +432,7 @@ export const MakeupMenu: FC = () => {
                     )}
                 </>
             ) : (
-                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">
+                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">
                     {locale?.NO_MAKEUP || "You can't modify your makeup"}
                 </Text>
             )}

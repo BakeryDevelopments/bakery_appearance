@@ -105,7 +105,7 @@ export const AddOutfitModal: FC<AddOutfitModalProps> = ({ opened, onClose, onAdd
           onChange={(e) => setNewOutfit({ ...newOutfit, gang: e.target.value || undefined })}
           disabled={isLoading}
         />
-        <Text c="dimmed" size="xs">
+        <Text c="gray.4" size="xs">
           Note: Outfit appearance data will be captured from your current character when you save.
         </Text>
         <Group position="right" mt="md">

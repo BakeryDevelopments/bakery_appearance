@@ -17,24 +17,24 @@ createRoot(document.getElementById('root')!).render(
       colorScheme: 'dark',
       fontFamily: '"Inter", sans-serif',
       fontSizes: {
-        xs: '14px',
-        sm: '15px',
-        md: '16px',
-        lg: '17px',
-        xl: '20px',
+        xs: '0.75rem',
+        sm: '0.875rem',
+        md: '1rem',
+        lg: '1.125rem',
+        xl: '1.25rem',
       },
       globalStyles: (theme) => ({
         body: {
           fontWeight: 500,
           WebkitFontSmoothing: 'antialiased',
-          MozOsxFontSmoothing: 'grayscale',
+          //MozOsxFontSmoothing: 'grayscale',
           textRendering: 'optimizeSpeed',
-          fontSize: '14px',
+        fontSize: '1rem',
         },
         '*': {
           fontWeight: 500,
           WebkitFontSmoothing: 'antialiased',
-          MozOsxFontSmoothing: 'grayscale',
+          //MozOsxFontSmoothing: 'grayscale',
         }
       })
     }}>

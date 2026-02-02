@@ -62,7 +62,7 @@ export const Face: FC = () => {
                     {headdata?.Ageing?.overlayValue != null && (
                         <>
                             <Box>
-                                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">
+                                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">
                                     {locale?.AGEING_SUBTITLE || 'Ageing'}
                                 </Text>
                                 <Box>
@@ -70,7 +70,7 @@ export const Face: FC = () => {
                                         <Grid.Col span={6}>
                                             <Box style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                                                 <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.4rem' }}>
-                                                    <Text size="sm" c="dimmed" ta="right">
+                                                    <Text size="sm" c="gray.4" ta="right">
                                                         {locale?.DESIGN_SUBTITLE || 'Depth'}
                                                     </Text>
                                                 </Box>
@@ -95,7 +95,7 @@ export const Face: FC = () => {
                                         <Grid.Col span={6}>
                                             <Box style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                                                 <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.4rem' }}>
-                                                    <Text size="sm" c="dimmed" ta="right">
+                                                    <Text size="sm" c="gray.4" ta="right">
                                                         {locale?.OPACITY_SUBTITLE || 'Opacity'}
                                                     </Text>
                                                 </Box>
@@ -135,7 +135,7 @@ export const Face: FC = () => {
                         <>
                             <Divider />
                             <Box>
-                                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">
+                                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">
                                     {locale?.BLEMISHES_SUBTITLE || 'Blemishes'}
                                 </Text>
                                 <Box>
@@ -143,7 +143,7 @@ export const Face: FC = () => {
                                         <Grid.Col span={6}>
                                             <Box style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                                                 <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.4rem' }}>
-                                                    <Text size="sm" c="dimmed" ta="right">
+                                                    <Text size="sm" c="gray.4" ta="right">
                                                         {locale?.DESIGN_SUBTITLE || 'Depth'}
                                                     </Text>
                                                 </Box>
@@ -168,7 +168,7 @@ export const Face: FC = () => {
                                         <Grid.Col span={6}>
                                             <Box style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                                                 <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.4rem' }}>
-                                                    <Text size="sm" c="dimmed" ta="right">
+                                                    <Text size="sm" c="gray.4" ta="right">
                                                         {locale?.OPACITY_SUBTITLE || 'Opacity'}
                                                     </Text>
                                                 </Box>
@@ -207,14 +207,14 @@ export const Face: FC = () => {
                         <>
                             <Divider />
                             <Box>
-                                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">
+                                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">
                                     {locale?.CHEEKS_TITLE || 'Cheeks'}
                                 </Text>
                                 <Box>
                                     <Grid gutter="sm">
                                         <Grid.Col span={6}>
                                             <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.625rem' }}>
-                                                <Text size="sm" c="dimmed" ta="right">
+                                                <Text size="sm" c="gray.4" ta="right">
                                                     {locale?.BONEHEIGHT_SUBTITLE || 'Bone Height'}
                                                 </Text>
                                             </Box>
@@ -243,7 +243,7 @@ export const Face: FC = () => {
 
                                         <Grid.Col span={6}>
                                             <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.625rem' }}>
-                                                <Text size="sm" c="dimmed" ta="right">
+                                                <Text size="sm" c="gray.4" ta="right">
                                                     {locale?.BONEWIDTH_SUBTITLE || 'Depth'}
                                                 </Text>
                                             </Box>
@@ -280,14 +280,14 @@ export const Face: FC = () => {
                         <>
                             <Divider />
                             <Box>
-                                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">
+                                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">
                                     {locale?.CHIN_TITLE || 'Chin'}
                                 </Text>
                                 <Box>
                                     <Grid gutter="sm">
                                         <Grid.Col span={6}>
                                             <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.625rem' }}>
-                                                <Text size="sm" c="dimmed" ta="right">
+                                                <Text size="sm" c="gray.4" ta="right">
                                                     {locale?.BONELOWERING_SUBTITLE || 'Bone Height'}
                                                 </Text>
                                             </Box>
@@ -316,7 +316,7 @@ export const Face: FC = () => {
 
                                         <Grid.Col span={6}>
                                             <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.625rem' }}>
-                                                <Text size="sm" c="dimmed" ta="right">
+                                                <Text size="sm" c="gray.4" ta="right">
                                                     {locale?.BONELENGTH_SUBTITLE || 'Depth'}
                                                 </Text>
                                             </Box>
@@ -345,7 +345,7 @@ export const Face: FC = () => {
                                     </Grid>
 
                                     <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.625rem' }}>
-                                        <Text size="sm" c="dimmed" ta="right">
+                                        <Text size="sm" c="gray.4" ta="right">
                                             {locale?.HOLE_SUBTITLE || 'Bone Height'}
                                         </Text>
                                     </Box>
@@ -380,7 +380,7 @@ export const Face: FC = () => {
                         <>
                             <Divider />
                             <Box>
-                                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">
+                                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">
                                     {locale?.COMPLEXION_SUBTITLE || 'Complexion'}
                                 </Text>
                                 <Box>
@@ -388,7 +388,7 @@ export const Face: FC = () => {
                                         <Grid.Col span={6}>
                                             <Box style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                                                 <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.4rem' }}>
-                                                    <Text size="sm" c="dimmed" ta="right">
+                                                    <Text size="sm" c="gray.4" ta="right">
                                                         {locale?.DESIGN_SUBTITLE || 'Depth'}
                                                     </Text>
                                                 </Box>
@@ -413,7 +413,7 @@ export const Face: FC = () => {
                                         <Grid.Col span={6}>
                                             <Box style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                                                 <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.4rem' }}>
-                                                    <Text size="sm" c="dimmed" ta="right">
+                                                    <Text size="sm" c="gray.4" ta="right">
                                                         {locale?.OPACITY_SUBTITLE || 'Opacity'}
                                                     </Text>
                                                 </Box>
@@ -454,14 +454,14 @@ export const Face: FC = () => {
                         <>
                             <Divider />
                             <Box>
-                                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">
+                                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">
                                     {locale?.EYEBROW_TITLE || 'Eyebrow'}
                                 </Text>
                                 <Box>
                                     <Grid gutter="sm">
                                         <Grid.Col span={6}>
                                             <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.625rem' }}>
-                                                <Text size="sm" c="dimmed" ta="right">
+                                                <Text size="sm" c="gray.4" ta="right">
                                                     {locale?.HEIGHT_SUBTITLE || 'Width'}
                                                 </Text>
                                             </Box>
@@ -490,7 +490,7 @@ export const Face: FC = () => {
 
                                         <Grid.Col span={6}>
                                             <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.625rem' }}>
-                                                <Text size="sm" c="dimmed" ta="right">
+                                                <Text size="sm" c="gray.4" ta="right">
                                                     {locale?.DEPTH_SUBTITLE || 'Depth'}
                                                 </Text>
                                             </Box>
@@ -527,12 +527,12 @@ export const Face: FC = () => {
                         <>
                             <Divider />
                             <Box>
-                                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">
+                                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">
                                     {locale?.EYES_TITLE || 'Eyes'}
                                 </Text>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.625rem' }}>
-                                        <Text size="sm" c="dimmed" ta="right">
+                                        <Text size="sm" c="gray.4" ta="right">
                                             {locale?.SQUINT_SUBTITLE || 'Width'}
                                         </Text>
                                     </Box>
@@ -567,14 +567,14 @@ export const Face: FC = () => {
                         <>
                             <Divider />
                             <Box>
-                                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">
+                                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">
                                     {locale?.JAW_TITLE || 'Eyebrow'}
                                 </Text>
                                 <Box>
                                     <Grid gutter="sm">
                                         <Grid.Col span={6}>
                                             <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.625rem' }}>
-                                                <Text size="sm" c="dimmed" ta="right">
+                                                <Text size="sm" c="gray.4" ta="right">
                                                     {locale?.BONEWIDTH_SUBTITLE || 'Width'}
                                                 </Text>
                                             </Box>
@@ -603,7 +603,7 @@ export const Face: FC = () => {
 
                                         <Grid.Col span={6}>
                                             <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.625rem' }}>
-                                                <Text size="sm" c="dimmed" ta="right">
+                                                <Text size="sm" c="gray.4" ta="right">
                                                     {locale?.BONELENGTH_SUBTITLE || 'Depth'}
                                                 </Text>
                                             </Box>
@@ -640,12 +640,12 @@ export const Face: FC = () => {
                         <>
                             <Divider />
                             <Box>
-                                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">
+                                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">
                                     {locale?.LIPS_TITLE || 'Lips'}
                                 </Text>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.625rem' }}>
-                                        <Text size="sm" c="dimmed" ta="right">
+                                        <Text size="sm" c="gray.4" ta="right">
                                             {locale?.THICKNESS_SUBTITLE || 'Thickness'}
                                         </Text>
                                     </Box>
@@ -680,12 +680,12 @@ export const Face: FC = () => {
                         <>
                             <Divider />
                             <Box>
-                                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">
+                                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">
                                     {locale?.NECKTHICK_TITLE || 'Lips'}
                                 </Text>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.625rem' }}>
-                                        <Text size="sm" c="dimmed" ta="right">
+                                        <Text size="sm" c="gray.4" ta="right">
                                             {locale?.THICKNESS_SUBTITLE || 'Thickness'}
                                         </Text>
                                     </Box>
@@ -720,7 +720,7 @@ export const Face: FC = () => {
                         <>
                             <Divider />
                             <Box>
-                                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">
+                                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">
                                     {locale?.NOSE_TITLE || 'Nose'}
                                 </Text>
 
@@ -728,7 +728,7 @@ export const Face: FC = () => {
                                     <Grid gutter="sm">
                                         <Grid.Col span={6}>
                                             <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.625rem' }}>
-                                                <Text size="sm" c="dimmed" ta="right">
+                                                <Text size="sm" c="gray.4" ta="right">
                                                     {locale?.WIDTH_SUBTITLE || 'Width'}
                                                 </Text>
                                             </Box>
@@ -757,7 +757,7 @@ export const Face: FC = () => {
 
                                         <Grid.Col span={6}>
                                             <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.625rem' }}>
-                                                <Text size="sm" c="dimmed" ta="right">
+                                                <Text size="sm" c="gray.4" ta="right">
                                                     {locale?.PEAKHEIGHT_SUBTITLE || 'Peak Height'}
                                                 </Text>
                                             </Box>
@@ -791,7 +791,7 @@ export const Face: FC = () => {
                                     <Grid gutter="sm" style={{ marginTop: '0.5rem' }}>
                                         <Grid.Col span={6}>
                                             <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.625rem' }}>
-                                                <Text size="sm" c="dimmed" ta="right">
+                                                <Text size="sm" c="gray.4" ta="right">
                                                     {locale?.BONEHEIGHT_SUBTITLE || 'Bone Height'}
                                                 </Text>
                                             </Box>
@@ -820,7 +820,7 @@ export const Face: FC = () => {
 
                                         <Grid.Col span={6}>
                                             <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.625rem' }}>
-                                                <Text size="sm" c="dimmed" ta="right">
+                                                <Text size="sm" c="gray.4" ta="right">
                                                     {locale?.PEAKLENGTH_SUBTITLE || 'Peak Length'}
                                                 </Text>
                                             </Box>
@@ -854,7 +854,7 @@ export const Face: FC = () => {
                                     <Grid gutter="sm" style={{ marginTop: '0.5rem' }}>
                                         <Grid.Col span={6}>
                                             <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.625rem' }}>
-                                                <Text size="sm" c="dimmed" ta="right">
+                                                <Text size="sm" c="gray.4" ta="right">
                                                     {locale?.BONETWIST_SUBTITLE || 'Bone Twist'}
                                                 </Text>
                                             </Box>
@@ -883,7 +883,7 @@ export const Face: FC = () => {
 
                                         <Grid.Col span={6}>
                                             <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.625rem' }}>
-                                                <Text size="sm" c="dimmed" ta="right">
+                                                <Text size="sm" c="gray.4" ta="right">
                                                     {locale?.PEAKLOWERING_SUBTITLE || 'Peak Lowering'}
                                                 </Text>
                                             </Box>
@@ -920,7 +920,7 @@ export const Face: FC = () => {
                         <>
                             <Divider />
                             <Box>
-                                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">
+                                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">
                                     {locale?.MOLESFRECKLES_SUBTITLE || 'Moles $ Freckles'}
                                 </Text>
                                 <Box>
@@ -928,7 +928,7 @@ export const Face: FC = () => {
                                         <Grid.Col span={6}>
                                             <Box style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                                                 <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.4rem' }}>
-                                                    <Text size="sm" c="dimmed" ta="right">
+                                                    <Text size="sm" c="gray.4" ta="right">
                                                         {locale?.DESIGN_SUBTITLE || 'Depth'}
                                                     </Text>
                                                 </Box>
@@ -953,7 +953,7 @@ export const Face: FC = () => {
                                         <Grid.Col span={6}>
                                             <Box style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                                                 <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.4rem' }}>
-                                                    <Text size="sm" c="dimmed" ta="right">
+                                                    <Text size="sm" c="gray.4" ta="right">
                                                         {locale?.OPACITY_SUBTITLE || 'Opacity'}
                                                     </Text>
                                                 </Box>
@@ -993,7 +993,7 @@ export const Face: FC = () => {
                         <>
                             <Divider />
                             <Box>
-                                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">
+                                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">
                                     {locale?.SUNDAMAGE_SUBTITLE || 'Sun Damage'}
                                 </Text>
                                 <Box>
@@ -1001,7 +1001,7 @@ export const Face: FC = () => {
                                         <Grid.Col span={6}>
                                             <Box style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                                                 <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.4rem' }}>
-                                                    <Text size="sm" c="dimmed" ta="right">
+                                                    <Text size="sm" c="gray.4" ta="right">
                                                         {locale?.DESIGN_SUBTITLE || 'Depth'}
                                                     </Text>
                                                 </Box>
@@ -1026,7 +1026,7 @@ export const Face: FC = () => {
                                         <Grid.Col span={6}>
                                             <Box style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                                                 <Box style={{ display: 'flex', justifyContent: 'right', marginBottom: '0.4rem' }}>
-                                                    <Text size="sm" c="dimmed" ta="right">
+                                                    <Text size="sm" c="gray.4" ta="right">
                                                         {locale?.OPACITY_SUBTITLE || 'Opacity'}
                                                     </Text>
                                                 </Box>
@@ -1064,7 +1064,7 @@ export const Face: FC = () => {
 
                 </>
             ) : (
-                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">
+                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">
                     {locale?.NO_FACEMENU || "You can't modify your face"}
                 </Text>
             )}

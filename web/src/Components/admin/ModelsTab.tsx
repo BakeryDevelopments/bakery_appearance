@@ -34,7 +34,7 @@ export const ModelsTab: FC<ModelsTabProps> = ({
     return (
       <Box style={{ padding: '3rem', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
         <Loader color="blue" size="md" />
-        <Text c="dimmed" mt="md" size="sm">Loading models...</Text>
+        <Text c="gray.4" mt="md" size="sm">Loading models...</Text>
       </Box>
     );
   }

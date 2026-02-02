@@ -42,7 +42,7 @@ const ComponentItem = memo(({
   onTextureChange: (val: number) => void;
 }) => (
   <Group spacing={4} style={{ padding: '4px 8px', backgroundColor: idx % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent', borderRadius: 4 }}>
-    <Text c="dimmed" size="xs" style={{ width: '80px', flexShrink: 0 }}>{idx}: {name}</Text>
+    <Text c="gray.4" size="xs" style={{ width: '80px', flexShrink: 0 }}>{idx}: {name}</Text>
     <NumberInput
       size="xs"
       value={drawable}
@@ -83,7 +83,7 @@ const PropItem = memo(({
   onTextureChange: (val: number) => void;
 }) => (
   <Group spacing={4} style={{ padding: '4px 8px', backgroundColor: realIdx % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent', borderRadius: 4 }}>
-    <Text c="dimmed" size="xs" style={{ width: '80px', flexShrink: 0 }}>{idx}: {name}</Text>
+    <Text c="gray.4" size="xs" style={{ width: '80px', flexShrink: 0 }}>{idx}: {name}</Text>
     <NumberInput
       size="xs"
       value={drawable}
@@ -118,7 +118,7 @@ const HairItem = memo(({
   onChange: (val: number) => void;
 }) => (
   <Group spacing={4} style={{ padding: '4px 8px', backgroundColor: idx % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent', borderRadius: 4 }}>
-    <Text c="dimmed" size="xs" style={{ width: '80px', flexShrink: 0 }}>{name}</Text>
+    <Text c="gray.4" size="xs" style={{ width: '80px', flexShrink: 0 }}>{name}</Text>
     <NumberInput
       size="xs"
       value={value}
@@ -316,7 +316,7 @@ const InitialClothesTabComponent: FC<InitialClothesTabProps> = ({
         <Text c="white" fw={500} size="lg" mb={4}>
           {locale.ADMIN_INITIAL_CLOTHES_TITLE || 'Initial Player Clothes'}
         </Text>
-        <Text c="dimmed" size="xs">
+        <Text c="gray.4" size="xs">
           {locale.ADMIN_INITIAL_CLOTHES_DESC || 'Set default clothing items that will be applied when a new character is created.'}
         </Text>
       </div>

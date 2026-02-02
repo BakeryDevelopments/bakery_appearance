@@ -161,7 +161,7 @@ export const TattoosTab: FC<TattoosTabProps> = ({
     return (
       <Box style={{ padding: '3rem', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
         <Loader color="blue" size="md" />
-        <Text c="dimmed" mt="md" size="sm">Loading tattoos...</Text>
+        <Text c="gray.4" mt="md" size="sm">Loading tattoos...</Text>
       </Box>
     );
   }
@@ -259,7 +259,7 @@ export const TattoosTab: FC<TattoosTabProps> = ({
               <Accordion.Panel>
                 <Stack spacing="sm">
                   <Group position="apart">
-                    <Text size="sm" c="dimmed">Tattoo Entries (label + hashes)</Text>
+                    <Text size="sm" c="gray.4">Tattoo Entries (label + hashes)</Text>
                     <Group spacing="xs">
                       <Button size="xs" variant="light" onClick={() => handleAddTattoo(dlcIdx)}>
                         <IconPlus size={12} style={{ marginRight: 4 }} />
@@ -277,11 +277,11 @@ export const TattoosTab: FC<TattoosTabProps> = ({
                   </Group>
                   
                   {(dlc.tattoos || []).length === 0 ? (
-                    <Text size="xs" c="dimmed" ta="center" py="md">
+                    <Text size="xs" c="gray.4" ta="center" py="md">
                       No tattoos in this DLC pack yet
                     </Text>
                   ) : totalCount === 0 ? (
-                    <Text size="xs" c="dimmed" ta="center" py="md">
+                    <Text size="xs" c="gray.4" ta="center" py="md">
                       No tattoos match "{searchTerm}"
                     </Text>
                   ) : (

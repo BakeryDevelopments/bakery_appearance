@@ -250,7 +250,7 @@ export const SettingsTab: FC<SettingsTabProps> = ({
         fallback={
           <Box style={{ padding: '2rem', textAlign: 'center' }}>
             <Loader size="sm" />
-            <Text c="dimmed" mt="sm" size="xs">Loading initial clothes...</Text>
+            <Text c="gray.4" mt="sm" size="xs">Loading initial clothes...</Text>
           </Box>
         }
       >

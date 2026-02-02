@@ -68,11 +68,11 @@ export const Heritage: FC = () => {
         }}>
             {/* Model Selection */}
             <Box>
-                <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.MODEL_TITLE || 'Model'}</Text>
+                <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.MODEL_TITLE || 'Model'}</Text>
                 <Stack spacing="xs">
                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                        <Text size="sm" c="dimmed">{locale?.OPTIONS_SUBTITLE || 'Options'}</Text>
-                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {models?.length || 0}</Text>
+                        <Text size="sm" c="gray.4">{locale?.OPTIONS_SUBTITLE || 'Options'}</Text>
+                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {models?.length || 0}</Text>
                     </Box>
 
                     {/* Current Model Display */}
@@ -266,13 +266,13 @@ export const Heritage: FC = () => {
 
                     {/* Mother */}
                     <Box>
-                        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.MOTHER_SUBTITLE || 'Mother'}</Text>
+                        <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.MOTHER_SUBTITLE || 'Mother'}</Text>
                         <Grid gutter="sm">
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.FACE_TITLE || 'Face'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: 46</Text>
+                                        <Text size="sm" c="gray.4">{locale?.FACE_TITLE || 'Face'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: 46</Text>
                                     </Box>
                                     <NumberStepper
                                         value={data.shapeFirst || 0}
@@ -285,8 +285,8 @@ export const Heritage: FC = () => {
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.SKIN_TITLE || 'Skin'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: 45</Text>
+                                        <Text size="sm" c="gray.4">{locale?.SKIN_TITLE || 'Skin'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: 45</Text>
                                     </Box>
                                     <NumberStepper
                                         value={data.skinFirst || 0}
@@ -301,13 +301,13 @@ export const Heritage: FC = () => {
 
                     {/* Father */}
                     <Box>
-                        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.FATHER_SUBTITLE || 'Father'}</Text>
+                        <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.FATHER_SUBTITLE || 'Father'}</Text>
                         <Grid gutter="sm">
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.FACE_TITLE || 'Face'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: 46</Text>
+                                        <Text size="sm" c="gray.4">{locale?.FACE_TITLE || 'Face'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: 46</Text>
                                     </Box>
                                     <NumberStepper
                                         value={data.shapeSecond || 0}
@@ -320,8 +320,8 @@ export const Heritage: FC = () => {
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.SKIN_TITLE || 'Skin'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: 45</Text>
+                                        <Text size="sm" c="gray.4">{locale?.SKIN_TITLE || 'Skin'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: 45</Text>
                                     </Box>
                                     <NumberStepper
                                         value={data.skinSecond || 0}
@@ -336,13 +336,13 @@ export const Heritage: FC = () => {
 
                     {/* Third Parent */}
                     <Box>
-                        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.THIRDPARENT_SUBTITLE || 'Third Parent'}</Text>
+                        <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.THIRDPARENT_SUBTITLE || 'Third Parent'}</Text>
                         <Grid gutter="sm">
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.FACE_TITLE || 'Face'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: 46</Text>
+                                        <Text size="sm" c="gray.4">{locale?.FACE_TITLE || 'Face'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: 46</Text>
                                     </Box>
                                     <NumberStepper
                                         value={data.shapeThird || 0}
@@ -355,8 +355,8 @@ export const Heritage: FC = () => {
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.SKIN_TITLE || 'Skin'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: 45</Text>
+                                        <Text size="sm" c="gray.4">{locale?.SKIN_TITLE || 'Skin'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: 45</Text>
                                     </Box>
                                     <NumberStepper
                                         value={data.skinThird || 0}
@@ -371,12 +371,12 @@ export const Heritage: FC = () => {
 
                     {/* Resemblance Mix */}
                     <Box>
-                        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.RESEMBLENCE_TITLE || 'Resemblance'}</Text>
+                        <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.RESEMBLENCE_TITLE || 'Resemblance'}</Text>
                         <Stack spacing="md">
                             <Box>
                                 <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.625rem' }}>
-                                    <Text size="sm" c="dimmed">{locale?.MOTHER_SUBTITLE || 'Mother'}</Text>
-                                    <Text size="sm" c="dimmed">{locale?.FATHER_SUBTITLE || 'Father'}</Text>
+                                    <Text size="sm" c="gray.4">{locale?.MOTHER_SUBTITLE || 'Mother'}</Text>
+                                    <Text size="sm" c="gray.4">{locale?.FATHER_SUBTITLE || 'Father'}</Text>
                                 </Box>
                                 <Box style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                                     <Box
@@ -429,7 +429,7 @@ export const Heritage: FC = () => {
                             </Box>
 
                             <Box>
-                                <Text size="sm" mb="0.625rem" ta="right" c="dimmed">Third</Text>
+                                <Text size="sm" mb="0.625rem" ta="right" c="gray.4">Third</Text>
                                 <Box style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                                     <input
                                         type="range"
@@ -468,11 +468,11 @@ export const Heritage: FC = () => {
 
                     {/* Skin Mix */}
                     <Box>
-                        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.SKINMIX_TITLE || 'Skin Mix'}</Text>
+                        <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.SKINMIX_TITLE || 'Skin Mix'}</Text>
                         <Box>
                             <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.625rem' }}>
-                                <Text size="sm" c="dimmed">{locale?.MOTHER_SUBTITLE || 'Mother'}</Text>
-                                <Text size="sm" c="dimmed">{locale?.FATHER_SUBTITLE || 'Father'}</Text>
+                                <Text size="sm" c="gray.4">{locale?.MOTHER_SUBTITLE || 'Mother'}</Text>
+                                <Text size="sm" c="gray.4">{locale?.FATHER_SUBTITLE || 'Father'}</Text>
                             </Box>
                             <Box style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                                 <Box

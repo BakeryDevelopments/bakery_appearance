@@ -702,7 +702,7 @@ export const AdminMenu: FC = () => {
                 fallback={
                   <Box style={{ padding: '3rem', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
                     <Loader color="blue" size="md" />
-                    <Text c="dimmed" mt="md" size="sm">{locale.ADMIN_MSG_LOADING_SETTINGS || 'Loading settings...'}</Text>
+                    <Text c="gray.4" mt="md" size="sm">{locale.ADMIN_MSG_LOADING_SETTINGS || 'Loading settings...'}</Text>
                   </Box>
                 }
               >
@@ -722,7 +722,7 @@ export const AdminMenu: FC = () => {
                 fallback={
                   <Box style={{ padding: '3rem', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
                     <Loader color="blue" size="md" />
-                    <Text c="dimmed" mt="md" size="sm">{locale.ADMIN_MSG_LOADING_RESTRICTIONS || 'Loading restrictions...'}</Text>
+                    <Text c="gray.4" mt="md" size="sm">{locale.ADMIN_MSG_LOADING_RESTRICTIONS || 'Loading restrictions...'}</Text>
                   </Box>
                 }
               >
@@ -746,7 +746,7 @@ export const AdminMenu: FC = () => {
                 fallback={
                   <Box style={{ padding: '3rem', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
                     <Loader color="blue" size="md" />
-                    <Text c="dimmed" mt="md" size="sm">{locale.ADMIN_MSG_LOADING_MODELS || 'Loading models...'}</Text>
+                    <Text c="gray.4" mt="md" size="sm">{locale.ADMIN_MSG_LOADING_MODELS || 'Loading models...'}</Text>
                   </Box>
                 }
               >
@@ -769,7 +769,7 @@ export const AdminMenu: FC = () => {
                 fallback={
                   <Box style={{ padding: '3rem', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
                     <Loader color="blue" size="md" />
-                    <Text c="dimmed" mt="md" size="sm">{locale.ADMIN_MSG_LOADING_TATTOOS || 'Loading tattoos...'}</Text>
+                    <Text c="gray.4" mt="md" size="sm">{locale.ADMIN_MSG_LOADING_TATTOOS || 'Loading tattoos...'}</Text>
                   </Box>
                 }
               >

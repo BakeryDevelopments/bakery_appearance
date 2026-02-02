@@ -27,13 +27,13 @@ export const ClothesMenu: FC = () => {
             {!disableConfig?.Components?.masks === true && drawTotal && drawTotal?.masks?.total > 0 ? (
                 <>
                     <Box>
-                        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.MASK_TITLE || 'Mask'}</Text>
+                        <Text fw={"bold"} mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.MASK_TITLE || 'Mask'}</Text>
                         <Grid gutter="sm">
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Design'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.masks.total}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Design'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.masks.total}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={drawables.masks.value || 0}
@@ -50,8 +50,8 @@ export const ClothesMenu: FC = () => {
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.masks.textures}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.masks.textures}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={drawables.masks.texture || 0}
@@ -73,13 +73,13 @@ export const ClothesMenu: FC = () => {
                 <>
                     <Divider />
                     <Box>
-                        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.JACKET_TITLE || 'Jacket'}</Text>
+                        <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.JACKET_TITLE || 'Jacket'}</Text>
                         <Grid gutter="sm">
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.jackets.total}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.jackets.total}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={drawables.jackets.value || 0}
@@ -96,8 +96,8 @@ export const ClothesMenu: FC = () => {
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.jackets.textures}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.jackets.textures}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={drawables.jackets.texture || 0}
@@ -119,13 +119,13 @@ export const ClothesMenu: FC = () => {
                 <>
                     <Divider />
                     <Box>
-                        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.SHIRT_TITLE || 'Jacket'}</Text>
+                        <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.SHIRT_TITLE || 'Jacket'}</Text>
                         <Grid gutter="sm">
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.shirts.total}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.shirts.total}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={drawables.shirts.value || 0}
@@ -142,8 +142,8 @@ export const ClothesMenu: FC = () => {
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.shirts.textures}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.shirts.textures}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={drawables.shirts.texture || 0}
@@ -165,13 +165,13 @@ export const ClothesMenu: FC = () => {
                 <>
                     <Divider />
                     <Box>
-                        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.ARMS_TITLE || 'Arms'}</Text>
+                        <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.ARMS_TITLE || 'Arms'}</Text>
                         <Grid gutter="sm">
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.torsos.total}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.torsos.total}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={drawables.torsos.value || 0}
@@ -188,8 +188,8 @@ export const ClothesMenu: FC = () => {
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.torsos.textures}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.torsos.textures}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={drawables.torsos.texture || 0}
@@ -211,13 +211,13 @@ export const ClothesMenu: FC = () => {
                 <>
                     <Divider />
                     <Box>
-                        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.VEST_TITLE || 'Vest'}</Text>
+                        <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.VEST_TITLE || 'Vest'}</Text>
                         <Grid gutter="sm">
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.vest.total}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.vest.total}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={drawables.vest.value || 0}
@@ -234,8 +234,8 @@ export const ClothesMenu: FC = () => {
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.vest.textures}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.vest.textures}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={drawables.vest.texture || 0}
@@ -257,13 +257,13 @@ export const ClothesMenu: FC = () => {
                 <>
                     <Divider />
                     <Box>
-                        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.LEGS_TITLE || 'Legs'}</Text>
+                        <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.LEGS_TITLE || 'Legs'}</Text>
                         <Grid gutter="sm">
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.legs.total}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.legs.total}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={drawables.legs.value || 0}
@@ -280,8 +280,8 @@ export const ClothesMenu: FC = () => {
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.legs.textures}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.legs.textures}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={drawables.legs.texture || 0}
@@ -303,13 +303,13 @@ export const ClothesMenu: FC = () => {
                 <>
                     <Divider />
                     <Box>
-                        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.SHOES_TITLE || 'Shoes'}</Text>
+                        <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.SHOES_TITLE || 'Shoes'}</Text>
                         <Grid gutter="sm">
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.shoes.total}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.shoes.total}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={drawables.shoes.value || 0}
@@ -326,8 +326,8 @@ export const ClothesMenu: FC = () => {
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.shoes.textures}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.shoes.textures}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={drawables.shoes.texture || 0}
@@ -349,13 +349,13 @@ export const ClothesMenu: FC = () => {
                 <>
                     <Divider />
                     <Box>
-                        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.BAGS_TITLE || 'Bags'}</Text>
+                        <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.BAGS_TITLE || 'Bags'}</Text>
                         <Grid gutter="sm">
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.bags.total}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.bags.total}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={drawables.bags.value || 0}
@@ -372,8 +372,8 @@ export const ClothesMenu: FC = () => {
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.bags.textures}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.bags.textures}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={drawables.bags.texture || 0}
@@ -395,13 +395,13 @@ export const ClothesMenu: FC = () => {
                 <>
                     <Divider />
                     <Box>
-                        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.NECK_TITLE || 'Necklace'}</Text>
+                        <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.NECK_TITLE || 'Necklace'}</Text>
                         <Grid gutter="sm">
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.neck.total}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.neck.total}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={drawables.neck.value || 0}
@@ -418,8 +418,8 @@ export const ClothesMenu: FC = () => {
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.neck.textures}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.neck.textures}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={drawables.neck.texture || 0}
@@ -441,13 +441,13 @@ export const ClothesMenu: FC = () => {
                 <>
                     <Divider />
                     <Box>
-                        <Text fw={600} mb="sm" ta="right" tt="uppercase" size="sm" c="white">{locale?.DECALS_TITLE || 'Decals'}</Text>
+                        <Text fw="bold" mb="sm" ta="right" tt="uppercase" size="md" c="white">{locale?.DECALS_TITLE || 'Decals'}</Text>
                         <Grid gutter="sm">
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.decals.total}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Face'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.decals.total}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={drawables.decals.value || 0}
@@ -464,8 +464,8 @@ export const ClothesMenu: FC = () => {
                             <Grid.Col span={6}>
                                 <Box>
                                     <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                        <Text size="sm" c="dimmed">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
-                                        <Text size="sm" c="dimmed">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.decals.textures}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.DESIGN_SUBTITLE || 'Skin'}</Text>
+                                        <Text size="sm" c="gray.4">{locale?.TOTAL_SUBTITLE || 'Total'}: {drawTotal.decals.textures}</Text>
                                     </Box>
                                     <NumberStepper
                                         value={drawables.decals.texture || 0}

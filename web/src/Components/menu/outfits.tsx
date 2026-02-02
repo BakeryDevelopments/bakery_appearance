@@ -325,7 +325,7 @@ const Outfits: React.FC = () => {
             />
 
             {!personalOutfits?.length && !adminOutfits?.length && (
-                <Text fw={600} mb="sm" ta="center" tt="uppercase" size="sm" c="dimmed">
+                <Text fw="bold" mb="sm" ta="center" tt="uppercase" size="md" c="gray.4">
                     {locale?.NO_OUTFITS || "No outfits configured"}
                 </Text>
             )}
@@ -368,7 +368,7 @@ const OutfitItem: React.FC<OutfitItemProps> = ({
     return (
         <Box>
             <Group position="apart" mb="md" spacing="xs" noWrap style={{ display: 'flex', alignItems: 'center' }}>
-                <Text fw={600} size="sm" c="white" style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <Text fw="bold" size="md" c="white" style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {isJob ? `${label} | ${jobname}` : label}
                 </Text>
                 <Button
@@ -554,7 +554,7 @@ const OutfitCreation: React.FC<OutfitCreationProps> = ({
     if (isAdding || isJobAdding) {
         return (
             <Box style={{ animation: 'fadeScaleIn 0.35s cubic-bezier(0.22, 1, 0.36, 1)' }}>
-                <Text fw={600} mb="sm" size="sm" c="white" tt="uppercase">
+                <Text fw="bold" mb="sm" size="md" c="white" tt="uppercase">
                     {isJobAdding ? (locale?.ADDJOBOUTFIT || 'Add Job Outfit') : (locale?.NEWOUTFIT_TITLE || 'New Outfit')}
                 </Text>
                 <Group spacing="xs">
@@ -593,7 +593,7 @@ const OutfitCreation: React.FC<OutfitCreationProps> = ({
     if (isImporting) {
         return (
             <Box style={{ animation: 'fadeScaleIn 0.35s cubic-bezier(0.22, 1, 0.36, 1)' }}>
-                <Text fw={600} mb="sm" size="sm" c="white" tt="uppercase">
+                <Text fw="bold" mb="sm" size="md" c="white" tt="uppercase">
                     {locale?.IMPORTOUTFIT_TITLE || 'Import Outfit'}
                 </Text>
                 <Group spacing="xs">
