@@ -12,7 +12,6 @@ local Cache = {
     locale = {},
     appearanceSettings = {
         useTarget = false,
-        enablePedsForShops = false,
         chargePerTattoo = false,
         blips = {},
         prices = {
@@ -148,7 +147,6 @@ local function loadAppearanceSettings()
 
         if type(decoded) == 'table' then
             Cache.appearanceSettings.useTarget = decoded.useTarget ~= nil and decoded.useTarget or Cache.appearanceSettings.useTarget
-            Cache.appearanceSettings.enablePedsForShops = decoded.enablePedsForShops ~= nil and decoded.enablePedsForShops or Cache.appearanceSettings.enablePedsForShops
             Cache.appearanceSettings.useRadialMenu = decoded.useRadialMenu ~= nil and decoded.useRadialMenu or Cache.appearanceSettings.useRadialMenu
             Cache.appearanceSettings.chargePerTattoo = decoded.chargePerTattoo ~= nil and decoded.chargePerTattoo or Cache.appearanceSettings.chargePerTattoo
             Cache.appearanceSettings.blips = decoded.blips or Cache.appearanceSettings.blips
@@ -285,7 +283,6 @@ end
 local function loadShopSettings()
     local shopSettingsFile = LoadResourceFile('bakery_appearance', 'shared/data/shop_settings.json')
     Cache.shopSettings = shopSettingsFile and json.decode(shopSettingsFile) or {
-        enablePedsForShops = true,
         enablePedsForClothingRooms = true,
         enablePedsForPlayerOutfitRooms = true
     }
@@ -470,6 +467,11 @@ end
 RegisterNetEvent('bakery_appearance:client:updateTheme', function(theme)
     Cache.theme = theme
     handleNuiMessage({ action = 'setThemeConfig', data = theme }, true)
+end)
+
+RegisterNetEvent('bakery_appearance:client:updateZones', function(zones)
+    Cache.zones = zones or {}
+    handleNuiMessage({ action = 'setZones', data = Cache.zones }, true)
 end)
 
 RegisterNetEvent('bakery_appearance:client:updateTattoos', function(tattoos)

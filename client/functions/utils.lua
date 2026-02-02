@@ -22,11 +22,18 @@ function TableContains(tbl, value)
 end
 
 -- Format zone label with menu type and price
-function getZoneLabel(zoneType)
+function getZoneLabel(zone)
     local settings = CacheAPI.getAppearanceSettings() or {}
-    local menuType = zoneType or 'clothing'
+    local menuType = type(zone) == 'table' and zone.type or zone or 'clothing'
     local typeName = (settings.blips and settings.blips[menuType] and settings.blips[menuType].name) or 'Appearance'
-    local price = (settings.prices and settings.prices[menuType]) or 0
+    
+    -- Check for custom price first, then fall back to default pricing
+    local price = 0
+    if type(zone) == 'table' and zone.price ~= nil then
+        price = zone.price
+    else
+        price = (settings.prices and settings.prices[menuType]) or 0
+    end
 
     if price > 0 then
         return string.format('Open %s - ($%d)', typeName, price)

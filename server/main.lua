@@ -27,7 +27,8 @@ lib.callback.register('bakery_appearance:saveAppearance', function(source, appea
 
     -- Get menu type from appearance data to determine price
     local menuType = appearance.menuType or 'clothing'
-    local price = ServerCache.appearanceSettings.prices[menuType] or 0
+    -- Use custom price if explicitly set (can be 0 for free), otherwise use default pricing
+    local price = (appearance.customPrice ~= nil) and appearance.customPrice or (ServerCache.appearanceSettings.prices[menuType] or 0)
     
     -- Get player data for money check
     local playerData = Framework.GetPlayer(source)

@@ -51,7 +51,7 @@ local function createZonePed(zone)
             {
                 name = 'bakery_appearance_zone_' .. zone.id,
                 icon = 'fa-solid fa-shirt',
-                label = getZoneLabel(zone.type),
+                label = getZoneLabel(zone),
                 onSelect = function()
                     OpenAppearanceMenu(zone)
                 end,
@@ -91,7 +91,7 @@ local function createPolyZone(zone)
         onEnter = function()
             if not hasAccess(zone) then return end
 
-            local prompt = canuseradial and getZoneLabel(zone.type) or '[E] ' .. getZoneLabel(zone.type)
+            local prompt = canuseradial and getZoneLabel(zone) or '[E] ' .. getZoneLabel(zone)
 
             if canuseradial then
                 addtoradial(zone)
@@ -147,8 +147,8 @@ CreateThread(function()
 
                     if distance < 2.0 then
                         local settings = CacheAPI.getAppearanceSettings()
-                        local prompt = settings.useRadialMenu and getZoneLabel(marker.zone.type) or
-                        '[E] ' .. getZoneLabel(marker.zone.type)
+                        local prompt = settings.useRadialMenu and getZoneLabel(marker.zone) or
+                        '[E] ' .. getZoneLabel(marker.zone)
                         lib.showTextUI(prompt)
 
                         if not settings.useRadialMenu and IsControlJustPressed(0, 38) then -- E key (only if not using radial menu)

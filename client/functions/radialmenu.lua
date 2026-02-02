@@ -1,5 +1,5 @@
 --Waiting for CacheAPI to be available...
-while not CacheAPI.getAppearanceSettings().useRadialMenu do
+while not CacheAPI.getAppearanceSettings().useRadialMenu == nil do
     Wait(100)
 end
 
@@ -54,7 +54,6 @@ end
 
 -- Determine if radial menu should be used
 function shouldUseRadialMenu()
-    print('Radial Menu Enabled:', radialMenuEnabled)
     return radialMenuEnabled and radialscript ~= nil
 end
 

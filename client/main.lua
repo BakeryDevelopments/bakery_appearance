@@ -25,6 +25,7 @@ function OpenAppearanceMenu(zone)
 
     local menuType = zone?.type or 'clothing'
     _CurrentMenuType = menuType  -- Set global menu type for save callback
+    _CustomPrice = zone?.price  -- Store custom price if set
 
     -- Get player's current model to determine gender
     local model = GetPedModalHash(cache.ped)
@@ -140,6 +141,7 @@ RegisterNuiCallback('save', function(data, cb)
   -- Get current appearance and save to database
   local appearance = GetAppearance(cache.ped)
   appearance.menuType = _CurrentMenuType or 'clothing'  -- Include menu type for pricing
+  appearance.customPrice = _CustomPrice  -- Include custom price if set
   
   lib.callback('bakery_appearance:saveAppearance', false, function(success)
     if success then

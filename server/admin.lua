@@ -206,7 +206,6 @@ local function LoadAppearanceSettingsCache()
 
         if type(decoded) == 'table' then
             ServerCache.appearanceSettings.useTarget = decoded.useTarget ~= nil and decoded.useTarget or false
-            ServerCache.appearanceSettings.enablePedsForShops = decoded.enablePedsForShops ~= nil and decoded.enablePedsForShops or false
             ServerCache.appearanceSettings.useRadialMenu = decoded.useRadialMenu ~= nil and decoded.useRadialMenu or false
             ServerCache.appearanceSettings.blips = decoded.blips or {}
             ServerCache.appearanceSettings.prices = decoded.prices or {}

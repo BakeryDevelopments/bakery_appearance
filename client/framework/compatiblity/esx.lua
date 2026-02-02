@@ -111,7 +111,7 @@ RegisterNetEvent("skinchanger:loadSkin", function(skin, cb)
             end, convertedAppearance)
             return
         else
-            print('No skin data provided to skinchanger:loadSkin')
+            --print('No skin data provided to skinchanger:loadSkin')
             SetModel(cache.ped, MODELS.MALE)
         end
         Framework.CachePed()
@@ -138,12 +138,12 @@ local SkinchangerExports = {
         end)
     end },
     { 'LoadSkin', function(data)
-        print('Loading skin via export...')
-        print(json.encode(data))
+        -- print('Loading skin via export...')
+        -- print(json.encode(data))
     end },
     { 'LoadClothes', function(data)
-        print('Loading vlothes via export...')
-        print(json.encode(data))
+        -- print('Loading vlothes via export...')
+        -- print(json.encode(data))
     end },
 
 }
