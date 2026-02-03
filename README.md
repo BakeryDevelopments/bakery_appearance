@@ -141,7 +141,7 @@ exports.bakery_appearance:SetPedAppearance(ped, {
   drawables = { [3] = { index = 3, value = 0, texture = 0 } },
   props = { [0] = { index = 0, value = -1, texture = 0 } },
   headBlend = { shapeFirst = 0, shapeSecond = 0, shapeThird = 0, skinFirst = 0, skinSecond = 0, skinThird = 0, shapeMix = 0.0, skinMix = 0.0, thirdMix = 0.0 },
-  hairColour = { primary = 0, highlight = 0 },
+  hairColour = { Colour = 0, highlight = 0 },
 })
 ```
 
