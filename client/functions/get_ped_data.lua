@@ -102,7 +102,7 @@ function GetPedComponents(ped)
     local Isfreemode = IsFreemodePed(ped)
 
     for i = 0, 11 do
-        local name = peddata.Components[i]
+        local name = peddata.Drawable[i]
         local current = GetPedDrawableVariation(ped, i)
         local drawableCount = GetNumberOfPedDrawableVariations(ped, i)
         local textureCount = GetNumberOfPedTextureVariations(ped, i, current)

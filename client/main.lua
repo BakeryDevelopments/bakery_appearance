@@ -309,7 +309,7 @@ RegisterNuiCallback('cancel', function(data, cb)
       
       -- Restore hair color
       if data.hairColour then
-        SetPedHairColor(ped, data.hairColour.primary or 0, data.hairColour.highlight or 0)
+        SetPedHairColor(ped, data.hairColour.Colour or 0, data.hairColour.highlight or 0)
       end
       
       -- Restore drawables (clothing)
@@ -525,25 +525,18 @@ RegisterNuiCallback('getPlayerCoords', function(_, cb)
   cb({ x = x, y = y, z = z, heading = heading })
 end)
 
--- Get current player appearance data (components and props only)
+-- Get current player appearance data (components, props, headBlend, and hair)
 RegisterNuiCallback('getAppearanceData', function(_, cb)
   local ped = cache.ped
   
-  -- Get components and props (ignoring the totals return value)
-  local components = GetPedComponents(ped)
-  local props = GetPedProps(ped)
-  
-  -- Filter out face, and hair from components
-  local filteredComponents = {}
-  for key, value in pairs(components) do
-    if key ~= 'face' and key ~= 'hair' then
-      filteredComponents[key] = value
-    end
-  end
+  -- Get full appearance data (returns a table with all fields)
+  local appearanceData = GetAppearance(ped)
   
   cb({
-    components = filteredComponents,
-    props = props,
+    drawables = appearanceData.drawables,
+    props = appearanceData.props,
+    headBlend = appearanceData.headBlend,
+    hairColour = appearanceData.hairColour,
   })
 end)
 

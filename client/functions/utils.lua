@@ -116,8 +116,8 @@ RegisterNuiCallback('toggleItem', function(info, cb)
 
         if componentIndex ~= nil and item.id then
             -- Check peddata to determine if it's a component or prop
-            local isComponent = peddata.Components[item.component] == item.id or
-                peddata.Components[item.index] == item.id
+            local isComponent = peddata.Drawable[item.component] == item.id or
+                peddata.Drawable[item.index] == item.id
             local isProp = peddata.Props[item.index] == item.id
 
             if isComponent then
@@ -165,12 +165,20 @@ function InitialCreation()
 
     local isMale = gender == 'Male'
 
-    SetupClothing(isMale)
-
-    
-    while IsScreenFadedIn() do
+        while IsScreenFadedOut() do
         Wait(100)
     end
+
+       print("Initial character creation started for " .. (isMale and "male" or "female") .. " character.")
+
+    SetupClothing(isMale)
+
+    Wait(2000)
+
+
+
+
+    print("Initial character creation completed for " .. (isMale and "male" or "female") .. " character.")
 
     TriggerServerEvent('bakery_appearance:server:SetRoutingBucket')
     OpenAppearanceMenu({ type = 'all' ,shouldcharge = false })

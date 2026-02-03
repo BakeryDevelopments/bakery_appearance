@@ -123,7 +123,9 @@ export const ZonesTab: FC<ZonesTabProps> = ({
               <Accordion.Panel>
                 <Stack spacing="md">
                   {group.zones.map((zone, idx) => {
-                    const uniqueKey = zone.id ? `zone-${zone.id}` : `${group.type}-temp-${idx}-${zones.indexOf(zone)}`;
+                    const uniqueKey = zone.id !== undefined
+                      ? `zone-${zone.id}-${idx}`
+                      : `${group.type}-temp-${idx}-${zones.indexOf(zone)}`;
                     return (
                       <Group
                         key={uniqueKey}

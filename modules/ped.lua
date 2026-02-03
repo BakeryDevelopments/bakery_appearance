@@ -1,5 +1,5 @@
 return {
-    Components = {
+    Drawable = {
         [0] = "face",
         [1] = "masks",
         [2] = "hair",

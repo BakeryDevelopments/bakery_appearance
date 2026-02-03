@@ -81,7 +81,7 @@ local ConvertIlleniumTobakery = function(appearance)
     if appearance.components then
         if appearance.hair then
             appearance.hairColour = {
-                primary = appearance.hair.color or 0,
+                primary = appearance.hair.Colour or 0,
                 secondary = appearance.hair.highlight or 0
             }
         end

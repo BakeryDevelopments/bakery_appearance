@@ -23,15 +23,23 @@ local Cache = {
         initialClothes = {
             male = {
                 model = 'mp_m_freemode_01',
-                components = {},
+                drawables = {},
                 props = {},
                 hair = { color = 0, highlight = 0, style = 0, texture = 0 }
             },
             female = {
                 model = 'mp_f_freemode_01',
-                components = {},
+                drawables = {},
                 props = {},
                 hair = { color = 0, highlight = 0, style = 0, texture = 0 }
+            }
+        },
+        initialFeatures = {
+            male = {
+                headBlend = {}
+            },
+            female = {
+                headBlend = {}
             }
         }
     },
@@ -110,14 +118,14 @@ local function loadAppearanceSettings()
 
     -- Initialize default components with proper names (0-11)
     for i = 0, 11 do
-        local name = peddata.Components[i]
-        Cache.appearanceSettings.initialClothes.male.components[name] = {
+        local name = peddata.Drawable[i]
+        Cache.appearanceSettings.initialClothes.male.drawables[name] = {
             id = name,
             index = i,
             value = 0,
             texture = 0
         }
-        Cache.appearanceSettings.initialClothes.female.components[name] = {
+        Cache.appearanceSettings.initialClothes.female.drawables[name] = {
             id = name,
             index = i,
             value = 0,
@@ -151,7 +159,40 @@ local function loadAppearanceSettings()
             Cache.appearanceSettings.chargePerTattoo = decoded.chargePerTattoo ~= nil and decoded.chargePerTattoo or Cache.appearanceSettings.chargePerTattoo
             Cache.appearanceSettings.blips = decoded.blips or Cache.appearanceSettings.blips
             Cache.appearanceSettings.prices = decoded.prices or Cache.appearanceSettings.prices
-            Cache.appearanceSettings.initialClothes = decoded.initialClothes or Cache.appearanceSettings.initialClothes
+            if decoded.initialClothes then
+                for _, gender in ipairs({ 'male', 'female' }) do
+                    local cachedGender = Cache.appearanceSettings.initialClothes[gender]
+                    local decodedGender = decoded.initialClothes[gender]
+
+                    if type(decodedGender) == 'table' then
+                        cachedGender.model = decodedGender.model or cachedGender.model
+                        -- Support both hair and hairColour for backwards compatibility
+                        cachedGender.hair = decodedGender.hair or decodedGender.hairColour or cachedGender.hair
+
+                        if type(decodedGender.drawables) == 'table' then
+                            for key, value in pairs(decodedGender.drawables) do
+                                cachedGender.drawables[key] = value
+                            end
+                        end
+
+                        if type(decodedGender.props) == 'table' then
+                            for key, value in pairs(decodedGender.props) do
+                                cachedGender.props[key] = value
+                            end
+                        end
+                    end
+                end
+            end
+            if decoded.initialFeatures then
+                for _, gender in ipairs({ 'male', 'female' }) do
+                    local cachedGender = Cache.appearanceSettings.initialFeatures[gender]
+                    local decodedGender = decoded.initialFeatures[gender]
+
+                    if type(decodedGender) == 'table' then
+                        cachedGender.headBlend = decodedGender.headBlend or cachedGender.headBlend
+                    end
+                end
+            end
         end
     end
 

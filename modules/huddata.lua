@@ -41,11 +41,11 @@ end
 
 function HudToggle(boolean)
     for hudname, actions in pairs(DetectedHuds) do
-        print("^2[HUD Manager]^7 Toggled " .. hudname .. " to " .. tostring(boolean))
+        --print("^2[HUD Manager]^7 Toggled " .. hudname .. " to " .. tostring(boolean))
         if boolean then
             local action = actions['toggleon']
             if action.exports then
-                print("^2[HUD Manager]^7 Calling export " .. action.exports, " with args " .. tostring(action.args))
+                --print("^2[HUD Manager]^7 Calling export " .. action.exports, " with args " .. tostring(action.args))
                 if action.args ~= nil then
                     exports[hudname][action.exports](nil,action.args)
                 else

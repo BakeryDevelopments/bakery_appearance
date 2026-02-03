@@ -22,17 +22,17 @@ local SkinchangerToAppearance = function(skin)
 
     appearance.drawables = {}
     local compSpecs = {
-        { peddata.Components[1],  1,  skin.mask_1,   skin.mask_2 },   -- masks
-        { peddata.Components[2],  2,  skin.hair_1,   skin.hair_2 },   -- hair
-        { peddata.Components[3],  3,  skin.arms,     skin.arms_2 },   -- torsos
-        { peddata.Components[4],  4,  skin.pants_1,  skin.pants_2 },  -- legs
-        { peddata.Components[5],  5,  skin.bags_1,   skin.bags_2 },   -- bags
-        { peddata.Components[6],  6,  skin.shoes_1,  skin.shoes_2 },  -- shoes
-        { peddata.Components[7],  7,  skin.chain_1,  skin.chain_2 },  -- neck
-        { peddata.Components[8],  8,  skin.shirt_1,  skin.shirt_2 },  -- shirts
-        { peddata.Components[9],  9,  skin.bproof_1, skin.bproof_2 }, -- vest
-        { peddata.Components[10], 10, skin.decals_1, skin.decals_2 }, -- decals
-        { peddata.Components[11], 11, skin.torso_1,  skin.torso_2 },  -- jackets
+        { peddata.Drawable[1],  1,  skin.mask_1,   skin.mask_2 },   -- masks
+        { peddata.Drawable[2],  2,  skin.hair_1,   skin.hair_2 },   -- hair
+        { peddata.Drawable[3],  3,  skin.arms,     skin.arms_2 },   -- torsos
+        { peddata.Drawable[4],  4,  skin.pants_1,  skin.pants_2 },  -- legs
+        { peddata.Drawable[5],  5,  skin.bags_1,   skin.bags_2 },   -- bags
+        { peddata.Drawable[6],  6,  skin.shoes_1,  skin.shoes_2 },  -- shoes
+        { peddata.Drawable[7],  7,  skin.chain_1,  skin.chain_2 },  -- neck
+        { peddata.Drawable[8],  8,  skin.shirt_1,  skin.shirt_2 },  -- shirts
+        { peddata.Drawable[9],  9,  skin.bproof_1, skin.bproof_2 }, -- vest
+        { peddata.Drawable[10], 10, skin.decals_1, skin.decals_2 }, -- decals
+        { peddata.Drawable[11], 11, skin.torso_1,  skin.torso_2 },  -- jackets
     }
     for _, spec in ipairs(compSpecs) do
         local entry = buildEntry(table.unpack(spec))

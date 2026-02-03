@@ -151,7 +151,8 @@ export const AdminMenu: FC = () => {
     model: string;
     components: Array<{ drawable: number; texture: number }>;
     props: Array<{ drawable: number; texture: number }>;
-    hair: { color: number; highlight: number; style: number; texture: number };
+    hairColour?: { Colour: number; highlight: number };
+    hair?: { color: number; highlight: number; style: number; texture: number }; // Legacy support
   }
   
   const [initialClothes, setInitialClothes] = useState<{
@@ -162,14 +163,22 @@ export const AdminMenu: FC = () => {
       model: 'mp_m_freemode_01',
       components: Array(12).fill(null).map(() => ({ drawable: 0, texture: 0 })),
       props: Array(5).fill(null).map(() => ({ drawable: -1, texture: -1 })),
-      hair: { color: 0, highlight: 0, style: 0, texture: 0 }
+      hairColour: { Colour: 0, highlight: 0 }
     },
     female: {
       model: 'mp_f_freemode_01',
       components: Array(12).fill(null).map(() => ({ drawable: 0, texture: 0 })),
       props: Array(5).fill(null).map(() => ({ drawable: -1, texture: -1 })),
-      hair: { color: 0, highlight: 0, style: 0, texture: 0 }
+      hairColour: { Colour: 0, highlight: 0 }
     }
+  });
+
+  const [initialFeatures, setInitialFeatures] = useState<{
+    male: { headBlend?: any };
+    female: { headBlend?: any };
+  }>({
+    male: { headBlend: {} },
+    female: { headBlend: {} }
   });
 
   // Loading State
@@ -246,7 +255,20 @@ export const AdminMenu: FC = () => {
   });
 
   HandleNuiMessage<Zone[]>('setZones', (data) => {
-    setZones(data);
+    if (!Array.isArray(data)) {
+      setZones([]);
+      return;
+    }
+
+    const seen = new Set<number>();
+    const deduped = data.filter((zone) => {
+      if (zone.id === undefined || zone.id === null) return true;
+      if (seen.has(zone.id)) return false;
+      seen.add(zone.id);
+      return true;
+    });
+
+    setZones(deduped);
   });
 
   HandleNuiMessage<any>('setTattoos', (data) => {
@@ -303,9 +325,10 @@ export const AdminMenu: FC = () => {
 
   HandleNuiMessage<AppearanceSettings>('setAppearanceSettings', (data) => {
     if (data) {
-      const { initialClothes: clothes, ...settings } = data as any;
+      const { initialClothes: clothes, initialFeatures: features, ...settings } = data as any;
       setAppearanceSettings(settings);
       if (clothes) setInitialClothes(clothes);
+      if (features) setInitialFeatures(features);
     }
   });
 
@@ -318,6 +341,13 @@ export const AdminMenu: FC = () => {
     female: ClothingConfig;
   }>('setInitialClothes', (data) => {
     if (data) setInitialClothes(data);
+  });
+
+  HandleNuiMessage<{
+    male: { headBlend?: any };
+    female: { headBlend?: any };
+  }>('setInitialFeatures', (data) => {
+    if (data) setInitialFeatures(data);
   });
 
 
@@ -711,6 +741,8 @@ export const AdminMenu: FC = () => {
                   setAppearanceSettings={setAppearanceSettings}
                   initialClothes={initialClothes}
                   setInitialClothes={setInitialClothes}
+                  initialFeatures={initialFeatures}
+                  setInitialFeatures={setInitialFeatures}
                   locale={locale}
                   isLoading={isLoadingTab && activeTab === 'settings'}
                 />

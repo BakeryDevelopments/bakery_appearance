@@ -315,6 +315,14 @@ lib.callback.register('bakery_appearance:admin:saveAppearanceSettings', function
                 props = {},
                 hair = { color = 0, highlight = 0, style = 0, texture = 0 }
             }
+        },
+        initialFeatures = settings.initialFeatures or {
+            male = {
+                headBlend = { shapeFirst = 0, shapeSecond = 0, shapeThird = 0, skinFirst = 0, skinSecond = 0, skinThird = 0, shapeMix = 0, skinMix = 0, thirdMix = 0 }
+            },
+            female = {
+                headBlend = { shapeFirst = 0, shapeSecond = 0, shapeThird = 0, skinFirst = 0, skinSecond = 0, skinThird = 0, shapeMix = 0, skinMix = 0, thirdMix = 0 }
+            }
         }
     }
 

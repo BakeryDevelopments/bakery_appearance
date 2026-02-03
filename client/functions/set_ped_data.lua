@@ -2,9 +2,9 @@ _CurrentTattoos = _CurrentTattoos or {}
 
 function SetHeadOverlay(ped, HeadBlendData)
 
-
     if HeadBlendData.index == 13 then
-        SetPedEyeColor(ped, HeadBlendData.overlayValue)
+        SetPedEyeColor(ped, HeadBlendData.value)
+        return
     end
 
     if HeadBlendData.id == 'hairColour' then
@@ -106,7 +106,7 @@ end
 exports('SetPedProps', SetProps);
 
 
-function SetModel(ped, Model)
+function SetModel(ped, Model, headblend)
     if not Model then return ped end
     local hash = Model
     if type(hash) == 'string' then hash = joaat(Model) end
@@ -158,7 +158,13 @@ function SetModel(ped, Model)
         SetPedDefaultComponentVariation(ped)
         -- Check if the model is male or female, then change the face mix based on this.
         if hash == `mp_m_freemode_01` then
-            SetPedHeadBlendData(ped, 0, 0, 0, 0, 0, 0, 0, 0, 0, false)
+
+            if headblend then
+                SetPedHeadBlendData(ped, 0, 0, 0, 0, 0, 0, 0, 0, 0, false)
+            else
+                SetPedHeadBlendData(ped, 0, 0, 0, 0, 0, 0, 0, 0, 0, false)
+            end
+            
         elseif hash == `mp_f_freemode_01` then
             SetPedHeadBlendData(ped, 45, 21, 0, 20, 15, 0, 0.3, 0.1, 0, false)
         end
@@ -362,9 +368,13 @@ function SetPedAppearance(ped, data)
             SetFaceFeatures(ped, features)
         end
 
-        -- Handle hair color
-        if data.hairColour then
-            SetPedHairTint(ped, data.hairColour.primary or 0, data.hairColour.highlight or 0)
+        -- Handle hair color (support both formats)
+        local hairData = data.hairColour or data.hair
+        if hairData then
+            local color = hairData.Colour or hairData.color or 0
+            local highlight = hairData.highlight or 0
+            DebugPrint(string.format("Setting hair color: %s, highlight: %s", color, highlight))
+            SetPedHairTint(ped, color, highlight)
         end
 
         -- Handle tattoos
@@ -376,20 +386,21 @@ end
 
 
 function SetupClothing(isMale)
-    local ped = cache.ped
 
     if isMale == nil then
-        isMale = IsPedMale(ped)
+        isMale = IsPedMale(cache.ped)
     end
 
     local baseclothing = CacheAPI.getAppearanceSettings().initialClothes
 
     if isMale then
-        SetModel(ped, `mp_m_freemode_01`)
-        SetPedAppearance(ped, baseclothing.male)
+        SetModel(cache.ped, joaat(baseclothing.male.model))
+        Wait(500)
+        SetPedAppearance(cache.ped, baseclothing.male)
     else
-        SetModel(ped, `mp_f_freemode_01`)
-        SetPedAppearance(ped, baseclothing.female)
+        SetModel(cache.ped, joaat(baseclothing.female.model))
+        Wait(500)
+        SetPedAppearance(cache.ped, baseclothing.female)
     end
 
 

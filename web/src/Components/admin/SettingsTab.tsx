@@ -3,12 +3,14 @@ import { Stack, Group, Checkbox, Divider, NumberInput, Box, Text, Button, Loader
 import { TriggerNuiCallback } from '../../Utils/TriggerNuiCallback';
 
 const InitialClothesTab = lazy(() => import('./InitialClothesTab').then(mod => ({ default: mod.InitialClothesTab })));
+const InitialFeaturesTab = lazy(() => import('./InitialFeaturesTab').then(mod => ({ default: mod.InitialFeaturesTab })));
 
 interface ClothingConfig {
   model: string;
   components: Array<{ drawable: number; texture: number }>;
   props: Array<{ drawable: number; texture: number }>;
-  hair: { color: number; highlight: number; style: number; texture: number };
+  hairColour?: { Colour: number; highlight: number };
+  hair?: { color: number; highlight: number; style: number; texture: number }; // Legacy support
 }
 
 interface AppearanceSettings {
@@ -87,7 +89,7 @@ const BlipConfigBox = memo(({
         <input
           type="text"
           placeholder="Name"
-          value={blip.name || ''}
+          value={blip.name ?? ''}
           onChange={handleNameChange}
           style={{
             padding: '6px',
@@ -113,6 +115,11 @@ interface SettingsTabProps {
     female: ClothingConfig;
   };
   setInitialClothes: (clothes: { male: ClothingConfig; female: ClothingConfig }) => void;
+  initialFeatures?: {
+    male: Record<string, any>;
+    female: Record<string, any>;
+  };
+  setInitialFeatures?: (features: { male: Record<string, any>; female: Record<string, any> }) => void;
   locale: Record<string, string>;
   isLoading?: boolean;
 }
@@ -122,11 +129,14 @@ export const SettingsTab: FC<SettingsTabProps> = ({
   setAppearanceSettings,
   initialClothes,
   setInitialClothes,
+  initialFeatures,
+  setInitialFeatures,
   locale,
   isLoading = false,
 }) => {
   // Local state to batch updates
   const [localSettings, setLocalSettings] = useState(appearanceSettings);
+  const [localFeatures, setLocalFeatures] = useState(initialFeatures || { male: {}, female: {} });
   const [localClothes, setLocalClothes] = useState(initialClothes);
 
   // Sync with parent when props change externally
@@ -138,15 +148,25 @@ export const SettingsTab: FC<SettingsTabProps> = ({
     setLocalClothes(initialClothes);
   }, [initialClothes]);
 
+  useEffect(() => {
+    if (initialFeatures) {
+      setLocalFeatures(initialFeatures);
+    }
+  }, [initialFeatures]);
+
   const handleSaveSettings = useCallback(() => {
     // Update parent state
     setAppearanceSettings(localSettings);
     setInitialClothes(localClothes);
+    if (setInitialFeatures) {
+      setInitialFeatures(localFeatures);
+    }
 
     // Send to backend
     TriggerNuiCallback('saveAppearanceSettings', {
       ...localSettings,
       initialClothes: localClothes,
+      initialFeatures: localFeatures,
     }).then(() => {
       // Optional: Show success message or handle response
     }).catch((error) => {
@@ -235,21 +255,41 @@ export const SettingsTab: FC<SettingsTabProps> = ({
         ))}
       </Group>
 
-      <Divider label={locale.ADMIN_INITIAL_CLOTHES_TITLE || 'Initial Player Clothes'} labelPosition="left" />
-      <Suspense
-        fallback={
-          <Box style={{ padding: '2rem', textAlign: 'center' }}>
-            <Loader size="sm" />
-            <Text c="gray.4" mt="sm" size="xs">Loading initial clothes...</Text>
-          </Box>
-        }
-      >
-        <InitialClothesTab
-          initialClothes={localClothes}
-          setInitialClothes={setLocalClothes}
-          locale={locale}
-        />
-      </Suspense>
+      <Divider label={locale.ADMIN_INITIAL_CLOTHES_TITLE || 'Initial Player Clothing'} labelPosition="left" />
+      <Box p="md" style={{ border: '1px solid rgba(255,255,255,0.05)', borderRadius: 8, backgroundColor: 'rgba(0,0,0,0.2)' }}>
+        <Suspense
+          fallback={
+            <Box style={{ padding: '2rem', textAlign: 'center' }}>
+              <Loader size="sm" />
+              <Text c="gray.4" mt="sm" size="xs">Loading initial clothes...</Text>
+            </Box>
+          }
+        >
+          <InitialClothesTab
+            initialClothes={localClothes}
+            setInitialClothes={setLocalClothes}
+            locale={locale}
+          />
+        </Suspense>
+      </Box>
+
+      <Divider label={locale.ADMIN_INITIAL_FEATURES_TITLE || 'Initial Player Heritage'} labelPosition="left" />
+      <Box p="md" style={{ border: '1px solid rgba(255,255,255,0.05)', borderRadius: 8, backgroundColor: 'rgba(0,0,0,0.2)' }}>
+        <Suspense
+          fallback={
+            <Box style={{ padding: '2rem', textAlign: 'center' }}>
+              <Loader size="sm" />
+              <Text c="gray.4" mt="sm" size="xs">Loading face features...</Text>
+            </Box>
+          }
+        >
+          <InitialFeaturesTab
+            initialFeatures={localFeatures}
+            setInitialFeatures={setLocalFeatures}
+            locale={locale}
+          />
+        </Suspense>
+      </Box>
 
       <Group position="right">
         <Button onClick={handleSaveSettings} disabled={isLoading}>
