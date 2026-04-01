@@ -311,19 +311,17 @@ export const AppearanceStoreProvider: FC<{ children: ReactNode }> = ({ children 
       console.warn('[setHeadOverlay] Ignored update: missing overlay.id', overlay);
       return;
     }
-    TriggerNuiCallback(Send.setHeadOverlay, overlay, 1).then(() => {
-      setAppearance(prev => {
-        if (!prev) return prev;
-        const updated = {
-          ...prev,
-          headOverlay: {
-            ...prev.headOverlay,
-            [overlay.id]: overlay,
-          },
-        };
-        return updated;
-      });
+    setAppearance(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        headOverlay: {
+          ...prev.headOverlay,
+          [overlay.id]: overlay,
+        },
+      };
     });
+    TriggerNuiCallback(Send.setHeadOverlay, overlay, 1);
   };
 
   const setEyeColour = (eyeColour: TValue) => {
@@ -331,6 +329,7 @@ export const AppearanceStoreProvider: FC<{ children: ReactNode }> = ({ children 
   };
 
   const setHairColour = (hairColour: THairColour) => {
+    setAppearance((prev) => prev ? { ...prev, hairColour } : prev);
     TriggerNuiCallback(Send.setHeadOverlay, {
       hairColour: typeof hairColour?.Colour === 'number' && !isNaN(hairColour.Colour) ? hairColour.Colour : 0,
       hairHighlight: typeof hairColour?.highlight === 'number' && !isNaN(hairColour.highlight) ? hairColour.highlight : 0,

@@ -278,4 +278,8 @@ function Database.DeleteJobGangOutfit(job, gang, outfitName, gender)
     return success ~= nil
 end
 
+
+
+
+
 return Database

@@ -113,6 +113,9 @@ export const App: FC = () => {
 
   return (
     <>
+      <div className={classes.fullscreen_background} />
+
+
       <AppearanceMenu animateIn={animateIn} />
       <AppearanceNav animateIn={animateIn} />
 
