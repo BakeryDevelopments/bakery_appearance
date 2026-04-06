@@ -2,7 +2,7 @@ _CurrentTattoos = _CurrentTattoos or {}
 
 function SetHeadOverlay(ped, HeadBlendData)
     if HeadBlendData.index == 13 then
-        SetPedEyeColor(ped, HeadBlendData.value)
+        SetPedEyeColor(ped, HeadBlendData.value or HeadBlendData.overlayValue or 0)
         return
     end
 
@@ -353,8 +353,11 @@ function SetPedAppearance(ped, data)
                     end
                 else
                     -- If it's a keyed table (like {makeUp: {...}, complexion: {...}})
-                    for _, overlay in pairs(data.headOverlay) do
-                        if overlay and overlay.id then
+                    for overlayId, overlay in pairs(data.headOverlay) do
+                        if overlay then
+                            if not overlay.id and type(overlayId) == 'string' then
+                                overlay.id = overlayId
+                            end
                             SetHeadOverlay(ped, overlay)
                         end
                     end

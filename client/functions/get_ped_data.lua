@@ -76,6 +76,7 @@ function GetHeadOverlay(ped)
 
         if name == 'EyeColour' then
             overlaydata[name] = {
+                id = name,
                 index = i,
                 overlayValue = GetPedEyeColor(ped)
             }
@@ -83,6 +84,7 @@ function GetHeadOverlay(ped)
             local _, ovalue, colourtype, firstcolour, secondcolour, oopacity = GetPedHeadOverlayData(ped, i)
 
             overlaydata[name] = {
+                id = name,
                 index = i,
                 overlayValue = ovalue == 255 and -1 or ovalue,
                 colourType = colourtype,

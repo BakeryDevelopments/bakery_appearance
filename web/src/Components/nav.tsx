@@ -34,12 +34,12 @@ const pointIcon = (
   radius: number,
   angle: number,
   limit: number
-): [string, string] => {
+): [number, number] => {
   angle = angle + limit / 2 + limit;
   const radians = degToRad(angle);
   const x = centerX + radius * Math.cos(radians);
   const y = centerY + radius * Math.sin(radians);
-  return [x.toPrecision(5), y.toPrecision(5)];
+  return [x, y];
 };
 
 interface ToggleItem {
@@ -220,7 +220,7 @@ export const AppearanceNav: FC<AppearanceNavProps> = ({ animateIn }) => {
           left: '50%',
           top: '50%',
           transform: 'translate(-50%, -50%)',
-          zIndex: -1,
+          zIndex: 5,
           width: '0',
           height: '0',
           pointerEvents: 'none',
@@ -233,7 +233,7 @@ export const AppearanceNav: FC<AppearanceNavProps> = ({ animateIn }) => {
           const [x, y] = pointIcon(
             0,  // center x
             0,  // center y
-            40,  // radius in rem
+            59.26,  // vh: equivalent to original 40rem @ 1080p, scales proportionally at any resolution
             pieAngle * (tabs.length - index) - pieAngle / 2,
             limit
           );
@@ -257,8 +257,9 @@ export const AppearanceNav: FC<AppearanceNavProps> = ({ animateIn }) => {
                 overflow: 'visible',
                 cursor: 'pointer',
                 pointerEvents: 'auto',
-                left: `${x}rem`,
-                top: `${y}rem`,
+                left: `${x}vh`,
+                top: `${y}vh`,
+
                 transform: 'translate(-50%, -50%)',
                 animation: 'scaleIn 0.75s ease-out',
                 opacity: limit > 0 ? 1 : 0,
@@ -474,7 +475,7 @@ export const AppearanceNav: FC<AppearanceNavProps> = ({ animateIn }) => {
       {/* Toggle Menu */}
       <Box
         style={{
-          width: '7vh',
+          width: 'clamp(76px, 7vh, 90px)',
           left: '3vh',
           position: 'absolute',
           height: '100%',
@@ -497,7 +498,7 @@ export const AppearanceNav: FC<AppearanceNavProps> = ({ animateIn }) => {
                 unstyled
                 onClick={() => handleToggleClick(item)}
                 style={{
-                  height: '7vh',
+                  height: 'clamp(76px, 7vh, 90px)',
                   width: '100%',
                   display: 'grid',
                   placeItems: 'center',
